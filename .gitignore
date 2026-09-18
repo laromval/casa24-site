@@ -1,0 +1,24 @@
+# === Секреты и доступы — НИКОГДА не коммитить ===
+.env
+.env.*
+*secret*
+*password*
+*credentials*
+*.pem
+*.key
+wp-config.php
+docs/secrets/
+docs/*credentials*
+
+# === Технические файлы ===
+node_modules/
+vendor/
+.DS_Store
+Thumbs.db
+*.log
+
+# === Экспорты и бэкапы сайта (тяжёлые, не для git) ===
+*.sql
+*.sql.gz
+uploads-backup/
+wp-content/uploads/
