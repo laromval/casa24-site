@@ -146,7 +146,7 @@ add_filter( 'wp_sitemaps_add_provider', 'glozin_child_disable_users_sitemap', 10
 
 /*
  * -----------------------------------------------------------------------
- * TODO — НЕ решается кодом дочерней темы, см. wp-content/themes/glozin-child/TODO.md
+ * TODO — НЕ решается кодом дочерней темы, см. wp-content/themes/glozin-child-industrial-pro/TODO.md
  * -----------------------------------------------------------------------
  * Пункт 9 раздела 5 ТЗ (дубль "User-agent: *" в robots.txt) и пункт 11
  * (структура языковых URL RO/RU, конфигурация WPML) сознательно НЕ
