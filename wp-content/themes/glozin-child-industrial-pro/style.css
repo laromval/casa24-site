@@ -221,6 +221,27 @@ Text Domain: glozin-child
   gap: 8px;
 }
 
+.ip-topbar__register{
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--on-dark-muted);
+  border-radius: 2px;
+  padding: 8px 14px;
+  color: var(--on-dark);
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.ip-topbar__register:hover{
+  background: var(--accent);
+  border-color: var(--accent);
+  color: oklch(0.15 0.02 255);
+}
+
 /* Иконки избранного/корзины — крупнее и заметнее на тёмном фоне (обратная связь 19.09.2026) */
 .ip-icon-btn{
   position: relative;
