@@ -13,14 +13,13 @@ Text Domain: glozin-child
    4.1 Цветовые токены (oklch) — ТЗ раздел 4.1, значения не изменять
    ===================================================================== */
 :root{
-  /* Тема "light" (по умолчанию) — шапка/хиро/футер светлее, чем в теме
-     "dark" (обратная связь 19.09.2026: "светлая — шапка очень тёмная,
-     надо осветлить"; тёмную тему при этом просили не трогать —
-     её палитра ниже, в :root[data-ip-theme="dark"]). */
-  --bg-dark: oklch(0.34 0.02 255);       /* фон шапки/хиро/футера */
-  --bg-dark-2: oklch(0.42 0.02 255);     /* утилити-полоса/навроу, вторичный тёмный фон */
-  --bg-dark-alt: oklch(0.38 0.02 255);   /* альтернативная плашка (хиро-категории) */
-  --bg-dark-chip: oklch(0.52 0.02 255);  /* кружки-кнопки и hover-состояния на тёмных фонах */
+  /* Шапка/хиро/футер/навроу — фиксированные, не зависят от переключателя
+     темы (обратная связь 19.09.2026: попытка их осветлить в light-теме
+     не понравилась ["блёклая"] — вернули как было изначально). */
+  --bg-dark: oklch(0.20 0.02 255);      /* фон хиро/футера */
+  --bg-dark-2: oklch(0.27 0.02 255);    /* фон навроу (каталог+поиск), цвет текста первой строки */
+  --bg-dark-alt: oklch(0.24 0.02 255);  /* альтернативная плашка (хиро-категории) */
+  --bg-dark-chip: oklch(0.38 0.02 255); /* кружки-кнопки и hover на тёмных фонах вне шапки */
   --accent: oklch(0.70 0.19 45);        /* фирменный оранжевый — акценты, кнопки, цены */
   --accent-dark: oklch(0.52 0.17 45);   /* оранжевый для текста на светлом фоне (цены в карточках) */
   --bg-light: oklch(0.985 0.004 90);    /* фон страницы */
@@ -30,25 +29,33 @@ Text Domain: glozin-child
   --text-muted: oklch(0.50 0.01 255);   /* вторичный текст */
   --on-dark: oklch(0.97 0.005 90);      /* текст на тёмном фоне */
   --on-dark-muted: oklch(0.72 0.01 255);/* вторичный текст на тёмном фоне */
+
+  /* Первая строка (topbar) — по обратной связи 19.09.2026: в теме "light"
+     полностью белая, текст/логотип/кружки-кнопки — цвета второй строки
+     (--bg-dark-2), иконки внутри кружков — светлые для контраста с их
+     собственной заливкой. */
+  --topbar-bg: var(--surface);
+  --topbar-text: var(--bg-dark-2);
+  --topbar-chip-bg: var(--bg-dark-2);
+  --topbar-chip-icon: var(--on-dark);
 }
 
 /* =====================================================================
    Переключатель светлая/тёмная тема сайта (обратная связь 19.09.2026).
-   [data-ip-theme="dark"] на <html> (ставится assets/theme-toggle.js)
-   возвращает исходную, более тёмную палитру шапки/хиро/футера (владельцу
-   понравилась именно она) и перекрашивает светлые секции категорий/
-   товаров/футера в тёмные.
+   Меняет только первую строку шапки (topbar) и светлые секции категорий/
+   товаров/футера — остальное (хиро/навроу/футер-полоса) фиксировано.
    ===================================================================== */
 :root[data-ip-theme="dark"]{
-  --bg-dark: oklch(0.20 0.02 255);
-  --bg-dark-2: oklch(0.27 0.02 255);
-  --bg-dark-alt: oklch(0.24 0.02 255);
-  --bg-dark-chip: oklch(0.38 0.02 255);
   --bg-light: oklch(0.17 0.02 255);
   --surface: oklch(0.22 0.015 255);
   --border: oklch(0.30 0.015 255);
   --text: oklch(0.95 0.005 90);
   --text-muted: oklch(0.72 0.01 255);
+
+  --topbar-bg: var(--bg-dark);
+  --topbar-text: var(--on-dark);
+  --topbar-chip-bg: var(--bg-dark-chip);
+  --topbar-chip-icon: var(--on-dark);
 }
 
 /* =====================================================================
@@ -172,7 +179,7 @@ Text Domain: glozin-child
    утилити-полосу и шапку по обратной связи 19.09.2026.
    ===================================================================== */
 .ip-topbar{
-  background: var(--bg-dark);
+  background: var(--topbar-bg);
   padding: 14px 0;
 }
 
@@ -202,12 +209,20 @@ Text Domain: glozin-child
   height: auto;
 }
 
+/* Первая строка воркмарка в шапке — SVG инлайнится в шаблоне (не через
+   <img>), чтобы её можно было перекрашивать через CSS-токен вместо
+   фиксированного fill в файле логотипа: белая шапка -> текст цвета
+   второй строки, тёмная шапка -> светлый текст (обратная связь 19.09.2026). */
+.ip-logo__line1{
+  fill: var(--topbar-text);
+}
+
 .ip-topbar__info{
   display: flex;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
-  color: var(--on-dark-muted);
+  color: var(--topbar-text);
   font-family: "Work Sans", sans-serif;
   font-size: 13px;
   margin-right: auto;
@@ -217,7 +232,7 @@ Text Domain: glozin-child
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--on-dark);
+  color: var(--topbar-text);
   font-weight: 500;
 }
 
@@ -248,8 +263,8 @@ Text Domain: glozin-child
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  color: var(--on-dark);
-  background: var(--bg-dark-chip);
+  color: var(--topbar-chip-icon);
+  background: var(--topbar-chip-bg);
   border: none;
   cursor: pointer;
 }
@@ -275,7 +290,7 @@ Text Domain: glozin-child
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--bg-dark);
+  border: 2px solid var(--topbar-bg);
 }
 
 .ip-lang-switch{
@@ -289,7 +304,7 @@ Text Domain: glozin-child
 }
 
 .ip-lang-switch a{
-  color: var(--on-dark-muted);
+  color: var(--topbar-text);
   padding: 4px 6px;
 }
 
@@ -305,8 +320,8 @@ Text Domain: glozin-child
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  color: var(--on-dark);
-  background: var(--bg-dark-chip);
+  color: var(--topbar-chip-icon);
+  background: var(--topbar-chip-bg);
   border: none;
   cursor: pointer;
 }
