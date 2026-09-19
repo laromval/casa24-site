@@ -13,8 +13,14 @@ Text Domain: glozin-child
    4.1 Цветовые токены (oklch) — ТЗ раздел 4.1, значения не изменять
    ===================================================================== */
 :root{
-  --bg-dark: oklch(0.20 0.02 255);      /* тёмный фон шапки/хиро/футера */
-  --bg-dark-2: oklch(0.27 0.02 255);    /* верхняя тонкая утилити-полоса, вторичный тёмный фон */
+  /* Тема "light" (по умолчанию) — шапка/хиро/футер светлее, чем в теме
+     "dark" (обратная связь 19.09.2026: "светлая — шапка очень тёмная,
+     надо осветлить"; тёмную тему при этом просили не трогать —
+     её палитра ниже, в :root[data-ip-theme="dark"]). */
+  --bg-dark: oklch(0.34 0.02 255);       /* фон шапки/хиро/футера */
+  --bg-dark-2: oklch(0.42 0.02 255);     /* утилити-полоса/навроу, вторичный тёмный фон */
+  --bg-dark-alt: oklch(0.38 0.02 255);   /* альтернативная плашка (хиро-категории) */
+  --bg-dark-chip: oklch(0.52 0.02 255);  /* кружки-кнопки и hover-состояния на тёмных фонах */
   --accent: oklch(0.70 0.19 45);        /* фирменный оранжевый — акценты, кнопки, цены */
   --accent-dark: oklch(0.52 0.17 45);   /* оранжевый для текста на светлом фоне (цены в карточках) */
   --bg-light: oklch(0.985 0.004 90);    /* фон страницы */
@@ -28,13 +34,16 @@ Text Domain: glozin-child
 
 /* =====================================================================
    Переключатель светлая/тёмная тема сайта (обратная связь 19.09.2026).
-   По умолчанию — токены выше ("light": тёмная шапка + светлые секции
-   категорий/товаров/футера). [data-ip-theme="dark"] на <html> (ставится
-   assets/theme-toggle.js) перекрашивает светлые поверхности в тёмные —
-   шапка/хиро/акцент остаются как есть, меняются только --bg-light/
-   --surface/--border/--text/--text-muted.
+   [data-ip-theme="dark"] на <html> (ставится assets/theme-toggle.js)
+   возвращает исходную, более тёмную палитру шапки/хиро/футера (владельцу
+   понравилась именно она) и перекрашивает светлые секции категорий/
+   товаров/футера в тёмные.
    ===================================================================== */
 :root[data-ip-theme="dark"]{
+  --bg-dark: oklch(0.20 0.02 255);
+  --bg-dark-2: oklch(0.27 0.02 255);
+  --bg-dark-alt: oklch(0.24 0.02 255);
+  --bg-dark-chip: oklch(0.38 0.02 255);
   --bg-light: oklch(0.17 0.02 255);
   --surface: oklch(0.22 0.015 255);
   --border: oklch(0.30 0.015 255);
@@ -240,7 +249,7 @@ Text Domain: glozin-child
   height: 42px;
   border-radius: 50%;
   color: var(--on-dark);
-  background: oklch(0.38 0.02 255);
+  background: var(--bg-dark-chip);
   border: none;
   cursor: pointer;
 }
@@ -297,7 +306,7 @@ Text Domain: glozin-child
   height: 42px;
   border-radius: 50%;
   color: var(--on-dark);
-  background: oklch(0.38 0.02 255);
+  background: var(--bg-dark-chip);
   border: none;
   cursor: pointer;
 }
@@ -560,11 +569,11 @@ Text Domain: glozin-child
 }
 
 .ip-hero-cat:hover{
-  background: oklch(0.32 0.02 255);
+  background: var(--bg-dark-chip);
 }
 
 .ip-hero-cat--alt{
-  background: oklch(0.24 0.02 255);
+  background: var(--bg-dark-alt);
 }
 
 .ip-hero-cat__icon{
