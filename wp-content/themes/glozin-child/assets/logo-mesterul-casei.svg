@@ -1,0 +1,25 @@
+<!--
+  ЗАГЛУШКА ЛОГОТИПА — функциональный placeholder для закрытия проблемы брендинга
+  (docs/tz-redesign-phase1.md, раздел 5, пункт 1: логотип/favicon "Larom VAL" -> Casa24 / Meșterul Casei).
+  Это НЕ финальный дизайн логотипа. Финальную версию должен подготовить дизайнер
+  или media-agent и заменить этот файл (и производный favicon) один в один.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72" role="img" aria-labelledby="logoTitle">
+  <title id="logoTitle">Meșterul Casei — Casa24.md</title>
+
+  <!-- Иконка: дом + ящик с инструментами -->
+  <g transform="translate(4,8)">
+    <rect x="0" y="24" width="56" height="32" rx="2" fill="oklch(0.27 0.02 255)"/>
+    <path d="M -4 26 L 28 2 L 60 26 Z" fill="oklch(0.20 0.02 255)"/>
+    <rect x="10" y="34" width="14" height="22" rx="1" fill="oklch(0.985 0.004 90)"/>
+    <rect x="30" y="30" width="18" height="8" rx="1" fill="oklch(0.70 0.19 45)"/>
+    <rect x="34" y="22" width="4" height="12" fill="oklch(0.70 0.19 45)"/>
+    <circle cx="53" cy="46" r="4" fill="oklch(0.70 0.19 45)"/>
+  </g>
+
+  <!-- Двухстрочный воркмарк -->
+  <text x="76" y="30" font-family="'Barlow Condensed', Arial, sans-serif" font-weight="700"
+        font-size="22" letter-spacing="1.5" fill="oklch(0.20 0.02 255)">MEȘTERUL CASEI</text>
+  <text x="76" y="52" font-family="'Barlow Condensed', Arial, sans-serif" font-weight="600"
+        font-size="15" letter-spacing="2.7" fill="oklch(0.70 0.19 45)">CASA24.MD</text>
+</svg>

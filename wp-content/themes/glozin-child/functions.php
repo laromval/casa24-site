@@ -14,6 +14,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Регистрация location 'primary' для главного меню шапки.
+ *
+ * template-homepage-industrial-pro.php вызывает wp_nav_menu( array( 'theme_location' => 'primary', ... ) ).
+ * Родительская тема Glozin, скорее всего, уже регистрирует свою собственную
+ * location — эта регистрация безвредна и в этом случае (WordPress просто
+ * объединяет массивы locations), а если родитель этого не делает, без неё
+ * wp_nav_menu('primary') не покажет ничего, даже если меню назначено.
+ */
+function glozin_child_register_nav_menus() {
+	register_nav_menus(
+		array(
+			'primary' => __( 'Главное меню (шапка)', 'glozin-child' ),
+		)
+	);
+}
+add_action( 'after_setup_theme', 'glozin_child_register_nav_menus' );
+
+/**
+ * Фолбэк для wp_nav_menu( 'primary' ), пока в wp-admin (Внешний вид → Меню)
+ * ещё не назначено реальное меню на location 'primary'. Показывает
+ * статические пункты из раздела 4.4 ТЗ (Каталог, Двери, Электроинструмент,
+ * Сад и огород, Статьи), переводимые через text domain glozin-child, чтобы
+ * шаблон не выглядел пустым до ручной настройки меню.
+ */
+function glozin_child_primary_nav_fallback() {
+	$items = array(
+		home_url( '/shop/' )               => __( 'Каталог', 'glozin-child' ),
+		home_url( '/product-category/usi/' ) => __( 'Двери', 'glozin-child' ),
+		home_url( '/product-category/electrounelte/' ) => __( 'Электроинструмент', 'glozin-child' ),
+		home_url( '/product-category/gradina/' ) => __( 'Сад и огород', 'glozin-child' ),
+		home_url( '/blog/' )               => __( 'Статьи', 'glozin-child' ),
+	);
+
+	echo '<ul id="primary-menu-fallback" class="ip-nav__fallback-list">';
+	foreach ( $items as $url => $label ) {
+		echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
+	}
+	echo '</ul>';
+}
+
+/**
  * Подключение родительских и дочерних стилей + шрифтов Google Fonts.
  *
  * Раздел 4.2 ТЗ: Barlow Condensed 600/700 (заголовки), Work Sans 400/500/600 (текст).
