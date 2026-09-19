@@ -1,0 +1,709 @@
+/*
+Theme Name: Glozin Child — Industrial Pro
+Theme URI: https://casa24.md
+Description: Дочерняя тема для casa24.md на базе Glozin. Реализует дизайн-направление «Industrial Pro» (ТЗ: docs/tz-redesign-phase1.md, раздел 4) — тёмная шапка/хиро с оранжевым акцентом, Barlow Condensed + Work Sans. Разработана как статический каркас без Elementor.
+Author: Casa24 dev-agent
+Author URI: https://casa24.md
+Template: glozin
+Version: 0.1.0
+Text Domain: glozin-child
+*/
+
+/* =====================================================================
+   4.1 Цветовые токены (oklch) — ТЗ раздел 4.1, значения не изменять
+   ===================================================================== */
+:root{
+  --bg-dark: oklch(0.20 0.02 255);      /* тёмный фон шапки/хиро/футера */
+  --bg-dark-2: oklch(0.27 0.02 255);    /* верхняя тонкая утилити-полоса, вторичный тёмный фон */
+  --accent: oklch(0.70 0.19 45);        /* фирменный оранжевый — акценты, кнопки, цены */
+  --accent-dark: oklch(0.52 0.17 45);   /* оранжевый для текста на светлом фоне (цены в карточках) */
+  --bg-light: oklch(0.985 0.004 90);    /* фон страницы */
+  --surface: oklch(1 0 0);              /* карточки/плашки на светлом фоне */
+  --border: oklch(0.90 0.005 90);       /* тонкие разделители */
+  --text: oklch(0.24 0.01 255);         /* основной текст */
+  --text-muted: oklch(0.50 0.01 255);   /* вторичный текст */
+  --on-dark: oklch(0.97 0.005 90);      /* текст на тёмном фоне */
+  --on-dark-muted: oklch(0.72 0.01 255);/* вторичный текст на тёмном фоне */
+}
+
+/* =====================================================================
+   Базовый reset для каркаса (минимальный — не переопределяем родителя)
+   ===================================================================== */
+.industrial-pro *,
+.industrial-pro *::before,
+.industrial-pro *::after{
+  box-sizing: border-box;
+}
+
+.industrial-pro{
+  background: var(--bg-light);
+  color: var(--text);
+}
+
+.industrial-pro a{
+  color: inherit;
+  text-decoration: none;
+}
+
+.industrial-pro img{
+  max-width: 100%;
+  display: block;
+}
+
+.industrial-pro .container{
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* =====================================================================
+   4.2 Типографика
+   ===================================================================== */
+.industrial-pro h1,
+.industrial-pro h2,
+.industrial-pro h3,
+.industrial-pro .ip-heading,
+.industrial-pro .ip-cat-name,
+.industrial-pro .ip-price,
+.industrial-pro .ip-btn,
+.industrial-pro .ip-nav a{
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.industrial-pro h1{
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.industrial-pro h2,
+.industrial-pro h3{
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.industrial-pro body,
+.industrial-pro p,
+.industrial-pro .ip-product-name,
+.industrial-pro .ip-body-text{
+  font-family: "Work Sans", sans-serif;
+  font-weight: 400;
+}
+
+.industrial-pro .ip-product-name{
+  font-weight: 500;
+}
+
+.industrial-pro strong,
+.industrial-pro .ip-body-strong{
+  font-weight: 600;
+}
+
+/* =====================================================================
+   4.3 Кнопки
+   ===================================================================== */
+.industrial-pro .btn-accent{
+  display: inline-block;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border: none;
+  border-radius: 2px;
+  padding: 14px 26px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.industrial-pro .btn-accent:hover{
+  opacity: 0.88;
+  color: oklch(0.15 0.02 255);
+}
+
+.industrial-pro .btn-outline{
+  display: inline-block;
+  background: transparent;
+  color: var(--on-dark);
+  border: 2px solid var(--on-dark);
+  border-radius: 2px;
+  padding: 14px 26px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.industrial-pro .btn-outline:hover{
+  background: var(--on-dark);
+  color: var(--bg-dark);
+}
+
+/* =====================================================================
+   4.4.1 Утилити-полоса
+   ===================================================================== */
+.ip-utility-bar{
+  background: var(--bg-dark-2);
+  color: var(--on-dark-muted);
+  font-size: 13px;
+}
+
+.ip-utility-bar .container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.ip-utility-bar__contacts,
+.ip-utility-bar__links{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.ip-utility-bar a:hover{
+  color: var(--on-dark);
+}
+
+/* =====================================================================
+   4.4.2 Шапка
+   ===================================================================== */
+.ip-header{
+  background: var(--bg-dark);
+  padding: 14px 0;
+}
+
+.ip-header .container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.ip-logo{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ip-logo img,
+.ip-logo svg{
+  height: 44px;
+  width: auto;
+}
+
+.ip-logo__wordmark{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.ip-logo__line1{
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--on-dark);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+}
+
+.ip-logo__line2{
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+}
+
+.ip-nav{
+  order: 3;
+  flex-basis: 100%;
+}
+
+.ip-nav ul{
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  margin: 0;
+  padding: 12px 0 0;
+  flex-wrap: wrap;
+}
+
+.ip-nav a{
+  color: var(--on-dark);
+  font-size: 15px;
+  letter-spacing: 0.03em;
+}
+
+.ip-nav a:hover{
+  color: var(--accent);
+}
+
+.ip-header__icons{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.ip-icon-btn{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--on-dark);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.ip-icon-btn:hover{
+  color: var(--accent);
+}
+
+.ip-icon-btn__badge{
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Desktop: одна строка для шапки, навигация по центру */
+@media (min-width: 992px){
+  .ip-nav{
+    order: 2;
+    flex-basis: auto;
+  }
+
+  .ip-header .container{
+    flex-wrap: nowrap;
+  }
+
+  .ip-nav ul{
+    padding-top: 0;
+  }
+}
+
+/* =====================================================================
+   4.4.3 Хиро
+   ===================================================================== */
+.ip-hero{
+  background: var(--bg-dark);
+  padding: 48px 0 56px;
+}
+
+.ip-hero .container{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.ip-hero__badge{
+  display: inline-block;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+
+.ip-hero__title{
+  color: var(--on-dark);
+  font-size: 34px;
+  margin: 0 0 16px;
+}
+
+.ip-hero__title em{
+  font-style: normal;
+  color: var(--accent);
+}
+
+.ip-hero__subtitle{
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 24px;
+  max-width: 46ch;
+}
+
+.ip-hero__actions{
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.ip-hero__usp{
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+}
+
+.ip-hero__usp li{
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Сетка 2x2 категорий-плашек в хиро */
+.ip-hero__categories{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.ip-hero-cat{
+  background: var(--bg-dark-2);
+  border-radius: 4px;
+  padding: 20px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--on-dark);
+  transition: background-color 0.15s ease;
+}
+
+.ip-hero-cat:hover{
+  background: oklch(0.32 0.02 255);
+}
+
+.ip-hero-cat--alt{
+  background: oklch(0.24 0.02 255);
+}
+
+.ip-hero-cat__icon{
+  width: 28px;
+  height: 28px;
+  color: var(--accent);
+}
+
+.ip-hero-cat__label{
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 15px;
+}
+
+@media (min-width: 992px){
+  .ip-hero .container{
+    grid-template-columns: 58% 42%;
+    align-items: center;
+  }
+
+  .ip-hero__title{
+    font-size: 58px;
+  }
+}
+
+/* =====================================================================
+   4.4.4 Категории (светлый фон)
+   ===================================================================== */
+.ip-section{
+  padding: 56px 0;
+}
+
+.ip-section__head{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.ip-section__head h2{
+  font-size: 28px;
+  margin: 0;
+  color: var(--text);
+}
+
+.ip-section__link{
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent-dark);
+  white-space: nowrap;
+}
+
+.ip-section__link:hover{
+  text-decoration: underline;
+}
+
+.ip-categories-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.ip-category-card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+  text-align: left;
+}
+
+.ip-category-card__badge{
+  width: 56px;
+  height: 56px;
+  background: var(--bg-dark);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.ip-category-card__badge svg,
+.ip-category-card__badge img{
+  width: 28px;
+  height: 28px;
+  color: var(--accent);
+}
+
+.ip-category-card__name{
+  font-size: 18px;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.ip-category-card__desc{
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+@media (min-width: 576px){
+  .ip-categories-grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px){
+  .ip-categories-grid{
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* =====================================================================
+   4.4.5 Сетка товаров («Топ продаж» / «Популярные товары»)
+   ===================================================================== */
+.ip-products-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.ip-product-card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ip-product-card__photo{
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  background: var(--bg-light);
+  overflow: hidden;
+}
+
+.ip-product-card__photo img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ip-product-card__body{
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.ip-product-card__name{
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(14px * 1.4 * 2);
+}
+
+.ip-product-card__footer{
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ip-product-card__price{
+  font-size: 20px;
+  color: var(--accent-dark);
+  white-space: nowrap;
+}
+
+.ip-product-card__cart-btn{
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: var(--bg-dark);
+  border: none;
+  border-radius: 2px;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ip-product-card__cart-btn:hover{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+@media (min-width: 576px){
+  .ip-products-grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px){
+  .ip-products-grid{
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.ip-section--muted{
+  background: var(--bg-light);
+}
+
+/* =====================================================================
+   4.4.6 Футер-полоса (акцентный нижний слой; полный футер темы — отдельно)
+   ===================================================================== */
+.ip-footer-bar{
+  background: var(--bg-dark);
+  padding: 22px 0;
+}
+
+.ip-footer-bar .container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ip-footer-bar__wordmark{
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-dark);
+  font-size: 16px;
+}
+
+.ip-footer-bar__wordmark span{
+  color: var(--accent);
+}
+
+.ip-footer-bar__copy{
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+}
+
+/* =====================================================================
+   Мобильная адаптивность — контрольные брейкпоинты 375px и 768px
+   ===================================================================== */
+@media (max-width: 767px){
+  .ip-hero{
+    padding: 32px 0 40px;
+  }
+
+  .ip-hero__title{
+    font-size: 28px;
+  }
+
+  .ip-hero__categories{
+    gap: 10px;
+  }
+
+  .ip-section{
+    padding: 36px 0;
+  }
+
+  .ip-section__head h2{
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 424px){
+  .ip-hero__categories{
+    grid-template-columns: 1fr;
+  }
+
+  .ip-hero__actions{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ip-hero__actions .btn-accent,
+  .ip-hero__actions .btn-outline{
+    text-align: center;
+  }
+
+  .ip-utility-bar .container{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
