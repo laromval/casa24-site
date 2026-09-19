@@ -178,6 +178,10 @@ Text Domain: glozin-child
 .ip-logo{
   display: flex;
   align-items: center;
+  /* Ширина = ширине кнопки "Каталог"/выпадающего списка ниже (обратная
+     связь 19.09.2026) — визуально логотип и каталог образуют один блок. */
+  width: 220px;
+  flex-shrink: 0;
 }
 
 .ip-logo img,
@@ -326,11 +330,17 @@ Text Domain: glozin-child
 
 .ip-catalog{
   position: relative;
+  /* Та же ширина, что у .ip-logo — по обратной связи 19.09.2026, чтобы
+     логотип и кнопка "Каталог" образовывали единый блок по вертикали. */
+  width: 220px;
+  flex-shrink: 0;
 }
 
 .ip-catalog__toggle{
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   background: var(--accent);
   color: oklch(0.15 0.02 255);
@@ -350,7 +360,7 @@ Text Domain: glozin-child
   top: 100%;
   left: 0;
   z-index: 20;
-  min-width: 220px;
+  width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -772,38 +782,166 @@ Text Domain: glozin-child
 }
 
 /* =====================================================================
-   4.4.6 Футер-полоса (акцентный нижний слой; полный футер темы — отдельно)
+   4.4.6 Футер — переделан по обратной связи 19.09.2026 (референс: футер
+   конкурента Supraten.md, контент — только наши реальные страницы)
    ===================================================================== */
-.ip-footer-bar{
-  background: var(--bg-dark);
-  padding: 22px 0;
+.ip-footer__social-bar{
+  background: var(--bg-dark-2);
 }
 
-.ip-footer-bar .container{
+.ip-footer__social-bar .container{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   flex-wrap: wrap;
-}
-
-.ip-footer-bar__wordmark{
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--on-dark-muted);
   font-family: "Barlow Condensed", sans-serif;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--on-dark);
-  font-size: 16px;
+  font-size: 13px;
 }
 
-.ip-footer-bar__wordmark span{
+.ip-footer__social-links{
+  display: flex;
+  gap: 10px;
+}
+
+.ip-footer__social-links a{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: oklch(1 0 0 / 8%);
+  color: var(--on-dark);
+}
+
+.ip-footer__social-links a:hover{
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+}
+
+.ip-footer__main{
+  background: var(--bg-dark);
+  padding: 48px 0;
+}
+
+.ip-footer__grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.ip-footer__brand{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.ip-footer__phone,
+.ip-footer__address{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+}
+
+.ip-footer__phone:hover,
+.ip-footer__address:hover{
   color: var(--accent);
 }
 
-.ip-footer-bar__copy{
+.ip-footer__col h3{
+  color: var(--on-dark);
+  font-size: 15px;
+  margin: 0 0 16px;
+}
+
+.ip-footer__col ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ip-footer__col a{
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+}
+
+.ip-footer__col a:hover{
+  color: var(--accent);
+}
+
+@media (min-width: 768px){
+  .ip-footer__grid{
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  }
+}
+
+.ip-footer__bottom{
+  background: var(--bg-dark-2);
+  border-top: 1px solid oklch(1 0 0 / 8%);
+  padding: 16px 0;
+}
+
+.ip-footer__bottom-row{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ip-footer__bottom-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--on-dark-muted);
   font-family: "Work Sans", sans-serif;
   font-size: 13px;
+}
+
+.ip-footer__bottom-link:hover{
+  color: var(--accent);
+}
+
+.ip-footer__copy{
+  margin-left: auto;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+}
+
+.ip-scroll-top{
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px oklch(0 0 0 / 25%);
+}
+
+.ip-scroll-top:hover{
+  opacity: 0.9;
 }
 
 /* =====================================================================
@@ -841,9 +979,22 @@ Text Domain: glozin-child
     align-items: stretch;
   }
 
+  .ip-catalog{
+    width: 100%;
+  }
+
   .ip-search{
     max-width: none;
     margin: 0;
+  }
+
+  .ip-footer__bottom-row{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ip-footer__copy{
+    margin-left: 0;
   }
 }
 

@@ -95,6 +95,15 @@ function glozin_child_enqueue_assets() {
 		wp_get_theme()->get( 'Version' ),
 		true
 	);
+
+	// Кнопка "наверх страницы" в футере (обратная связь 19.09.2026).
+	wp_enqueue_script(
+		'glozin-child-ui-interactions',
+		get_stylesheet_directory_uri() . '/assets/ui-interactions.js',
+		array(),
+		wp_get_theme()->get( 'Version' ),
+		true
+	);
 }
 add_action( 'wp_enqueue_scripts', 'glozin_child_enqueue_assets' );
 
