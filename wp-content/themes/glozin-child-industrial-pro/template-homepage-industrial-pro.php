@@ -99,34 +99,17 @@ get_header();
 <div class="industrial-pro">
 
 	<!-- =================================================================
-	     1. Утилити-полоса
-	     ================================================================= -->
-	<div class="ip-utility-bar">
-		<div class="container">
-			<div class="ip-utility-bar__contacts">
-				<a href="tel:+37300000000">
-					<?php esc_html_e( '+373 00 000 000', 'glozin-child' ); ?>
-				</a>
-				<a href="mailto:info@casa24.md">info@casa24.md</a>
-			</div>
-			<nav class="ip-utility-bar__links" aria-label="<?php esc_attr_e( 'Дополнительная навигация', 'glozin-child' ); ?>">
-				<a href="<?php echo esc_url( home_url( '/dostavka-i-oplata/' ) ); ?>">
-					<?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?>
-				</a>
-				<a href="<?php echo esc_url( home_url( '/o-nas/' ) ); ?>">
-					<?php esc_html_e( 'О нас', 'glozin-child' ); ?>
-				</a>
-				<a href="<?php echo esc_url( home_url( '/contacte/' ) ); ?>">
-					<?php esc_html_e( 'Контакты', 'glozin-child' ); ?>
-				</a>
-			</nav>
-		</div>
-	</div>
+	     1. Верхняя строка: логотип, телефон/часы, избранное/корзина,
+	     язык, переключатель светлая/тёмная тема.
 
-	<!-- =================================================================
-	     2. Шапка
+	     ВАЖНО для деплоя (см. TODO.md): в реальной теме сайта эта
+	     разметка должна заменить существующий header.php/inc/header,
+	     а не просто вывестись НИЖЕ него — иначе на сайте будут два
+	     заголовка друг под другом. get_header() ниже по коду вызывает
+	     заголовок ТЕКУЩЕЙ активной темы, который на сайте уже содержит
+	     свою шапку — при переносе на прод это надо свести в одно место.
 	     ================================================================= -->
-	<header class="ip-header">
+	<div class="ip-topbar">
 		<div class="container">
 			<a class="ip-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Casa24.md — на главную', 'glozin-child' ); ?>">
 				<?php
@@ -135,33 +118,24 @@ get_header();
 				 * и README.md). Заменяет прежний логотип "Larom Val" — пункт 1 раздела 5 ТЗ.
 				 */
 				?>
-				<img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/logo-mesterul-casei.svg' ); ?>" alt="<?php esc_attr_e( 'Meșterul Casei — Casa24.md', 'glozin-child' ); ?>" width="160" height="36">
+				<img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/logo-mesterul-casei.svg' ); ?>" alt="<?php esc_attr_e( 'Meșterul Casei — Casa24.md', 'glozin-child' ); ?>" width="170" height="38">
 			</a>
 
-			<nav class="ip-nav" aria-label="<?php esc_attr_e( 'Главное меню', 'glozin-child' ); ?>">
-				<?php
-				wp_nav_menu(
-					array(
-						'theme_location' => 'primary',
-						'container'      => false,
-						'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-						'fallback_cb'    => 'glozin_child_primary_nav_fallback',
-					)
-				);
-				?>
-			</nav>
+			<div class="ip-topbar__info">
+				<a class="ip-topbar__phone" href="tel:+37300000000">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+					<?php esc_html_e( '+373 00 000 000', 'glozin-child' ); ?>
+				</a>
+				<span class="ip-topbar__hours">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+					<?php esc_html_e( 'Пн–Сб 9:00–18:00', 'glozin-child' ); ?>
+				</span>
+			</div>
 
-			<div class="ip-header__icons">
-				<button type="button" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Поиск по сайту', 'glozin-child' ); ?>">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-						<circle cx="11" cy="11" r="8"></circle>
-						<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-					</svg>
-				</button>
-
+			<div class="ip-topbar__actions">
 				<?php /* Избранное — разметка-заглушка. Подключить реальный счётчик через хуки плагина wishlist (например, YITH/TI WooCommerce Wishlist), когда плагин будет определён на живом сайте. */ ?>
 				<a href="#" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Избранное', 'glozin-child' ); ?>">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
 					</svg>
 					<span class="ip-icon-btn__badge"><?php echo esc_html( '0' ); /* TODO: подключить реальное количество избранного. */ ?></span>
@@ -169,7 +143,7 @@ get_header();
 
 				<?php /* Корзина — заглушка счётчика. Подключить WC()->cart->get_cart_contents_count() и фрагменты WooCommerce (woocommerce_add_to_cart_fragments) для живого обновления без перезагрузки. */ ?>
 				<a href="<?php echo function_exists( 'wc_get_cart_url' ) ? esc_url( wc_get_cart_url() ) : '#'; ?>" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Корзина', 'glozin-child' ); ?>">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<circle cx="9" cy="21" r="1"></circle>
 						<circle cx="20" cy="21" r="1"></circle>
 						<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -180,12 +154,69 @@ get_header();
 						?>
 					</span>
 				</a>
+
+				<?php glozin_child_language_switcher(); ?>
+
+				<button type="button" class="ip-theme-toggle" data-ip-theme-toggle aria-label="<?php esc_attr_e( 'Переключить светлую/тёмную тему сайта', 'glozin-child' ); ?>">
+					<svg class="ip-theme-toggle__icon ip-theme-toggle__icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+					<svg class="ip-theme-toggle__icon ip-theme-toggle__icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+				</button>
 			</div>
 		</div>
-	</header>
+	</div>
 
 	<!-- =================================================================
-	     3. Хиро
+	     2. Вторая строка: «Каталог» (подкатегории — выпадающий список)
+	     слева, поиск по товарам по центру.
+	     ================================================================= -->
+	<div class="ip-navrow">
+		<div class="container">
+			<div class="ip-catalog">
+				<button type="button" class="ip-catalog__toggle" aria-expanded="false" aria-haspopup="true">
+					<?php esc_html_e( 'Каталог', 'glozin-child' ); ?>
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+				</button>
+				<nav class="ip-catalog__menu" aria-label="<?php esc_attr_e( 'Категории каталога', 'glozin-child' ); ?>">
+					<?php
+					wp_nav_menu(
+						array(
+							'theme_location' => 'primary',
+							'container'      => false,
+							'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
+							'fallback_cb'    => 'glozin_child_primary_nav_fallback',
+						)
+					);
+					?>
+				</nav>
+			</div>
+
+			<form class="ip-search" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+				<input type="search" name="s" class="ip-search__input" placeholder="<?php esc_attr_e( 'Искать товары…', 'glozin-child' ); ?>">
+				<input type="hidden" name="post_type" value="product">
+				<button type="submit" class="ip-search__submit" aria-label="<?php esc_attr_e( 'Найти', 'glozin-child' ); ?>">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+				</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- =================================================================
+	     3. Рекламная карусель-виджет — плейсхолдер разметки. Реальная
+	     логика слайдера (автопрокрутка/точки/свайп) и содержимое —
+	     отдельная задача, здесь только структура и стили.
+	     ================================================================= -->
+	<div class="ip-promo-carousel">
+		<div class="container">
+			<div class="ip-promo-carousel__track">
+				<div class="ip-promo-carousel__slide"><?php esc_html_e( 'Место для рекламного блока №1', 'glozin-child' ); ?></div>
+				<div class="ip-promo-carousel__slide"><?php esc_html_e( 'Место для рекламного блока №2', 'glozin-child' ); ?></div>
+				<div class="ip-promo-carousel__slide"><?php esc_html_e( 'Место для рекламного блока №3', 'glozin-child' ); ?></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- =================================================================
+	     4. Хиро
 	     ================================================================= -->
 	<section class="ip-hero">
 		<div class="container">
@@ -261,7 +292,7 @@ get_header();
 	</section>
 
 	<!-- =================================================================
-	     4. Категории
+	     5. Категории
 	     ================================================================= -->
 	<section class="ip-section">
 		<div class="container">
@@ -323,7 +354,7 @@ get_header();
 	<?php if ( class_exists( 'WooCommerce' ) ) : ?>
 
 		<!-- =============================================================
-		     5a. Топ продаж — сортировка по total_sales (фактические продажи)
+		     6a. Топ продаж — сортировка по total_sales (фактические продажи)
 		     ============================================================= -->
 		<section class="ip-section ip-section--muted">
 			<div class="container">
@@ -375,7 +406,7 @@ get_header();
 		</section>
 
 		<!-- =============================================================
-		     5b. Популярные товары — ДРУГОЙ критерий сортировки, чем "Топ продаж"
+		     6b. Популярные товары — ДРУГОЙ критерий сортировки, чем "Топ продаж"
 		     ============================================================= -->
 		<section class="ip-section">
 			<div class="container">
@@ -443,7 +474,7 @@ get_header();
 </div><!-- .industrial-pro -->
 
 <!-- =====================================================================
-     6. Футер-полоса (акцентный нижний слой — не заменяет основной футер темы)
+     7. Футер-полоса (акцентный нижний слой — не заменяет основной футер темы)
      ===================================================================== -->
 <div class="ip-footer-bar">
 	<div class="container">

@@ -86,8 +86,45 @@ function glozin_child_enqueue_assets() {
 		array( 'glozin-style', 'glozin-child-google-fonts' ),
 		wp_get_theme()->get( 'Version' )
 	);
+
+	// Переключатель светлая/тёмная тема (обратная связь 19.09.2026) — чистый JS, без зависимостей.
+	wp_enqueue_script(
+		'glozin-child-theme-toggle',
+		get_stylesheet_directory_uri() . '/assets/theme-toggle.js',
+		array(),
+		wp_get_theme()->get( 'Version' ),
+		true
+	);
 }
 add_action( 'wp_enqueue_scripts', 'glozin_child_enqueue_assets' );
+
+/**
+ * Переключатель языка RU/RO в верхней строке шапки (обратная связь 19.09.2026).
+ * Использует WPML, если он активен на сайте; иначе — статический фолбэк
+ * на два самых частых варианта адресов (см. TODO.md, пункт про структуру
+ * языковых URL — реальные пути уточнить после доступа к настройкам WPML).
+ */
+function glozin_child_language_switcher() {
+	echo '<div class="ip-lang-switch">';
+
+	if ( function_exists( 'icl_get_languages' ) ) {
+		$languages = icl_get_languages( 'skip_missing=0' );
+		foreach ( (array) $languages as $lang_code => $lang ) {
+			printf(
+				'<a href="%1$s" class="%2$s" lang="%3$s" hreflang="%3$s">%4$s</a>',
+				esc_url( $lang['url'] ),
+				! empty( $lang['active'] ) ? 'is-active' : '',
+				esc_attr( $lang_code ),
+				esc_html( strtoupper( $lang_code ) )
+			);
+		}
+	} else {
+		printf( '<a href="%1$s" class="is-active" lang="ru">%2$s</a>', esc_url( home_url( '/' ) ), 'RU' );
+		printf( '<a href="%1$s" lang="ro">%2$s</a>', esc_url( home_url( '/ro/' ) ), 'RO' );
+	}
+
+	echo '</div>';
+}
 
 /**
  * preconnect на fonts.gstatic.com для ускорения загрузки шрифтов

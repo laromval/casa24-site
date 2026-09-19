@@ -27,6 +27,22 @@ Text Domain: glozin-child
 }
 
 /* =====================================================================
+   Переключатель светлая/тёмная тема сайта (обратная связь 19.09.2026).
+   По умолчанию — токены выше ("light": тёмная шапка + светлые секции
+   категорий/товаров/футера). [data-ip-theme="dark"] на <html> (ставится
+   assets/theme-toggle.js) перекрашивает светлые поверхности в тёмные —
+   шапка/хиро/акцент остаются как есть, меняются только --bg-light/
+   --surface/--border/--text/--text-muted.
+   ===================================================================== */
+:root[data-ip-theme="dark"]{
+  --bg-light: oklch(0.17 0.02 255);
+  --surface: oklch(0.22 0.015 255);
+  --border: oklch(0.30 0.015 255);
+  --text: oklch(0.95 0.005 90);
+  --text-muted: oklch(0.72 0.01 255);
+}
+
+/* =====================================================================
    Базовый reset для каркаса (минимальный — не переопределяем родителя)
    ===================================================================== */
 .industrial-pro *,
@@ -62,12 +78,7 @@ Text Domain: glozin-child
    ===================================================================== */
 .industrial-pro h1,
 .industrial-pro h2,
-.industrial-pro h3,
-.industrial-pro .ip-heading,
-.industrial-pro .ip-cat-name,
-.industrial-pro .ip-price,
-.industrial-pro .ip-btn,
-.industrial-pro .ip-nav a{
+.industrial-pro h3{
   font-family: "Barlow Condensed", sans-serif;
   font-weight: 600;
   text-transform: uppercase;
@@ -147,143 +158,95 @@ Text Domain: glozin-child
 }
 
 /* =====================================================================
-   4.4.1 Утилити-полоса
+   4.4.1 Верхняя строка (topbar) — логотип, телефон/часы, избранное,
+   корзина, язык, переключатель темы. Заменяет прежние отдельные
+   утилити-полосу и шапку по обратной связи 19.09.2026.
    ===================================================================== */
-.ip-utility-bar{
-  background: var(--bg-dark-2);
-  color: var(--on-dark-muted);
-  font-size: 13px;
-}
-
-.ip-utility-bar .container{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-
-.ip-utility-bar__contacts,
-.ip-utility-bar__links{
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.ip-utility-bar a:hover{
-  color: var(--on-dark);
-}
-
-/* =====================================================================
-   4.4.2 Шапка
-   ===================================================================== */
-.ip-header{
+.ip-topbar{
   background: var(--bg-dark);
   padding: 14px 0;
 }
 
-.ip-header .container{
+.ip-topbar .container{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px 24px;
   flex-wrap: wrap;
 }
 
 .ip-logo{
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .ip-logo img,
 .ip-logo svg{
-  height: 44px;
+  height: 40px;
   width: auto;
 }
 
-.ip-logo__wordmark{
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-}
-
-.ip-logo__line1{
-  font-family: "Barlow Condensed", sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--on-dark);
-  font-size: 18px;
-  letter-spacing: 0.04em;
-}
-
-.ip-logo__line2{
-  font-family: "Barlow Condensed", sans-serif;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-size: 13px;
-  letter-spacing: 0.18em;
-}
-
-.ip-nav{
-  order: 3;
-  flex-basis: 100%;
-}
-
-.ip-nav ul{
-  list-style: none;
+.ip-topbar__info{
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
-  margin: 0;
-  padding: 12px 0 0;
+  gap: 20px;
   flex-wrap: wrap;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+  margin-right: auto;
 }
 
-.ip-nav a{
+.ip-topbar__phone{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--on-dark);
-  font-size: 15px;
-  letter-spacing: 0.03em;
+  font-weight: 500;
 }
 
-.ip-nav a:hover{
+.ip-topbar__phone:hover{
   color: var(--accent);
 }
 
-.ip-header__icons{
-  display: flex;
+.ip-topbar__hours{
+  display: inline-flex;
   align-items: center;
-  gap: 18px;
+  gap: 6px;
 }
 
+.ip-topbar__actions{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Иконки избранного/корзины — крупнее и заметнее на тёмном фоне (обратная связь 19.09.2026) */
 .ip-icon-btn{
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   color: var(--on-dark);
-  background: transparent;
+  background: oklch(1 0 0 / 8%);
   border: none;
   cursor: pointer;
 }
 
 .ip-icon-btn:hover{
-  color: var(--accent);
+  color: oklch(0.15 0.02 255);
+  background: var(--accent);
 }
 
 .ip-icon-btn__badge{
   position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 16px;
-  height: 16px;
+  top: -3px;
+  right: -3px;
+  min-width: 17px;
+  height: 17px;
   padding: 0 3px;
   border-radius: 50%;
   background: var(--accent);
@@ -294,21 +257,197 @@ Text Domain: glozin-child
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid var(--bg-dark);
 }
 
-/* Desktop: одна строка для шапки, навигация по центру */
+.ip-lang-switch{
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+.ip-lang-switch a{
+  color: var(--on-dark-muted);
+  padding: 4px 6px;
+}
+
+.ip-lang-switch a.is-active,
+.ip-lang-switch a:hover{
+  color: var(--accent);
+}
+
+.ip-theme-toggle{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--on-dark);
+  background: oklch(1 0 0 / 8%);
+  border: none;
+  cursor: pointer;
+}
+
+.ip-theme-toggle:hover{
+  color: oklch(0.15 0.02 255);
+  background: var(--accent);
+}
+
+/* По умолчанию (тема "light") показываем солнце — кнопка предлагает включить тёмную */
+.ip-theme-toggle__icon--moon{ display: none; }
+:root[data-ip-theme="dark"] .ip-theme-toggle__icon--sun{ display: none; }
+:root[data-ip-theme="dark"] .ip-theme-toggle__icon--moon{ display: block; }
+
+/* =====================================================================
+   4.4.2 Вторая строка (navrow) — каталог с выпадающим списком слева,
+   поиск по центру.
+   ===================================================================== */
+.ip-navrow{
+  background: var(--bg-dark-2);
+  padding: 10px 0;
+}
+
+.ip-navrow .container{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ip-catalog{
+  position: relative;
+}
+
+.ip-catalog__toggle{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border: none;
+  border-radius: 2px;
+  padding: 10px 16px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.ip-catalog__menu{
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 12px 24px oklch(0 0 0 / 18%);
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.ip-catalog:hover .ip-catalog__menu,
+.ip-catalog:focus-within .ip-catalog__menu{
+  display: block;
+}
+
+.ip-catalog__menu ul{
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+}
+
+.ip-catalog__menu a{
+  display: block;
+  padding: 10px 18px;
+  color: var(--text);
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+}
+
+.ip-catalog__menu a:hover{
+  background: var(--bg-light);
+  color: var(--accent-dark);
+}
+
+.ip-search{
+  flex-grow: 1;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ip-search__input{
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  padding: 10px 14px;
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: transparent;
+}
+
+.ip-search__submit{
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  color: var(--accent);
+  border: none;
+  cursor: pointer;
+}
+
+.ip-search__submit:hover{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+/* =====================================================================
+   4.4.3 Рекламная карусель-виджет (плейсхолдер разметки)
+   ===================================================================== */
+.ip-promo-carousel{
+  background: var(--bg-dark);
+  border-top: 1px solid oklch(1 0 0 / 8%);
+  padding: 10px 0;
+}
+
+.ip-promo-carousel__track{
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.ip-promo-carousel__slide{
+  flex: 0 0 auto;
+  min-width: 220px;
+  padding: 10px 16px;
+  background: oklch(1 0 0 / 6%);
+  border-radius: 2px;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+  text-align: center;
+}
+
 @media (min-width: 992px){
-  .ip-nav{
-    order: 2;
-    flex-basis: auto;
-  }
-
-  .ip-header .container{
+  .ip-navrow .container{
     flex-wrap: nowrap;
-  }
-
-  .ip-nav ul{
-    padding-top: 0;
   }
 }
 
@@ -685,6 +824,22 @@ Text Domain: glozin-child
   .ip-section__head h2{
     font-size: 22px;
   }
+
+  .ip-topbar__info{
+    order: 3;
+    flex-basis: 100%;
+    margin-right: 0;
+  }
+
+  .ip-navrow .container{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ip-search{
+    max-width: none;
+    margin: 0;
+  }
 }
 
 @media (max-width: 424px){
@@ -702,8 +857,13 @@ Text Domain: glozin-child
     text-align: center;
   }
 
-  .ip-utility-bar .container{
+  .ip-topbar .container{
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .ip-topbar__actions{
+    width: 100%;
+    justify-content: space-between;
   }
 }
