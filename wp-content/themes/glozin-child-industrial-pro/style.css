@@ -37,7 +37,7 @@ Text Domain: glozin-child
   --topbar-bg: var(--surface);
   --topbar-text: var(--bg-dark-2);
   --topbar-chip-bg: var(--bg-dark-2);
-  --topbar-chip-icon: var(--on-dark);
+  --topbar-chip-icon: var(--accent);
 }
 
 /* =====================================================================
@@ -55,7 +55,7 @@ Text Domain: glozin-child
   --topbar-bg: var(--bg-dark);
   --topbar-text: var(--on-dark);
   --topbar-chip-bg: var(--bg-dark-chip);
-  --topbar-chip-icon: var(--on-dark);
+  --topbar-chip-icon: var(--accent);
 }
 
 /* =====================================================================
