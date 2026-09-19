@@ -382,8 +382,10 @@ get_header();
 				/*
 				 * Пункт 3 раздела 5 ТЗ: "Топ продаж" и "Популярные товары" на живом
 				 * сайте сейчас показывают ОДИНАКОВЫЙ список. Здесь — два разных
-				 * WP_Query с разными критериями сортировки, чтобы структурно
-				 * исключить повтор.
+				 * WP_Query с разными критериями, чтобы структурно исключить повтор:
+				 * этот блок — реальные продажи (total_sales), блок ниже (6b) —
+				 * товары со скидкой (переименован в "Товары на скидках" по
+				 * обратной связи 19.09.2026, см. комментарий там).
 				 */
 				$ip_top_sales_query = new WP_Query(
 					array(
@@ -419,46 +421,41 @@ get_header();
 		</section>
 
 		<!-- =============================================================
-		     6b. Популярные товары — ДРУГОЙ критерий сортировки, чем "Топ продаж"
+		     6b. Товары на скидках — по обратной связи 19.09.2026 заменяет
+		     "Популярные товары": владелец счёл рейтинг/просмотры недостаточно
+		     отличимыми от "Топ продаж" на глаз. Скидка — однозначно другой
+		     критерий (реальные товары со скидкой, а не просто другая сортировка).
 		     ============================================================= -->
 		<section class="ip-section">
 			<div class="container">
 				<div class="ip-section__head">
-					<h2><?php esc_html_e( 'Популярные товары', 'glozin-child' ); ?></h2>
-					<a class="ip-section__link" href="<?php echo esc_url( home_url( '/shop/?orderby=rating' ) ); ?>">
+					<h2><?php esc_html_e( 'Товары на скидках', 'glozin-child' ); ?></h2>
+					<a class="ip-section__link" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>">
 						<?php esc_html_e( 'Смотреть всё', 'glozin-child' ); ?>
 					</a>
 				</div>
 
 				<?php
-				/*
-				 * Критерий — средний рейтинг товара (_wc_average_rating, нативное
-				 * поле WooCommerce). Если на сайте окажется отдельный механизм
-				 * подсчёта просмотров товара (например, плагин "post views
-				 * counter" или собственное поле, добавленное подрядчиком CLICK
-				 * WEB DESIGN), логичнее заменить meta_key на него — тогда
-				 * "популярное" будет означать "часто просматриваемое", что ещё
-				 * заметнее отличается от "Топ продаж". Проверить на реальном
-				 * сайте при первом деплое.
-				 */
-				$ip_popular_query = new WP_Query(
+				$ip_sale_ids   = function_exists( 'wc_get_product_ids_on_sale' ) ? wc_get_product_ids_on_sale() : array();
+				$ip_sale_query = new WP_Query(
 					array(
 						'post_type'      => 'product',
 						'post_status'    => 'publish',
 						'posts_per_page' => 4,
-						'meta_key'       => '_wc_average_rating',
-						'orderby'        => 'meta_value_num',
-						'order'          => 'DESC',
+						// array( 0 ) — намеренно: пустой post__in WP_Query интерпретирует
+						// как "фильтр не задан" и вернёт ВСЕ товары; так возвращает ноль.
+						'post__in'       => ! empty( $ip_sale_ids ) ? $ip_sale_ids : array( 0 ),
+						'orderby'        => 'post__in',
 						'no_found_rows'  => true,
 					)
 				);
 
-				if ( $ip_popular_query->have_posts() ) :
+				if ( $ip_sale_query->have_posts() ) :
 					?>
 					<ul class="ip-products-grid">
 						<?php
-						while ( $ip_popular_query->have_posts() ) :
-							$ip_popular_query->the_post();
+						while ( $ip_sale_query->have_posts() ) :
+							$ip_sale_query->the_post();
 							glozin_child_render_product_card( wc_get_product( get_the_ID() ) );
 						endwhile;
 						?>
@@ -467,7 +464,7 @@ get_header();
 					wp_reset_postdata();
 				else :
 					?>
-					<p><?php esc_html_e( 'Товары появятся здесь после подключения каталога WooCommerce.', 'glozin-child' ); ?></p>
+					<p><?php esc_html_e( 'Сейчас нет товаров со скидкой — блок появится, как только в WooCommerce будет хотя бы один товар с указанной акционной ценой.', 'glozin-child' ); ?></p>
 					<?php
 				endif;
 				?>
@@ -478,7 +475,7 @@ get_header();
 
 		<section class="ip-section">
 			<div class="container">
-				<p><?php esc_html_e( 'WooCommerce не активен — блоки "Топ продаж" и "Популярные товары" появятся после активации плагина.', 'glozin-child' ); ?></p>
+				<p><?php esc_html_e( 'WooCommerce не активен — блоки "Топ продаж" и "Товары на скидках" появятся после активации плагина.', 'glozin-child' ); ?></p>
 			</div>
 		</section>
 
