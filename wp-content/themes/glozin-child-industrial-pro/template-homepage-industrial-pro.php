@@ -128,7 +128,7 @@ get_header();
 				</a>
 				<span class="ip-topbar__hours">
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
-					<?php esc_html_e( 'Пн–Сб 9:00–18:00', 'glozin-child' ); ?>
+					<?php esc_html_e( 'Пн–Пт 9:00–19:00, Сб–Вс 9:00–17:00', 'glozin-child' ); ?>
 				</span>
 			</div>
 
@@ -139,8 +139,11 @@ get_header();
 				 * Зарегистрироваться → Избранное → переключатель темы → Корзина → RU/RO.
 				 */
 				?>
-				<a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ) ); ?>" class="ip-topbar__register">
-					<?php esc_html_e( 'Зарегистрироваться', 'glozin-child' ); ?>
+				<a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ) ); ?>" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Зарегистрироваться / Личный кабинет', 'glozin-child' ); ?>">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+						<circle cx="12" cy="7" r="4"></circle>
+					</svg>
 				</a>
 
 				<?php /* Избранное — разметка-заглушка. Подключить реальный счётчик через хуки плагина wishlist (например, YITH/TI WooCommerce Wishlist), когда плагин будет определён на живом сайте. */ ?>
