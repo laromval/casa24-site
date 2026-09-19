@@ -10,6 +10,10 @@ wp-config.php
 docs/secrets/
 docs/*credentials*
 
+# Акт сдачи сайта содержит пароли от wp-admin и хостинга в открытом виде — см. docs/security-notes.md
+акт сдачи*.pdf
+*акт сдачи*
+
 # === Технические файлы ===
 node_modules/
 vendor/

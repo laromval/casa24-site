@@ -49,6 +49,7 @@
 ## Ссылки
 
 - ТЗ на разработку: `docs/tz-development.md`
+- ТЗ на редизайн (Фаза 1, «Industrial Pro»): `docs/tz-redesign-phase1.md`
 - ТЗ на продвижение: `docs/tz-promotion.md`
 - Техническая справка о сайте (стек, страницы, подрядчик): `docs/site-reference.md`
 - Git/деплой процесс: `docs/workflow-git.md`
