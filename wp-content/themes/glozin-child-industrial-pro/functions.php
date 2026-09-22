@@ -58,6 +58,8 @@ function glozin_child_primary_nav_fallback() {
  * Подключение родительских и дочерних стилей + шрифтов Google Fonts.
  *
  * Раздел 4.2 ТЗ: Barlow Condensed 600/700 (заголовки), Work Sans 400/500/600 (текст).
+ * Плюс 900 у обоих (обратная связь 23.09.2026) — для акцентного текста на
+ * баннерах карусели (.ip-season-promo__overlay-title/-subtitle).
  * preconnect на fonts.gstatic.com — для ускорения загрузки шрифтов (см. dev-agent.md,
  * зона ответственности "производительность").
  */
@@ -74,7 +76,7 @@ function glozin_child_enqueue_assets() {
 	// Google Fonts: Barlow Condensed + Work Sans (раздел 4.2 ТЗ).
 	wp_enqueue_style(
 		'glozin-child-google-fonts',
-		'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Work+Sans:wght@400;500;600;800&display=swap',
+		'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;900&family=Work+Sans:wght@400;500;600;800;900&display=swap',
 		array(),
 		null
 	);

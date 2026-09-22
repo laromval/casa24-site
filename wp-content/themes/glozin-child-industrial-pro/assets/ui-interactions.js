@@ -222,7 +222,8 @@
 			var wrap = document.createElement( 'div' );
 			wrap.className = 'ip-leaf';
 
-			var size = 14 + Math.random() * 14;
+			// Размер x2 по обратной связи 23.09.2026 (было 14–28px).
+			var size = 28 + Math.random() * 28;
 			var startLeft = Math.random() * 100;
 			var fallDuration = 7 + Math.random() * 6;
 			var swayDuration = 2 + Math.random() * 2;
