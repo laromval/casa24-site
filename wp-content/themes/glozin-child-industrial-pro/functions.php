@@ -74,7 +74,7 @@ function glozin_child_enqueue_assets() {
 	// Google Fonts: Barlow Condensed + Work Sans (раздел 4.2 ТЗ).
 	wp_enqueue_style(
 		'glozin-child-google-fonts',
-		'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap',
+		'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Work+Sans:wght@400;500;600;800&display=swap',
 		array(),
 		null
 	);

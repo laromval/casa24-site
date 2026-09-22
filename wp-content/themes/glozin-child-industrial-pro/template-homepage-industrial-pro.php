@@ -111,7 +111,19 @@ get_header();
 	     ================================================================= -->
 	<div class="ip-topbar">
 		<div class="container">
-			<a class="ip-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Casa24.md — на главную', 'glozin-child' ); ?>">
+			<?php
+			/*
+			 * Логотип и кнопки — во вложенном .ip-topbar__row, ЖЁСТКО одной строкой
+			 * (flex-wrap: nowrap), телефон/часы — отдельным блоком под ней (не в
+			 * общем flex-ряду с ними). Раньше все три блока были прямыми children
+			 * одного flex-контейнера с wrap — при сужении окна порядок переноса не
+			 * контролировался явно, и было видно, как кнопки "прыгают" между
+			 * строкой логотипа и отдельной строкой на разных промежуточных ширинах
+			 * (обратная связь 22.09.2026).
+			 */
+			?>
+			<div class="ip-topbar__row">
+				<a class="ip-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Casa24.md — на главную', 'glozin-child' ); ?>">
 				<?php
 				/*
 				 * Логотип-заглушка (не финальный дизайн, см. README.md). Заменяет прежний
@@ -133,17 +145,6 @@ get_header();
 					<text x="80" y="56" font-family="'Barlow Condensed', Arial, sans-serif" font-weight="600" font-size="16" letter-spacing="2.8" fill="oklch(0.70 0.19 45)">CASA24.MD</text>
 				</svg>
 			</a>
-
-			<div class="ip-topbar__info">
-				<a class="ip-topbar__phone" href="tel:+37368338813">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-					<?php esc_html_e( '+373 68 338 813', 'glozin-child' ); ?>
-				</a>
-				<span class="ip-topbar__hours">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
-					<?php esc_html_e( 'Пн–Пт 9:00–19:00, Сб–Вс 9:00–17:00', 'glozin-child' ); ?>
-				</span>
-			</div>
 
 			<div class="ip-topbar__actions">
 				<?php
@@ -188,6 +189,18 @@ get_header();
 
 				<?php glozin_child_language_switcher(); ?>
 			</div>
+			</div>
+
+			<div class="ip-topbar__info">
+				<a class="ip-topbar__phone" href="tel:+37368338813">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+					<?php esc_html_e( '+373 68 338 813', 'glozin-child' ); ?>
+				</a>
+				<span class="ip-topbar__hours">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+					<?php esc_html_e( 'Пн–Пт 9:00–19:00, Сб–Вс 9:00–17:00', 'glozin-child' ); ?>
+				</span>
+			</div>
 		</div>
 	</div>
 
@@ -227,95 +240,258 @@ get_header();
 	</div>
 
 	<!-- =================================================================
-	     3. Рекламная карусель-виджет — плейсхолдер разметки. Реальная
-	     логика слайдера (автопрокрутка/точки/свайп) и содержимое —
-	     отдельная задача, здесь только структура и стили.
+	     3. Рекламные баннеры — полноширинная карусель из 3 слайдов.
+
+	     21.09.2026 (первая версия): владелец попросил просто готовые
+	     картинки без наложения текста поверх, взамен собранного ранее в тот
+	     же день виджета с иконками/градиентами.
+
+	     22.09.2026 (уточнение): слайдам с текстовым оверлеем нужны реальные
+	     кликабельные ссылки на разные категории — несколько ссылок физически
+	     нельзя "запечь" в один файл картинки, поэтому у таких слайдов (см.
+	     ключ 'overlay' в массиве ниже) текст и ссылки — обычный HTML поверх
+	     фото, а не часть изображения. Плюс это чинит и предыдущую проблему:
+	     HTML-текст переводится через WPML как любой другой текст темы,
+	     отдельная картинка с румынским текстом для RO не нужна.
+
+	     22.09.2026 (позже в тот же день, важное уточнение владельца): слайд
+	     "уборка участка" — это НОВЫЙ третий слайд, а не замена слайда
+	     "консервация" ("Сохрани вкус лета" — банки/вёдра/бочки). Оба остаются
+	     в карусели: консервация — 2-я позиция (как было исходно), уборка —
+	     новая 3-я. Слайд с дисконтной картой (был 2-м) сдвинулся на 1-е
+	     место — текст в нём по-прежнему часть картинки, ссылка одна,
+	     `overlay` для него не задан.
+
+	     Секция намеренно НЕ обёрнута в .container — баннер должен доходить
+	     до края экрана. Карусель использует тот же генеричный JS, что и
+	     раньше (см. assets/ui-interactions.js — [data-ip-carousel]), он не
+	     завязан на конкретное количество слайдов.
 	     ================================================================= -->
-	<div class="ip-promo-carousel">
-		<div class="container">
-			<div class="ip-promo-carousel__track">
-				<div class="ip-promo-carousel__slide"><?php esc_html_e( 'Место для рекламного блока №1', 'glozin-child' ); ?></div>
-				<div class="ip-promo-carousel__slide"><?php esc_html_e( 'Место для рекламного блока №2', 'glozin-child' ); ?></div>
-				<div class="ip-promo-carousel__slide"><?php esc_html_e( 'Место для рекламного блока №3', 'glozin-child' ); ?></div>
-			</div>
-		</div>
-	</div>
-
-	<!-- =================================================================
-	     4. Хиро
-	     ================================================================= -->
-	<section class="ip-hero">
-		<div class="container">
-			<div class="ip-hero__content">
-				<span class="ip-hero__badge"><?php esc_html_e( 'Строительные материалы и хозтовары', 'glozin-child' ); ?></span>
-
-				<h1 class="ip-hero__title">
-					<?php
-					printf(
-						/* translators: %s: акцентная фраза, выделяется оранжевым */
-						esc_html__( 'Всё для ремонта и стройки — %s', 'glozin-child' ),
-						'<em>' . esc_html__( 'в одном месте', 'glozin-child' ) . '</em>'
-					);
-					?>
-				</h1>
-
-				<p class="ip-hero__subtitle">
-					<?php esc_html_e( 'Двери, электроинструмент, товары для сада и огорода — с доставкой по Кишинёву и Молдове. Заглушка текста: финальный копирайт согласовать с владельцем сайта.', 'glozin-child' ); ?>
-				</p>
-
-				<div class="ip-hero__actions">
-					<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="btn-accent">
-						<?php esc_html_e( 'Смотреть каталог', 'glozin-child' ); ?>
-					</a>
-					<a href="<?php echo esc_url( home_url( '/o-nas/' ) ); ?>" class="btn-outline">
-						<?php esc_html_e( 'О компании', 'glozin-child' ); ?>
-					</a>
-				</div>
-
-				<ul class="ip-hero__usp">
-					<li><?php esc_html_e( 'Бесплатная доставка от 1000 MDL', 'glozin-child' ); ?></li>
-					<li><?php esc_html_e( 'Гарантия качества', 'glozin-child' ); ?></li>
-				</ul>
-			</div>
-
-			<?php
-			/*
-			 * Сетка 2x2 категорий-плашек. Ссылки временно "#" — заменить на
-			 * реальные get_term_link() после того, как будут определены
-			 * 4 приоритетные категории для хиро (решение владельца/content-agent,
-			 * не техническая задача).
-			 */
-			$ip_hero_categories = array(
-				array(
-					'label' => __( 'Двери', 'glozin-child' ),
-					'alt'   => false,
+	<?php
+	$ip_promo_banners = array(
+		array(
+			'file'   => 'promo-season-cleanup.webp',
+			'alt'    => '',
+			'w'      => 1942,
+			'h'      => 809,
+			'leaves' => true,
+			// Новый слайд (обратная связь 22.09.2026) — фото владельца с
+			// граблями/тачкой/мешками для листвы. Ведущий слайд карусели —
+			// самая актуальная сейчас сезонная тема ("конец сезона"), поэтому
+			// первый; слайд "консервация" — второй (как попросил владелец),
+			// дисконтная карта (вечнозелёный оффер, без сезонной срочности) —
+			// последняя, как и было исходно.
+			'overlay' => array(
+				'title'    => __( 'Завершение дачного сезона', 'glozin-child' ),
+				'subtitle' => __( 'Всё для уборки', 'glozin-child' ),
+				'links'    => array(
+					array(
+						// TODO (content-agent): подтвердить реальный слаг категории
+						// "Инвентарь" (грабли/секаторы/лопаты) — сейчас ведёт на "#".
+						'label' => __( 'Инвентарь', 'glozin-child' ),
+						'href'  => '#',
+					),
+					array(
+						// TODO (content-agent): подтвердить реальный слаг категории "Тачки".
+						'label' => __( 'Тачки', 'glozin-child' ),
+						'href'  => '#',
+					),
+					array(
+						// TODO (content-agent): подтвердить реальный слаг категории "Мешки"
+						// (для листвы/мусора).
+						'label' => __( 'Мешки', 'glozin-child' ),
+						'href'  => '#',
+					),
+					array(
+						// Родительская категория "Вёдра" — подкатегория "Пищевые вёдра"
+						// подтверждена на слайде "консервация" ниже, эта ссылка на
+						// уровень выше по тому же дереву категорий.
+						'label' => __( 'Вёдра', 'glozin-child' ),
+						'href'  => 'https://casa24.md/product-category/%d1%85%d0%be%d0%b7%d1%8f%d0%b9%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be-%d0%b1%d1%8b%d1%82%d0%be%d0%b2%d1%8b%d0%b5/%d0%b2%d0%b5%d0%b4%d1%80%d0%b0/',
+					),
 				),
-				array(
-					'label' => __( 'Электроинструмент', 'glozin-child' ),
-					'alt'   => true,
+			),
+		),
+		array(
+			'file'   => 'promo-season-canning.webp',
+			// Декоративное фото: реальный смысл несёт текстовый оверлей ниже,
+			// поэтому alt пустой — иначе скринридер дважды озвучит то же самое.
+			'alt'    => '',
+			'w'      => 1942,
+			'h'      => 809,
+			// Анимация падающих кленовых листьев (обратная связь 21.09.2026,
+			// показана и одобрена в превью) — тематически подходит слайдам
+			// "дачный сезон", у карты скидок её нет.
+			'leaves' => true,
+			'overlay' => array(
+				'title'    => __( 'Завершение дачного сезона', 'glozin-child' ),
+				'subtitle' => __( 'Сохрани вкус лета', 'glozin-child' ),
+				'links'    => array(
+					array(
+						'label' => __( 'Банки', 'glozin-child' ),
+						'href'  => 'https://casa24.md/product-category/%d1%85%d0%be%d0%b7%d1%8f%d0%b9%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be-%d0%b1%d1%8b%d1%82%d0%be%d0%b2%d1%8b%d0%b5/%d1%82%d0%be%d0%b2%d0%b0%d1%80%d1%8b-%d0%b4%d0%bb%d1%8f-%d0%ba%d1%83%d1%85%d0%bd%d0%b8/%d0%b1%d0%b0%d0%bd%d0%ba%d0%b8-%d1%81%d1%82%d0%b5%d0%ba%d0%bb%d1%8f%d0%bd%d0%bd%d1%8b%d0%b5/',
+					),
+					array(
+						'label' => __( 'Пищевые вёдра', 'glozin-child' ),
+						'href'  => 'https://casa24.md/product-category/%d1%85%d0%be%d0%b7%d1%8f%d0%b9%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be-%d0%b1%d1%8b%d1%82%d0%be%d0%b2%d1%8b%d0%b5/%d0%b2%d0%b5%d0%b4%d1%80%d0%b0/%d0%b2%d0%b5%d0%b4%d1%80%d0%b0-%d0%bf%d0%b8%d1%89%d0%b5%d0%b2%d1%8b%d0%b5/',
+					),
+					array(
+						'label' => __( 'Бочки пищевые', 'glozin-child' ),
+						'href'  => 'https://casa24.md/product-category/bidoane-si-butoaie/',
+					),
 				),
-				array(
-					'label' => __( 'Сад и огород', 'glozin-child' ),
-					'alt'   => true,
-				),
-				array(
-					'label' => __( 'Хозтовары', 'glozin-child' ),
-					'alt'   => false,
-				),
-			);
-			?>
-			<div class="ip-hero__categories">
-				<?php foreach ( $ip_hero_categories as $ip_hero_cat ) : ?>
-					<a class="ip-hero-cat<?php echo $ip_hero_cat['alt'] ? ' ip-hero-cat--alt' : ''; ?>" href="#">
-						<svg class="ip-hero-cat__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<rect x="3" y="3" width="18" height="18" rx="2"></rect>
-						</svg>
-						<span class="ip-hero-cat__label"><?php echo esc_html( $ip_hero_cat['label'] ); ?></span>
-					</a>
+			),
+		),
+		array(
+			'file'   => 'promo-discount-card.webp',
+			// TODO(content-agent/владелец): подтвердить точный текст и ссылку
+			// страницы с условиями дисконтной карты — сейчас ведёт на "#".
+			'alt'    => __( 'Дисконтная карта «Meșterul Casei» — максимальная скидка по карте на кассе', 'glozin-child' ),
+			'href'   => '#',
+			// 22.09.2026: заменена на версию 1942×809 (та же картинка, но без
+			// обрезки по высоте) — старая 1920×500 была заметно шире слота
+			// карусели (aspect-ratio 2.4 в style.css) и показывалась с пустыми
+			// полями сверху/снизу; новая почти точно совпадает с рамкой.
+			'w'      => 1942,
+			'h'      => 809,
+			'leaves' => false,
+		),
+	);
+	?>
+	<section class="ip-season-promo" aria-roledescription="карусель" aria-label="<?php esc_attr_e( 'Акции и предложения', 'glozin-child' ); ?>" data-ip-carousel>
+		<div class="ip-season-promo__viewport">
+			<div class="ip-season-promo__track" data-ip-carousel-track>
+				<?php foreach ( $ip_promo_banners as $ip_banner ) : ?>
+					<?php if ( ! empty( $ip_banner['overlay'] ) ) : ?>
+						<div class="ip-season-promo__slide ip-season-promo__slide--overlay">
+							<img
+								class="ip-season-promo__banner"
+								src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . $ip_banner['file'] ); ?>"
+								alt=""
+								width="<?php echo esc_attr( $ip_banner['w'] ); ?>"
+								height="<?php echo esc_attr( $ip_banner['h'] ); ?>"
+								loading="lazy"
+							>
+							<?php
+							/*
+							 * Затемнение — отдельный слой на всю картинку (не боксик под
+							 * текстом, не градиент, ограниченный серединой кадра). И "плашка
+							 * под текстом" (обратная связь 22.09.2026 — "текст как на
+							 * затеняющей плашке"), и более ранний узкий градиент до 75%
+							 * ширины (давал видимую полосу на границе — обратная связь
+							 * 22.09.2026 раньше в тот же день) не подошли. Решение: растянуть
+							 * затемнение на все 100% слайда БЕЗ края внутри кадра — граница
+							 * гашения оказывается за пределами видимой области, смотреть
+							 * не на чем, полосе неоткуда взяться. Стоит ДО листьев в разметке,
+							 * чтобы листья рисовались поверх затемнения и оставались яркими.
+							 */
+							?>
+							<div class="ip-season-promo__scrim" aria-hidden="true"></div>
+							<?php if ( ! empty( $ip_banner['leaves'] ) ) : ?>
+								<div class="ip-season-promo__leaves" data-ip-falling-leaves aria-hidden="true"></div>
+							<?php endif; ?>
+							<div class="ip-season-promo__overlay">
+								<h2 class="ip-season-promo__overlay-title"><?php echo esc_html( $ip_banner['overlay']['title'] ); ?></h2>
+								<p class="ip-season-promo__overlay-subtitle"><?php echo esc_html( $ip_banner['overlay']['subtitle'] ); ?></p>
+								<div class="ip-season-promo__overlay-links">
+									<?php foreach ( $ip_banner['overlay']['links'] as $ip_overlay_link ) : ?>
+										<a class="ip-season-promo__overlay-link" href="<?php echo esc_url( $ip_overlay_link['href'] ); ?>"><?php echo esc_html( $ip_overlay_link['label'] ); ?></a>
+									<?php endforeach; ?>
+								</div>
+							</div>
+						</div>
+					<?php else : ?>
+						<a class="ip-season-promo__slide" href="<?php echo esc_url( $ip_banner['href'] ); ?>">
+							<img
+								class="ip-season-promo__banner"
+								src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . $ip_banner['file'] ); ?>"
+								alt="<?php echo esc_attr( $ip_banner['alt'] ); ?>"
+								width="<?php echo esc_attr( $ip_banner['w'] ); ?>"
+								height="<?php echo esc_attr( $ip_banner['h'] ); ?>"
+								loading="lazy"
+							>
+							<?php if ( ! empty( $ip_banner['leaves'] ) ) : ?>
+								<div class="ip-season-promo__leaves" data-ip-falling-leaves aria-hidden="true"></div>
+							<?php endif; ?>
+						</a>
+					<?php endif; ?>
 				<?php endforeach; ?>
 			</div>
 		</div>
+
+		<?php if ( count( $ip_promo_banners ) > 1 ) : ?>
+			<div class="ip-season-promo__dots" data-ip-carousel-dots role="tablist" aria-label="<?php esc_attr_e( 'Выбор слайда', 'glozin-child' ); ?>">
+				<?php foreach ( $ip_promo_banners as $ip_dot_index => $ip_dot_banner ) : ?>
+					<button
+						type="button"
+						class="ip-season-promo__dot<?php echo 0 === $ip_dot_index ? ' is-active' : ''; ?>"
+						data-ip-carousel-dot="<?php echo esc_attr( $ip_dot_index ); ?>"
+						role="tab"
+						aria-selected="<?php echo 0 === $ip_dot_index ? 'true' : 'false'; ?>"
+						aria-label="<?php echo esc_attr( sprintf( /* translators: %d: номер слайда */ __( 'Слайд %d', 'glozin-child' ), $ip_dot_index + 1 ) ); ?>"
+					></button>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
 	</section>
+
+	<!-- =================================================================
+	     3b. Полоса преимуществ — 4 пункта с иконками (доставка/гарантия/
+	     оплата/поддержка), сразу под баннерами карусели (обратная связь
+	     21.09.2026, по референсу). Статичный контент — не зависит от
+	     WooCommerce, поэтому без условий вывода.
+	     ================================================================= -->
+	<?php
+	$ip_usp_items = array(
+		array(
+			'icon'  => '<path d="M21 8 12 3 3 8l9 5 9-5Z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path>',
+			'title' => __( 'Бесплатная доставка', 'glozin-child' ),
+			'text'  => __( 'При заказе от 1000 лей.', 'glozin-child' ),
+		),
+		array(
+			'icon'  => '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>',
+			'title' => __( 'Гарантия качества', 'glozin-child' ),
+			'text'  => __( 'Высокое качество всех товаров.', 'glozin-child' ),
+		),
+		array(
+			'icon'  => '<rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line>',
+			'title' => __( 'Удобная оплата', 'glozin-child' ),
+			'text'  => __( 'Любым удобным способом.', 'glozin-child' ),
+		),
+		array(
+			'icon'  => '<path d="M21 11.5a8.38 8.38 0 0 1-4.7 7.6 8.38 8.38 0 0 1-3.8.9H12a8.5 8.5 0 0 1-4-1L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"></path>',
+			'title' => __( 'Мы на связи', 'glozin-child' ),
+			'text'  => __( 'Поддержка в один клик.', 'glozin-child' ),
+		),
+	);
+	?>
+	<div class="ip-usp-bar">
+		<div class="container">
+			<?php
+			/*
+			 * Сетка — на ВЛОЖЕННОМ div, не на самом .container: у общего
+			 * `.industrial-pro .container` (0-2-0) выше по специфичности
+			 * правило `padding: 0 20px`, и если повесить .ip-usp-bar__grid
+			 * на тот же элемент, что и .container, он перебивает вертикальные
+			 * отступы сетки (обнаружено на скриншоте 21.09.2026 — полоса
+			 * сжалась до высоты иконок без отступов).
+			 */
+			?>
+			<div class="ip-usp-bar__grid">
+				<?php foreach ( $ip_usp_items as $ip_usp ) : ?>
+					<div class="ip-usp-item">
+						<span class="ip-usp-item__icon" aria-hidden="true">
+							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><?php echo $ip_usp['icon']; // phpcs:ignore WordPress.Security.EscapeOutput -- статичный набор SVG, без пользовательских данных. ?></svg>
+						</span>
+						<span class="ip-usp-item__body">
+							<span class="ip-usp-item__title"><?php echo esc_html( $ip_usp['title'] ); ?></span>
+							<span class="ip-usp-item__text"><?php echo esc_html( $ip_usp['text'] ); ?></span>
+						</span>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</div>
 
 	<!-- =================================================================
 	     5. Категории
@@ -508,64 +684,79 @@ get_header();
      ================================================================= -->
 <footer class="ip-footer">
 
+	<?php
+	/* Верхняя строка футера — переделана по обратной связи 22.09.2026:
+	   логотип + кнопка "Полезная информация" слева, "Будьте на связи" +
+	   телефон + соцсети справа, в одну строку (референс — скриншот
+	   пользователя). Кнопка — аккордеон на любой ширине экрана: по
+	   умолчанию .ip-footer__main пустой (0 высоты), колонки со ссылками
+	   появляются широкой панелью только по клику. */
+	?>
 	<div class="ip-footer__social-bar">
-		<div class="container">
-			<span><?php esc_html_e( 'Будьте на связи', 'glozin-child' ); ?></span>
-			<?php
-			/* TODO (media-agent/marketing-agent): подставить реальные ссылки соцсетей — сейчас "#". */
-			?>
-			<div class="ip-footer__social-links">
-				<a href="#" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
-				<a href="#" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1"></circle></svg></a>
-				<a href="#" aria-label="Telegram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg></a>
-			</div>
-		</div>
-	</div>
+		<div class="container ip-footer__social-bar-row">
 
-	<div class="ip-footer__main">
-		<div class="container ip-footer__grid">
-
-			<div class="ip-footer__brand">
+			<div class="ip-footer__brand-row">
 				<img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/logo-mesterul-casei.svg' ); ?>" alt="<?php esc_attr_e( 'Meșterul Casei — Casa24.md', 'glozin-child' ); ?>" width="170" height="38">
+				<button type="button" class="ip-footer__info-toggle" data-ip-footer-toggle aria-expanded="false" aria-controls="ip-footer-cols">
+					<?php esc_html_e( 'Полезная информация', 'glozin-child' ); ?>
+					<svg class="ip-footer__info-toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+				</button>
+			</div>
+
+			<div class="ip-footer__contact-row">
+				<span><?php esc_html_e( 'Будьте на связи', 'glozin-child' ); ?></span>
 				<a class="ip-footer__phone" href="tel:+37368338813">
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
 					<?php esc_html_e( '+373 68 338 813', 'glozin-child' ); ?>
 				</a>
-				<a class="ip-footer__address" href="#" target="_blank" rel="noopener">
-					<?php /* TODO: подставить реальную ссылку на карту (Google Maps) после подтверждения адреса магазина/пункта выдачи владельцем. */ ?>
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-					<?php esc_html_e( 'Кишинёв, Молдова', 'glozin-child' ); ?>
-				</a>
+				<?php
+				/* TODO (media-agent/marketing-agent): подставить реальные ссылки соцсетей — сейчас "#". */
+				?>
+				<div class="ip-footer__social-links">
+					<a href="#" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+					<a href="#" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1"></circle></svg></a>
+					<a href="#" aria-label="Telegram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg></a>
+				</div>
 			</div>
 
-			<div class="ip-footer__col">
-				<h3><?php esc_html_e( 'Интернет-магазин', 'glozin-child' ); ?></h3>
-				<ul>
-					<li><a href="<?php echo esc_url( home_url( '/dostavka-i-oplata/' ) ); ?>"><?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/oferta/' ) ); ?>"><?php esc_html_e( 'Публичная оферта', 'glozin-child' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/obmen-i-vozvrat/' ) ); ?>"><?php esc_html_e( 'Обмен и возврат товара', 'glozin-child' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>"><?php esc_html_e( 'Политика конфиденциальности', 'glozin-child' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/contacte/' ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
-				</ul>
-			</div>
+		</div>
+	</div>
 
-			<div class="ip-footer__col">
-				<h3><?php esc_html_e( 'Каталог', 'glozin-child' ); ?></h3>
-				<ul>
-					<li><a href="#"><?php esc_html_e( 'Двери', 'glozin-child' ); ?></a></li>
-					<li><a href="#"><?php esc_html_e( 'Электроинструмент', 'glozin-child' ); ?></a></li>
-					<li><a href="#"><?php esc_html_e( 'Сад и огород', 'glozin-child' ); ?></a></li>
-					<li><a href="#"><?php esc_html_e( 'Хозтовары', 'glozin-child' ); ?></a></li>
-				</ul>
-			</div>
+	<div class="ip-footer__main">
+		<div class="container">
 
-			<div class="ip-footer__col">
-				<h3><?php esc_html_e( 'О компании', 'glozin-child' ); ?></h3>
-				<ul>
-					<li><a href="<?php echo esc_url( home_url( '/o-nas/' ) ); ?>"><?php esc_html_e( 'О нас', 'glozin-child' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>"><?php esc_html_e( 'Статьи', 'glozin-child' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/contacte/' ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
-				</ul>
+			<div class="ip-footer__cols" id="ip-footer-cols" data-ip-footer-cols>
+
+				<div class="ip-footer__col">
+					<h3><?php esc_html_e( 'Интернет-магазин', 'glozin-child' ); ?></h3>
+					<ul>
+						<li><a href="<?php echo esc_url( home_url( '/dostavka-i-oplata/' ) ); ?>"><?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/oferta/' ) ); ?>"><?php esc_html_e( 'Публичная оферта', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/obmen-i-vozvrat/' ) ); ?>"><?php esc_html_e( 'Обмен и возврат товара', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>"><?php esc_html_e( 'Политика конфиденциальности', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contacte/' ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
+					</ul>
+				</div>
+
+				<div class="ip-footer__col">
+					<h3><?php esc_html_e( 'Каталог', 'glozin-child' ); ?></h3>
+					<ul>
+						<li><a href="#"><?php esc_html_e( 'Двери', 'glozin-child' ); ?></a></li>
+						<li><a href="#"><?php esc_html_e( 'Электроинструмент', 'glozin-child' ); ?></a></li>
+						<li><a href="#"><?php esc_html_e( 'Сад и огород', 'glozin-child' ); ?></a></li>
+						<li><a href="#"><?php esc_html_e( 'Хозтовары', 'glozin-child' ); ?></a></li>
+					</ul>
+				</div>
+
+				<div class="ip-footer__col">
+					<h3><?php esc_html_e( 'О компании', 'glozin-child' ); ?></h3>
+					<ul>
+						<li><a href="<?php echo esc_url( home_url( '/o-nas/' ) ); ?>"><?php esc_html_e( 'О нас', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>"><?php esc_html_e( 'Статьи', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contacte/' ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
+					</ul>
+				</div>
+
 			</div>
 
 		</div>
@@ -584,6 +775,32 @@ get_header();
 			<span class="ip-footer__copy">
 				&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> Casa24.md — LAROMVAL SRL. <?php esc_html_e( 'Все права защищены.', 'glozin-child' ); ?>
 			</span>
+		</div>
+	</div>
+
+	<?php
+	/* Полоса платёжных систем — обратная связь 21.09.2026, референс: скриншот
+	   текущего сайта. Специально светлая (не в тёмной палитре футера) —
+	   иконки платёжных систем и так низкоконтрастны, на тёмном фоне их почти
+	   не видно. Плашку разработчика ("click WEB DESIGN") убрали по просьбе
+	   владельца (обратная связь 22.09.2026). */
+	?>
+	<div class="ip-footer__payments">
+		<div class="container ip-footer__payments-row">
+			<div class="ip-footer__payment-icons">
+				<span class="ip-footer__payment-icon ip-footer__payment-icon--maib" aria-label="maib">
+					<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="9" fill="#00A99D"></circle></svg>
+					maib
+				</span>
+				<span class="ip-footer__payment-icon ip-footer__payment-icon--mastercard" aria-label="Mastercard">
+					<svg width="32" height="20" viewBox="0 0 32 20" aria-hidden="true">
+						<circle cx="12" cy="10" r="10" fill="#EB001B"></circle>
+						<circle cx="20" cy="10" r="10" fill="#F79E1B"></circle>
+						<path d="M16 2.2a10 10 0 0 1 0 15.6 10 10 0 0 1 0-15.6Z" fill="#FF5F00"></path>
+					</svg>
+				</span>
+				<span class="ip-footer__payment-icon ip-footer__payment-icon--visa" aria-label="VISA">VISA</span>
+			</div>
 		</div>
 	</div>
 
