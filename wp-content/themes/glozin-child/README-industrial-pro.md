@@ -21,8 +21,10 @@ DESIGN, скачан с хостинга 25.10.2026) **плюс редизайн
 - `template-homepage-industrial-pro.php` — шаблон главной.
 - `assets/industrial-pro.css`, `assets/*.js`, логотип и баннеры карусели.
 
-**Всё визуальное срабатывает только на странице, которой назначен шаблон
-«Industrial Pro — Главная».** Пока шаблон не выбран, сайт выглядит и работает
+**Визуальное срабатывает на странице с шаблоном «Industrial Pro — Главная», а при
+опции `casa24_ip_sitewide` (wp option update casa24_ip_sitewide 1) — на всём сайте:
+шапка/футер из `template-parts/industrial-pro/`, перекраска Glozin из
+`assets/industrial-pro-site.css`.** Выключить: `wp option update casa24_ip_sitewide 0`. Пока шаблон не выбран, сайт выглядит и работает
 точно как раньше. На этой странице шапка и футер родительской темы скрыты
 (`#topbar`, `#site-header`, `#site-footer`), вместо них — свои.
 

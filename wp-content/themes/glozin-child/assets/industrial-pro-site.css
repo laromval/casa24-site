@@ -52,6 +52,7 @@ body.ip-site{
   --gz-button-padding-top: 14px;
   --gz-button-padding-bottom: 14px;
 
+  --gz-input-border-color: var(--border);
   --gz-input-border-color-hover: var(--accent);
 
   background: var(--bg-light);
@@ -341,4 +342,53 @@ body.ip-site .wc-block-cart__sidebar{
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 20px;
+}
+
+/* В Customizer темы остался бордовый #8b535e от «Larom VAL» (инлайн-CSS
+   Glozin: body{--gz-color-primary}, .gz-button-light{--gz-button-bg-color},
+   :root{--gz-input-border-color}). Основной цвет и рамки полей перекрыты в
+   блоке переменных выше; светлые кнопки-иконки (избранное и «в корзину» на
+   фото товара) — здесь: тёмные с оранжевой иконкой, как в шапке. */
+body.ip-site .gz-button-light{
+  --gz-button-color: var(--accent);
+  --gz-button-bg-color: var(--bg-dark);
+  --gz-button-border-color: var(--bg-dark);
+  --gz-button-color-hover: oklch(0.15 0.02 255);
+  --gz-button-bg-color-hover: var(--accent);
+  --gz-button-border-color-hover: var(--accent);
+}
+
+/* Закреплённая строка «Каталог + поиск» ниже админ-панели WordPress
+   (видна только вошедшим администраторам). */
+body.admin-bar .ip-navrow{
+  top: 32px;
+}
+
+@media (max-width: 782px){
+  body.admin-bar .ip-navrow{
+    top: 0;
+  }
+}
+
+/* Блочная корзина на телефоне: таблица товаров была шире колонки (362px при
+   330px) — сумма строки уезжала за край экрана. Фиксированная раскладка
+   таблицы ужимает колонку с названием, а не выталкивает сумму. */
+@media (max-width: 575px){
+  body.ip-site table.wc-block-cart-items{
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  body.ip-site .wc-block-cart-items .wc-block-cart-item__image{
+    width: 64px;
+  }
+
+  body.ip-site .wc-block-cart-items .wc-block-cart-item__total{
+    width: 72px;
+  }
+
+  body.ip-site .wc-block-cart-item__product{
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 }
