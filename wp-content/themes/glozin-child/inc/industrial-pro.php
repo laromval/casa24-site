@@ -308,6 +308,39 @@ function glozin_child_load_textdomain() {
 add_action( 'after_setup_theme', 'glozin_child_load_textdomain' );
 
 /**
+ * Перевод строк glozin-child из languages/{locale}.l10n.php самой темы.
+ *
+ * WPML String Translation перехватывает load_textdomain (override_load_textdomain)
+ * и подставляет свои файлы — наш ro_RO.mo при этом не применялся, на /ro/
+ * строки оставались русскими (staging, 25.10.2026). Фильтр берёт перевод из
+ * файла темы, а если строки там нет — оставляет то, что дали WP/WPML
+ * (например, перевод, добавленный позже в String Translation).
+ *
+ * @param string $translation Перевод, предложенный WordPress/WPML.
+ * @param string $text        Исходная (русская) строка.
+ * @return string
+ */
+function glozin_child_theme_mo_translate( $translation, $text ) {
+	static $catalogs = array();
+
+	$locale = determine_locale();
+	if ( 0 === strpos( $locale, 'ru' ) ) {
+		return $translation; // Исходные строки уже на русском.
+	}
+
+	if ( ! isset( $catalogs[ $locale ] ) ) {
+		// PHP-файл перевода (формат WP 6.5+): MO::import_from_file() на
+		// хостинге в веб-режиме .mo не читал (в wp-cli — читал).
+		$file                = get_stylesheet_directory() . '/languages/' . $locale . '.l10n.php';
+		$data                = is_readable( $file ) ? include $file : null;
+		$catalogs[ $locale ] = ( is_array( $data ) && isset( $data['messages'] ) ) ? $data['messages'] : array();
+	}
+
+	return isset( $catalogs[ $locale ][ $text ] ) ? $catalogs[ $locale ][ $text ] : $translation;
+}
+add_filter( 'gettext_glozin-child', 'glozin_child_theme_mo_translate', 20, 2 );
+
+/**
  * Пункт 10 раздела 5 ТЗ: отключить публичный wp-sitemap-users
  * (раскрывает логины пользователей через /wp-sitemap-users-1.xml).
  * Действует на весь сайт.
