@@ -29,3 +29,6 @@ Thumbs.db
 *.sql.gz
 uploads-backup/
 wp-content/uploads/
+
+# Файлы, скачанные с хостинга, до разбора
+_incoming/
