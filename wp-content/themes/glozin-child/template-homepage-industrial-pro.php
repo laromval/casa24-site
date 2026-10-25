@@ -485,45 +485,62 @@ get_header();
 		<div class="container">
 			<div class="ip-section__head">
 				<h2><?php esc_html_e( 'Категории', 'glozin-child' ); ?></h2>
-				<a class="ip-section__link" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>">
+				<a class="ip-section__link" href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' ) ); ?>">
 					<?php esc_html_e( 'Все категории', 'glozin-child' ); ?>
 				</a>
 			</div>
 
 			<?php
+			/*
+			 * Основные разделы магазина (обратная связь 25.10.2026) — вместо
+			 * первых попавшихся get_terms() (выходили бренды AIST/BINGO/DOLEPAK).
+			 * ID — категории верхнего уровня casa24.md (Store API, 25.10.2026),
+			 * отобраны по профилю магазина и числу товаров. Иконки — свои,
+			 * контурные 24×24 в стиле остальных иконок шаблона.
+			 */
+			$ip_main_categories = array(
+				841  => '<path d="M3 11l9-8 9 8"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',                                                                                         // Товары для дома.
+				910  => '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>', // Ручной инструмент.
+				886  => '<rect x="2" y="6" width="12" height="6" rx="1"/><path d="M14 8h4l3 1-3 1h-4"/><path d="M6 12v7a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-7"/>',                                     // Электроинструмент.
+				815  => '<path d="M12 21V11"/><path d="M12 11C12 7 9 4 4 4c0 4 3 7 8 7z"/><path d="M12 14c0-3.5 2.5-6 7-6 0 3.5-2.5 6-7 6z"/><path d="M7 21h10"/>',                               // Садово-огородные.
+				1351 => '<path d="M12 2.7l5.66 5.66a8 8 0 1 1-11.31 0z"/>',                                                                                                                        // Сантехника.
+				1282 => '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',                                                                                                                                  // Электрооборудование.
+				1420 => '<path d="M12 2l8.66 5v10L12 22l-8.66-5V7z"/><circle cx="12" cy="12" r="3.5"/>',                                                                                          // Строительный крепёж.
+				1172 => '<rect x="3" y="3" width="15" height="6" rx="1"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',               // Декоративно-отделочные материалы.
+			);
+
 			$ip_categories = array();
 			if ( taxonomy_exists( 'product_cat' ) ) {
-				$ip_categories = get_terms(
-					array(
-						'taxonomy'   => 'product_cat',
-						'hide_empty' => true,
-						'number'     => 4,
-						'exclude'    => array( get_option( 'default_product_cat', 0 ) ),
-					)
-				);
+				foreach ( $ip_main_categories as $ip_cat_id => $ip_cat_icon ) {
+					// На RO-версии WPML подставляет румынскую категорию.
+					$ip_cat = get_term( (int) apply_filters( 'wpml_object_id', $ip_cat_id, 'product_cat', true ), 'product_cat' );
+					if ( $ip_cat && ! is_wp_error( $ip_cat ) ) {
+						$ip_categories[] = array(
+							'term' => $ip_cat,
+							'icon' => $ip_cat_icon,
+						);
+					}
+				}
 			}
 
-			if ( ! is_wp_error( $ip_categories ) && ! empty( $ip_categories ) ) :
+			if ( ! empty( $ip_categories ) ) :
 				?>
 				<ul class="ip-categories-grid">
-					<?php foreach ( $ip_categories as $ip_cat ) : ?>
+					<?php foreach ( $ip_categories as $ip_item ) : ?>
 						<li class="ip-category-card">
-							<a href="<?php echo esc_url( get_term_link( $ip_cat ) ); ?>">
+							<a class="ip-category-card__link" href="<?php echo esc_url( get_term_link( $ip_item['term'] ) ); ?>">
 								<span class="ip-category-card__badge" aria-hidden="true">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-										<rect x="3" y="3" width="18" height="18" rx="2"></rect>
-									</svg>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><?php echo $ip_item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput -- статичная разметка иконки из массива выше. ?></svg>
 								</span>
-								<h3 class="ip-category-card__name"><?php echo esc_html( $ip_cat->name ); ?></h3>
-								<p class="ip-category-card__desc">
-									<?php
-									echo esc_html(
-										$ip_cat->description
-											? wp_trim_words( $ip_cat->description, 8 )
-											: __( 'Смотреть товары в категории', 'glozin-child' )
-									);
-									?>
-								</p>
+								<span class="ip-category-card__text">
+									<h3 class="ip-category-card__name"><?php echo esc_html( $ip_item['term']->name ); ?></h3>
+									<span class="ip-category-card__desc">
+										<?php
+										/* translators: %s: количество товаров в категории */
+										echo esc_html( sprintf( __( 'Товаров: %s', 'glozin-child' ), number_format_i18n( $ip_item['term']->count ) ) );
+										?>
+									</span>
+								</span>
 							</a>
 						</li>
 					<?php endforeach; ?>

@@ -975,58 +975,120 @@ html[lang^="ro"] .ip-season-promo__scrim{
 
 .ip-categories-grid{
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
+  /* minmax(0, 1fr): длинные слова («Электрооборудование») не распирают колонку. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
 }
 
+/* Карточка категории: квадратный значок + название и число товаров.
+   Вся карточка — одна ссылка; при наведении значок и рамка оранжевые. */
 .ip-category-card{
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 24px;
-  text-align: left;
+  border-radius: 2px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.ip-category-card:hover{
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px oklch(0 0 0 / 8%);
+}
+
+.ip-category-card__link{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  padding: 16px;
 }
 
 .ip-category-card__badge{
-  width: 56px;
-  height: 56px;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
   background: var(--bg-dark);
-  border-radius: 4px;
+  color: var(--accent);
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  transition: background-color .2s, color .2s;
 }
 
-.ip-category-card__badge svg,
-.ip-category-card__badge img{
-  width: 28px;
-  height: 28px;
-  color: var(--accent);
+.ip-category-card:hover .ip-category-card__badge{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+.ip-category-card__badge svg{
+  width: 26px;
+  height: 26px;
+}
+
+.ip-category-card__text{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .ip-category-card__name{
-  font-size: 18px;
-  margin: 0 0 8px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  overflow-wrap: break-word;
+  hyphens: auto;
   color: var(--text);
+  margin: 0;
 }
 
 .ip-category-card__desc{
   font-family: "Work Sans", sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin: 0;
 }
 
-@media (min-width: 576px){
-  .ip-categories-grid{
-    grid-template-columns: repeat(2, 1fr);
+/* Значок над названием: на телефоне (2 колонки) и на средних экранах
+   (4 узкие колонки) — иначе «Электроинструмент» рвётся посреди слова. */
+@media (max-width: 575px), (min-width: 992px) and (max-width: 1279px){
+  .ip-category-card__link{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .ip-category-card__badge{
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Без этого блок текста шире карточки (align-items: flex-start даёт ему
+     ширину по содержимому) и длинное название вылезает за рамку. */
+  .ip-category-card__text{
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 575px){
+  .ip-category-card__name{
+    font-size: 15px;
   }
 }
 
 @media (min-width: 992px){
   .ip-categories-grid{
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .ip-category-card__link{
+    padding: 20px;
   }
 }
 
