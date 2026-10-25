@@ -26,7 +26,20 @@ DESIGN, скачан с хостинга 25.10.2026) **плюс редизайн
 точно как раньше. На этой странице шапка и футер родительской темы скрыты
 (`#topbar`, `#site-header`, `#site-footer`), вместо них — свои.
 
-## Как включить на staging
+## Выкладка на staging
+
+С 25.10.2026 — по SSH (ключ `~/.ssh/casa24_tophost`, порт 49786, см. docs/priorities.md №28):
+
+```bash
+scp -P 49786 -i ~/.ssh/casa24_tophost <файл> casamd@195.178.106.95:public_html/staging.casa24.md/wp-content/themes/glozin-child/<путь>
+```
+
+Только папка `staging.casa24.md`. Рабочий сайт — только с явного «да» владельца.
+Страницы на staging: RU `/главная-industrial-pro/` (ID 1093428), RO
+`/ro/pagina-principala-industrial-pro/` (ID 1093430). Перевод строк — `languages/`,
+сборка — `tools/i18n/README.md`.
+
+## Как включить на сайте
 
 1. Залить папку поверх `wp-content/themes/glozin-child/` на staging
    (`public_html/staging.casa24.md`). Файлы `README-industrial-pro.md`,
