@@ -146,6 +146,12 @@ get_header();
 				</svg>
 			</a>
 
+			<?php /* Телефон — в одной строке с логотипом; часы работы убраны, чтобы шапка была на строку ниже (обратная связь 25.10.2026). */ ?>
+			<a class="ip-topbar__phone" href="tel:+37368338813" aria-label="<?php esc_attr_e( 'Позвонить: +373 68 338 813', 'glozin-child' ); ?>">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+				<span class="ip-topbar__phone-number"><?php esc_html_e( '+373 68 338 813', 'glozin-child' ); ?></span>
+			</a>
+
 			<div class="ip-topbar__actions">
 				<?php
 				/*
@@ -189,17 +195,6 @@ get_header();
 
 				<?php glozin_child_language_switcher(); ?>
 			</div>
-			</div>
-
-			<div class="ip-topbar__info">
-				<a class="ip-topbar__phone" href="tel:+37368338813">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-					<?php esc_html_e( '+373 68 338 813', 'glozin-child' ); ?>
-				</a>
-				<span class="ip-topbar__hours">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
-					<?php esc_html_e( 'Пн–Пт 9:00–19:00, Сб–Вс 9:00–17:00', 'glozin-child' ); ?>
-				</span>
 			</div>
 		</div>
 	</div>

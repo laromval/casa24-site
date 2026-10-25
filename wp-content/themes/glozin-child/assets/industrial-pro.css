@@ -10,8 +10,16 @@
 body.ip-page #topbar,
 body.ip-page #site-header,
 body.ip-page #page-header,
-body.ip-page #site-footer{
+body.ip-page #site-footer,
+body.ip-page #gotop{
   display: none !important;
+}
+
+/* Glozin даёт .site-content отступы 54px сверху и 90px снизу — над нашей
+   шапкой оставалась пустая белая полоса (обратная связь 25.10.2026). */
+body.ip-page #site-content{
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 /* Glozin задаёт всем <button> свои отступы, фон, шрифт и межбуквенный
@@ -35,6 +43,12 @@ body.ip-page #site-footer{
 :where(body.ip-page) button::after{
   content: none;
   animation: none;
+}
+
+/* Glozin оставляет маркеры у списков в контенте страницы — в наших
+   сетках карточек (ul > li) они вылезали точками слева от карточек. */
+:where(body.ip-page) .industrial-pro :is(ul, ol){
+  list-style: none;
 }
 
 /* =====================================================================
@@ -208,7 +222,9 @@ body.ip-page #site-footer{
    ===================================================================== */
 .ip-topbar{
   background: var(--topbar-bg);
-  padding: 14px 0;
+  /* 14px → 10px и без второй строки с телефоном/часами — шапка ниже
+     (обратная связь 25.10.2026). */
+  padding: 10px 0;
 }
 
 .ip-topbar .container{
@@ -222,8 +238,8 @@ body.ip-page #site-footer{
    одного flex-ряда с wrap, и то, что переносилось на новую строку при
    сужении окна, менялось непредсказуемо на разных промежуточных ширинах —
    кнопки визуально "прыгали" между строкой логотипа и отдельной строкой).
-   Телефон/часы (.ip-topbar__info) теперь всегда отдельным блоком под этой
-   строкой — см. разметку в template-homepage-industrial-pro.php. */
+   25.10.2026: отдельная строка с телефоном/часами убрана — часы удалены,
+   телефон стоит в этом ряду сразу за логотипом. */
 .ip-topbar__row{
   display: flex;
   align-items: center;
@@ -258,32 +274,28 @@ body.ip-page #site-footer{
   fill: var(--topbar-text);
 }
 
-.ip-topbar__info{
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  color: var(--topbar-text);
-  font-family: "Work Sans", sans-serif;
-  font-size: 13px;
-}
-
 .ip-topbar__phone{
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  /* Отодвигает кнопки справа к краю — телефон остаётся рядом с логотипом. */
+  margin-right: auto;
+  margin-left: 12px;
   color: var(--topbar-text);
-  font-weight: 500;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ip-topbar__phone svg{
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .ip-topbar__phone:hover{
   color: var(--accent);
-}
-
-.ip-topbar__hours{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .ip-topbar__actions{
@@ -469,19 +481,30 @@ body.ip-page #site-footer{
 .ip-search{
   flex-grow: 1;
   max-width: 520px;
+  height: 40px;
   margin: 0 auto;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   background: var(--surface);
-  border-radius: 2px;
+  border-radius: 0;
   overflow: hidden;
 }
 
-.ip-search__input{
+/* .ip-search в селекторе — чтобы перебить правило Glozin
+   input[type=search] (рамка, скругление, высота 50px — внутри квадратного
+   поля получалась закруглённая «таблетка», обратная связь 25.10.2026).
+   Высота поля = высоте кнопки поиска. */
+.ip-search .ip-search__input{
   flex-grow: 1;
+  min-width: 0;
+  height: 40px;
+  min-height: 0;
+  margin: 0;
   border: none;
+  border-radius: 0;
+  box-shadow: none;
   outline: none;
-  padding: 10px 14px;
+  padding: 0 14px;
   font-family: "Work Sans", sans-serif;
   font-size: 14px;
   color: var(--text);
@@ -1023,8 +1046,15 @@ html[lang^="ro"] .ip-season-promo__scrim{
 }
 
 .ip-product-card__name{
+  /* Glozin задаёт h3 свой шрифт заголовков и uppercase — по ТЗ 4.4
+     название товара Work Sans, 2 строки. max-height страхует обрезку:
+     без него у длинных названий выглядывал кусок третьей строки. */
+  font-family: "Work Sans", sans-serif;
+  font-weight: 500;
   font-size: 14px;
   line-height: 1.4;
+  text-transform: none;
+  letter-spacing: normal;
   color: var(--text);
   margin: 0;
   display: -webkit-box;
@@ -1032,6 +1062,7 @@ html[lang^="ro"] .ip-season-promo__scrim{
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: calc(14px * 1.4 * 2);
+  max-height: calc(14px * 1.4 * 2);
 }
 
 .ip-product-card__footer{
@@ -1043,9 +1074,27 @@ html[lang^="ro"] .ip-season-promo__scrim{
 }
 
 .ip-product-card__price{
-  font-size: 20px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.1;
   color: var(--accent-dark);
-  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Товар со скидкой: старая цена мелко строкой выше, новая — основной.
+   Раньше обе стояли в одну строку и выталкивали кнопку корзины за край
+   карточки; жёлтый фон <ins> — от Glozin, убираем. */
+.ip-product-card__price del{
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ip-product-card__price ins{
+  background: none;
+  text-decoration: none;
 }
 
 .ip-product-card__cart-btn{
@@ -1328,6 +1377,23 @@ html[lang^="ro"] .ip-season-promo__scrim{
 /* =====================================================================
    Мобильная адаптивность — контрольные брейкпоинты 375px и 768px
    ===================================================================== */
+@media (max-width: 991px){
+  /* Номер не помещается рядом с логотипом и кнопками — остаётся иконка
+     телефона (по нажатию звонок), номер есть в футере. */
+  .ip-topbar__phone-number{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .ip-topbar__phone{
+    margin-left: 6px;
+  }
+}
+
 @media (max-width: 767px){
   .ip-section{
     padding: 36px 0;
