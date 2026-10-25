@@ -294,3 +294,51 @@ body.ip-site .woocommerce-product-gallery__image img{
   max-height: 640px;
   object-fit: contain;
 }
+
+/* Корзина на блоках WooCommerce (/cart/): у блоков свои классы
+   wc-block-components-*, переменные Glozin на них не действуют. */
+body.ip-site .wc-block-cart__submit-button,
+body.ip-site .wc-block-components-checkout-place-order-button{
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border: none;
+  border-radius: 2px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+body.ip-site .wc-block-cart__submit-button:hover,
+body.ip-site .wc-block-components-checkout-place-order-button:hover{
+  background: var(--bg-dark);
+  color: var(--accent);
+}
+
+body.ip-site :is(.wc-block-cart__totals-title, .wc-block-components-title, .wc-block-cart-items__header){
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+body.ip-site :is(.wc-block-components-product-price, .wc-block-cart-item__total, .wc-block-components-totals-footer-item .wc-block-components-totals-item__value){
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+body.ip-site .wc-block-components-product-name{
+  font-family: "Work Sans", sans-serif;
+  font-weight: 500;
+}
+
+body.ip-site .wc-block-components-quantity-selector{
+  border-radius: 0;
+}
+
+body.ip-site .wc-block-cart__sidebar{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px;
+}
