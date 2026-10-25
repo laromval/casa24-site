@@ -1,0 +1,296 @@
+/*
+ * Industrial Pro на всём сайте — перекраска страниц Glozin (каталог, карточка
+ * товара, корзина, оформление заказа, личный кабинет, обычные страницы).
+ *
+ * Подключается только при опции casa24_ip_sitewide (inc/industrial-pro.php),
+ * после industrial-pro.css — токены --accent, --text и т.д. берутся оттуда.
+ * Основа — переопределение переменных --gz-* темы Glozin: шаблоны, фильтры,
+ * быстрый просмотр, избранное и логика заказа не меняются. Ниже — точечные
+ * правила там, где переменных не хватает.
+ */
+
+/* =====================================================================
+   1. Переменные Glozin → токены Industrial Pro
+   ===================================================================== */
+body.ip-site{
+  --gz-body-font: "Work Sans", Arial, sans-serif;
+  --gz-heading-font: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --gz-heading-font-weight: 700;
+  --gz-heading-text-transform: uppercase;
+  --gz-heading-letter-spacing: 0.02em;
+  --gz-heading-color: var(--text);
+
+  --gz-color-base: var(--text);
+  --gz-color-dark: var(--text);
+  --gz-color-primary: var(--accent);
+  --gz-text-color-on-primary: oklch(0.15 0.02 255);
+  --gz-link-color: var(--text);
+  --gz-link-color-hover: var(--accent-dark);
+  --gz-color-price-sale: var(--accent-dark);
+  --gz-color-light-grey: var(--bg-light);
+  --gz-border-color: var(--border);
+
+  /* Почти всё квадратное (обратная связь владельца 25.10.2026). */
+  --gz-image-rounded: 2px;
+  --gz-image-rounded-product-card: 2px;
+  --gz-rounded-xs: 2px;
+  --gz-rounded-sm: 2px;
+  --gz-rounded-md: 2px;
+  --gz-input-rounded: 0;
+  --gz-button-rounded: 2px;
+  --gz-tooltip-rounded: 2px;
+
+  /* Кнопки: тёмные, при наведении — оранжевые с тёмным текстом. */
+  --gz-button-color: var(--on-dark);
+  --gz-button-bg-color: var(--bg-dark);
+  --gz-button-border-color: var(--bg-dark);
+  --gz-button-color-hover: oklch(0.15 0.02 255);
+  --gz-button-bg-color-hover: var(--accent);
+  --gz-button-border-color-hover: var(--accent);
+  --gz-button-eff-bg-color-hover: var(--accent);
+  --gz-button-font-weight: 700;
+  --gz-button-padding-top: 14px;
+  --gz-button-padding-bottom: 14px;
+
+  --gz-input-border-color-hover: var(--accent);
+
+  background: var(--bg-light);
+  color: var(--text);
+}
+
+/* Текст кнопок — шрифтом заголовков, заглавными (ТЗ 4.3). */
+body.ip-site :is(.button, button, input[type="submit"], .gz-button):not(.gz-button-text):not(.gz-button-icon):not(.ip-icon-btn):not(.ip-theme-toggle){
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Glozin у некоторых элементов зашивает свои цвета поверх переменных. */
+body.ip-site a:hover{
+  color: var(--accent-dark);
+}
+
+/* Главная кнопка действия («В корзину», «Оформить заказ», «Подтвердить
+   заказ») — оранжевая, как .btn-accent в ТЗ 4.3. */
+body.ip-site :is(.single_add_to_cart_button, .checkout-button, #place_order, .wc-proceed-to-checkout .button){
+  background: var(--accent);
+  border-color: var(--accent);
+  color: oklch(0.15 0.02 255);
+}
+
+body.ip-site :is(.single_add_to_cart_button, .checkout-button, #place_order, .wc-proceed-to-checkout .button):hover{
+  background: var(--bg-dark);
+  border-color: var(--bg-dark);
+  color: var(--accent);
+}
+
+/* =====================================================================
+   2. Заголовок страницы (хлебные крошки + H1)
+   ===================================================================== */
+body.ip-site .page-header{
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+body.ip-site .page-header__title{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+body.ip-site .woocommerce-breadcrumb,
+body.ip-site .site-breadcrumb{
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* =====================================================================
+   3. Каталог: карточки товаров, фильтры, панель сортировки
+   ===================================================================== */
+body.ip-site ul.products li.product .product-inner{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 10px 10px 14px;
+  height: 100%;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+body.ip-site ul.products li.product .product-inner:hover{
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px oklch(0 0 0 / 8%);
+}
+
+body.ip-site ul.products li.product .product-thumbnail{
+  background: var(--bg-light);
+}
+
+body.ip-site ul.products li.product .product-thumbnail img{
+  object-fit: contain;
+}
+
+/* Название — Work Sans в 2 строки, как на главной (ТЗ 4.4). */
+body.ip-site ul.products li.product .woocommerce-loop-product__title{
+  font-family: "Work Sans", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Цены — шрифтом заголовков, тёмно-оранжевые (ТЗ 4.4). */
+body.ip-site :is(ul.products li.product, .summary, .product-summary, .woocommerce-mini-cart, .cart_totals, .woocommerce-checkout-review-order) .price,
+body.ip-site ul.products li.product .price .amount{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+body.ip-site .price del,
+body.ip-site .price del .amount{
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+body.ip-site .price ins{
+  background: none;
+  text-decoration: none;
+}
+
+/* Плитки подкатегорий над товарами (Top Categories подрядчика). */
+body.ip-site .catalog-top-categories :is(img, .gz-ratio){
+  border-radius: 2px;
+}
+
+body.ip-site .catalog-top-categories :is(h2, h3, h6, .catalog-top-categories__title, a){
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Боковая панель фильтров. */
+body.ip-site .catalog-filters-sidebar :is(.widget-title, .products-filter__filter-name, h2, h3){
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+body.ip-site .catalog-filters-sidebar a:hover,
+body.ip-site .catalog-filters-sidebar .current-cat > a,
+body.ip-site .catalog-filters-sidebar .selected > a{
+  color: var(--accent-dark);
+}
+
+/* Счётчик/бейджи «-10%», «Новинка». */
+body.ip-site :is(.onsale, .woocommerce-badge, .gz-badge, .product-badge){
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border-radius: 2px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Пагинация. */
+body.ip-site .woocommerce-pagination :is(a, span).page-numbers{
+  border-radius: 2px;
+}
+
+body.ip-site .woocommerce-pagination span.page-numbers.current{
+  background: var(--bg-dark);
+  color: var(--accent);
+}
+
+/* =====================================================================
+   4. Карточка товара
+   ===================================================================== */
+body.ip-site .single-product .product_title,
+body.ip-site .product_title{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+body.ip-site .single-product .summary .price{
+  font-size: 30px;
+}
+
+body.ip-site .woocommerce-tabs .tabs li a,
+body.ip-site .woocommerce-tabs :is(.wc-tabs, .tabs) a{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+body.ip-site .woocommerce-tabs .tabs li.active a{
+  color: var(--accent-dark);
+}
+
+body.ip-site .quantity :is(input, .qty){
+  border-radius: 0;
+}
+
+/* =====================================================================
+   5. Корзина, оформление заказа, личный кабинет
+   ===================================================================== */
+body.ip-site :is(.woocommerce-cart-form, .cart_totals, .woocommerce-checkout-review-order, #order_review, .woocommerce-MyAccount-content){
+  background: var(--surface);
+}
+
+body.ip-site :is(.cart_totals, .woocommerce-checkout-review-order, #order_review) :is(h2, h3){
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+}
+
+body.ip-site .woocommerce-MyAccount-navigation a{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+body.ip-site .woocommerce-MyAccount-navigation .is-active a{
+  color: var(--accent-dark);
+}
+
+/* Поля форм: квадратные, акцент при фокусе. */
+body.ip-site :is(input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="search"], input[type="number"], select, textarea, .select2-selection){
+  border-radius: 0;
+}
+
+body.ip-site :is(input, select, textarea):focus{
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* Уведомления WooCommerce. */
+body.ip-site :is(.woocommerce-message, .woocommerce-info){
+  border-left: 3px solid var(--accent);
+  border-radius: 2px;
+}
+
+body.ip-site .woocommerce-error{
+  border-left: 3px solid oklch(0.55 0.2 25);
+  border-radius: 2px;
+}
+
+/* Фото товара на всю ширину колонки галереи: у многих товаров картинка
+   400px и Glozin показывал её в натуральную величину (~190px на экране
+   в колонке ~480px — staging, 26.10.2026). */
+body.ip-site .woocommerce-product-gallery :is(.woocommerce-product-gallery__image, .woocommerce-product-gallery__wrapper){
+  background: var(--surface);
+}
+
+body.ip-site .woocommerce-product-gallery__image img{
+  width: 100%;
+  height: auto;
+  max-height: 640px;
+  object-fit: contain;
+}

@@ -3,10 +3,11 @@
  * Industrial Pro — редизайн casa24.md, Фаза 1 (docs/tz-redesign-phase1.md).
  *
  * Перенесено из черновика glozin-child-industrial-pro в рабочую тему
- * подрядчика (docs/merge-plan-glozin-child.md). Всё, что меняет внешний
- * вид, срабатывает только на странице с шаблоном
- * template-homepage-industrial-pro.php — остальные страницы сайта и
- * логика подрядчика (чекаут, maib, поиск по штрихкоду) не затрагиваются.
+ * подрядчика (docs/merge-plan-glozin-child.md). Внешний вид меняется на
+ * странице с шаблоном template-homepage-industrial-pro.php, а при включённой
+ * опции casa24_ip_sitewide — шапка/футер Industrial Pro и перекраска Glozin
+ * (assets/industrial-pro-site.css) на всех страницах. Логика подрядчика
+ * (чекаут, maib, поиск по штрихкоду) не затрагивается.
  *
  * @package Glozin Child
  */
@@ -23,6 +24,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 function glozin_child_is_industrial_pro_page() {
 	return is_page_template( 'template-homepage-industrial-pro.php' );
 }
+
+/**
+ * Industrial Pro на всём сайте (шапка, футер, перекраска страниц Glozin)?
+ *
+ * Включается опцией: wp option update casa24_ip_sitewide 1 (выключается — 0).
+ * Сначала — только на staging (26.10.2026), на проде — после приёмки.
+ *
+ * @return bool
+ */
+function glozin_child_ip_sitewide() {
+	return (bool) get_option( 'casa24_ip_sitewide' ) && ! is_admin();
+}
+
+/**
+ * На странице выводятся шапка и футер Industrial Pro?
+ *
+ * @return bool
+ */
+function glozin_child_ip_chrome_enabled() {
+	return glozin_child_is_industrial_pro_page() || glozin_child_ip_sitewide();
+}
+
+/**
+ * Шапка Industrial Pro — сразу после <body>.
+ */
+function glozin_child_ip_render_header() {
+	if ( glozin_child_ip_chrome_enabled() ) {
+		get_template_part( 'template-parts/industrial-pro/header' );
+	}
+}
+add_action( 'wp_body_open', 'glozin_child_ip_render_header', 5 );
+
+/**
+ * Футер Industrial Pro — в начале wp_footer, до скриптов и модальных окон Glozin.
+ */
+function glozin_child_ip_render_footer() {
+	if ( glozin_child_ip_chrome_enabled() ) {
+		get_template_part( 'template-parts/industrial-pro/footer' );
+	}
+}
+add_action( 'wp_footer', 'glozin_child_ip_render_footer', 1 );
 
 /**
  * Регистрация location 'primary' для главного меню шапки.
@@ -74,7 +116,7 @@ function glozin_child_primary_nav_fallback() {
  * плюс 900 у обоих — акцентный текст на баннерах карусели.
  */
 function glozin_child_industrial_pro_assets() {
-	if ( ! glozin_child_is_industrial_pro_page() ) {
+	if ( ! glozin_child_ip_chrome_enabled() ) {
 		return;
 	}
 
@@ -94,6 +136,17 @@ function glozin_child_industrial_pro_assets() {
 		array( 'glozin-child-style', 'glozin-child-google-fonts' ),
 		filemtime( get_stylesheet_directory() . '/assets/industrial-pro.css' )
 	);
+
+	// Перекраска страниц Glozin (каталог, товар, корзина, чекаут, кабинет)
+	// под Industrial Pro — переменные --gz-* и точечные правила.
+	if ( glozin_child_ip_sitewide() ) {
+		wp_enqueue_style(
+			'glozin-child-industrial-pro-site',
+			get_stylesheet_directory_uri() . '/assets/industrial-pro-site.css',
+			array( 'glozin-child-industrial-pro' ),
+			filemtime( get_stylesheet_directory() . '/assets/industrial-pro-site.css' )
+		);
+	}
 
 	// Переключатель светлая/тёмная тема (обратная связь 19.09.2026) — чистый JS, без зависимостей.
 	wp_enqueue_script(
@@ -116,8 +169,9 @@ function glozin_child_industrial_pro_assets() {
 add_action( 'wp_enqueue_scripts', 'glozin_child_industrial_pro_assets', 30 );
 
 /**
- * Класс ip-page на body — по нему industrial-pro.css прячет шапку и футер
- * родительской темы на странице Industrial Pro.
+ * Классы body: ip-page — страница с шаблоном Industrial Pro (без заголовка
+ * страницы Glozin, контент во всю ширину); ip-chrome — шапка и футер
+ * Industrial Pro вместо Glozin; ip-site — перекраска страниц Glozin.
  *
  * @param string[] $classes Классы body.
  * @return string[]
@@ -125,6 +179,14 @@ add_action( 'wp_enqueue_scripts', 'glozin_child_industrial_pro_assets', 30 );
 function glozin_child_industrial_pro_body_class( $classes ) {
 	if ( glozin_child_is_industrial_pro_page() ) {
 		$classes[] = 'ip-page';
+	}
+
+	if ( glozin_child_ip_chrome_enabled() ) {
+		$classes[] = 'ip-chrome';
+	}
+
+	if ( glozin_child_ip_sitewide() ) {
+		$classes[] = 'ip-site';
 	}
 
 	return $classes;

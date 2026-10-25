@@ -7,12 +7,19 @@
 /* На странице Industrial Pro своя шапка и футер — шапку/футер родительской
    темы Glozin прячем, чтобы не было двух шапок подряд. Модальные окна,
    панель корзины и мобильное меню родителя остаются в разметке. */
-body.ip-page #topbar,
-body.ip-page #site-header,
-body.ip-page #page-header,
-body.ip-page #site-footer,
-body.ip-page #gotop{
+body.ip-chrome #topbar,
+body.ip-chrome #site-header,
+body.ip-chrome #site-footer,
+body.ip-chrome #gotop,
+body.ip-page #page-header{
   display: none !important;
+}
+
+/* Обёртка шапки (template-parts/industrial-pro/header.php) не создаёт
+   своего блока — иначе position: sticky у .ip-navrow ограничивался бы её
+   высотой и строка «Каталог + поиск» не закреплялась бы при прокрутке. */
+.ip-site-header{
+  display: contents;
 }
 
 /* Glozin даёт .site-content отступы 54px сверху и 90px снизу — над нашей
@@ -44,7 +51,10 @@ body.ip-page .ip-footer{
    Сбрасываем на той же специфичности, что у Glozin (:where не добавляет
    веса), поэтому собственные правила .ip-* ниже по файлу по-прежнему
    побеждают. */
-:where(body.ip-page) button{
+/* Только наши кнопки (шапка, секции, футер, «наверх») — раньше сброс шёл на
+   все <button> страницы и задевал кнопки Glozin в панели корзины и окнах. */
+:where(.industrial-pro, .ip-footer) button,
+button:where(.ip-scroll-top){
   padding: 0;
   min-width: 0;
   line-height: 1;
@@ -56,14 +66,15 @@ body.ip-page .ip-footer{
   transition: background-color .2s, color .2s;
 }
 
-:where(body.ip-page) button::after{
+:where(.industrial-pro, .ip-footer) button::after,
+button:where(.ip-scroll-top)::after{
   content: none;
   animation: none;
 }
 
 /* Glozin оставляет маркеры у списков в контенте страницы — в наших
    сетках карточек (ul > li) они вылезали точками слева от карточек. */
-:where(body.ip-page) .industrial-pro :is(ul, ol){
+:where(.industrial-pro, .ip-footer) :is(ul, ol){
   list-style: none;
 }
 
