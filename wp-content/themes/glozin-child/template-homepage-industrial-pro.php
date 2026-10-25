@@ -505,7 +505,7 @@ get_header();
 				815  => '<path d="M12 21V11"/><path d="M12 11C12 7 9 4 4 4c0 4 3 7 8 7z"/><path d="M12 14c0-3.5 2.5-6 7-6 0 3.5-2.5 6-7 6z"/><path d="M7 21h10"/>',                               // Садово-огородные.
 				1351 => '<path d="M12 2.7l5.66 5.66a8 8 0 1 1-11.31 0z"/>',                                                                                                                        // Сантехника.
 				1282 => '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',                                                                                                                                  // Электрооборудование.
-				1420 => '<path d="M12 2l8.66 5v10L12 22l-8.66-5V7z"/><circle cx="12" cy="12" r="3.5"/>',                                                                                          // Строительный крепёж.
+				813  => '<path d="M6 21V3h12v18"/><path d="M3 21h18"/><path d="M14.5 12h.01"/>',                                                                                                         // Двери (вместо «Строительного крепежа», обратная связь 25.10.2026).
 				1172 => '<rect x="3" y="3" width="15" height="6" rx="1"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',               // Декоративно-отделочные материалы.
 			);
 
@@ -515,9 +515,15 @@ get_header();
 					// На RO-версии WPML подставляет румынскую категорию.
 					$ip_cat = get_term( (int) apply_filters( 'wpml_object_id', $ip_cat_id, 'product_cat', true ), 'product_cat' );
 					if ( $ip_cat && ! is_wp_error( $ip_cat ) ) {
+						// Число товаров с учётом подкатегорий: WordPress в ->count считает
+						// только товары, лежащие прямо в категории (у разделов верхнего
+						// уровня это почти 0), а WooCommerce хранит полный пересчёт в мете.
+						$ip_count = get_term_meta( $ip_cat->term_id, 'product_count_product_cat', true );
+
 						$ip_categories[] = array(
-							'term' => $ip_cat,
-							'icon' => $ip_cat_icon,
+							'term'  => $ip_cat,
+							'icon'  => $ip_cat_icon,
+							'count' => '' !== $ip_count ? (int) $ip_count : (int) $ip_cat->count,
 						);
 					}
 				}
@@ -534,12 +540,14 @@ get_header();
 								</span>
 								<span class="ip-category-card__text">
 									<h3 class="ip-category-card__name"><?php echo esc_html( $ip_item['term']->name ); ?></h3>
-									<span class="ip-category-card__desc">
-										<?php
-										/* translators: %s: количество товаров в категории */
-										echo esc_html( sprintf( __( 'Товаров: %s', 'glozin-child' ), number_format_i18n( $ip_item['term']->count ) ) );
-										?>
-									</span>
+									<?php if ( $ip_item['count'] > 0 ) : ?>
+										<span class="ip-category-card__desc">
+											<?php
+											/* translators: %s: количество товаров в категории */
+											echo esc_html( sprintf( __( 'Товаров: %s', 'glozin-child' ), number_format_i18n( $ip_item['count'] ) ) );
+											?>
+										</span>
+									<?php endif; ?>
 								</span>
 							</a>
 						</li>
