@@ -83,24 +83,56 @@ function glozin_child_register_nav_menus() {
 add_action( 'after_setup_theme', 'glozin_child_register_nav_menus' );
 
 /**
- * Фолбэк для wp_nav_menu( 'primary' ), пока в wp-admin (Внешний вид → Меню)
- * ещё не назначено реальное меню на location 'primary'. Показывает
- * статические пункты из раздела 4.4 ТЗ (Каталог, Двери, Электроинструмент,
- * Сад и огород, Статьи), переводимые через text domain glozin-child.
+ * Список «Каталог» в шапке: все разделы верхнего уровня WooCommerce.
+ *
+ * Раньше здесь было меню WordPress 'primary' — его на сайте так и не
+ * назначили, и выводились 5 запасных пунктов (обратная связь 26.10.2026).
+ * Теперь — категории товаров верхнего уровня на текущем языке WPML, по
+ * алфавиту, с числом товаров (с учётом подкатегорий), без пустых. Первая
+ * строка — весь каталог.
  */
-function glozin_child_primary_nav_fallback() {
-	$items = array(
-		home_url( '/shop/' )               => __( 'Каталог', 'glozin-child' ),
-		home_url( '/product-category/usi/' ) => __( 'Двери', 'glozin-child' ),
-		home_url( '/product-category/electrounelte/' ) => __( 'Электроинструмент', 'glozin-child' ),
-		home_url( '/product-category/gradina/' ) => __( 'Сад и огород', 'glozin-child' ),
-		home_url( '/blog/' )               => __( 'Статьи', 'glozin-child' ),
+function glozin_child_catalog_menu() {
+	if ( ! taxonomy_exists( 'product_cat' ) ) {
+		return;
+	}
+
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'product_cat',
+			'parent'     => 0,
+			'hide_empty' => true,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+			'exclude'    => array( (int) get_option( 'default_product_cat', 0 ) ),
+		)
 	);
 
-	echo '<ul id="primary-menu-fallback" class="ip-nav__fallback-list">';
-	foreach ( $items as $url => $label ) {
-		echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
+	if ( is_wp_error( $terms ) ) {
+		return;
 	}
+
+	$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' );
+
+	echo '<ul class="ip-catalog__list">';
+	printf(
+		'<li class="ip-catalog__item ip-catalog__item--all"><a href="%1$s">%2$s</a></li>',
+		esc_url( $shop_url ),
+		esc_html__( 'Все категории', 'glozin-child' )
+	);
+
+	foreach ( $terms as $term ) {
+		$count = get_term_meta( $term->term_id, 'product_count_product_cat', true );
+		$count = '' !== $count ? (int) $count : (int) $term->count;
+
+		// Счётчик WooCommerce бывает 0 при товарах в подкатегориях — тогда без числа.
+		printf(
+			'<li class="ip-catalog__item"><a href="%1$s"><span class="ip-catalog__name">%2$s</span>%3$s</a></li>',
+			esc_url( get_term_link( $term ) ),
+			esc_html( $term->name ),
+			$count > 0 ? '<span class="ip-catalog__count">' . esc_html( number_format_i18n( $count ) ) . '</span>' : ''
+		);
+	}
+
 	echo '</ul>';
 }
 

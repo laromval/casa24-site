@@ -21,6 +21,42 @@
 	window.addEventListener( 'resize', updateScrollbarWidth );
 	document.addEventListener( 'DOMContentLoaded', updateScrollbarWidth );
 
+	/*
+	 * «Каталог» в шапке — открывается и закрывается по нажатию (обратная связь
+	 * 26.10.2026: при наведении список исчезал, пока курсор шёл к пункту).
+	 * Закрывается также кликом мимо списка и клавишей Esc.
+	 */
+	document.addEventListener( 'DOMContentLoaded', function () {
+		var toggle = document.querySelector( '[data-ip-catalog-toggle]' );
+		if ( ! toggle ) {
+			return;
+		}
+
+		var catalog = toggle.closest( '.ip-catalog' );
+
+		function setOpen( open ) {
+			catalog.classList.toggle( 'is-open', open );
+			toggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+		}
+
+		toggle.addEventListener( 'click', function () {
+			setOpen( ! catalog.classList.contains( 'is-open' ) );
+		} );
+
+		document.addEventListener( 'click', function ( event ) {
+			if ( catalog.classList.contains( 'is-open' ) && ! catalog.contains( event.target ) ) {
+				setOpen( false );
+			}
+		} );
+
+		document.addEventListener( 'keydown', function ( event ) {
+			if ( 'Escape' === event.key && catalog.classList.contains( 'is-open' ) ) {
+				setOpen( false );
+				toggle.focus();
+			}
+		} );
+	} );
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		var button = document.querySelector( '[data-ip-scroll-top]' );
 		if ( ! button ) {

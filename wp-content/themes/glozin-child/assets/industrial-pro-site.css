@@ -392,3 +392,23 @@ body.admin-bar .ip-navrow{
     overflow-wrap: anywhere;
   }
 }
+
+/* Единый формат фото (обратная связь 26.10.2026: «фото не помещаются»):
+   квадрат, картинка целиком (contain), без обрезки, на светлом фоне.
+   Плитки разделов над товарами Glozin обрезал под квадрат (cover) — высокие
+   фото дверей теряли верх и низ. Карточки товаров уже contain (раздел 3). */
+body.ip-site .catalog-top-categories .gz-ratio,
+body.ip-site :is(.woocommerce-mini-cart-item, .search-modal, .modal__content-results, .wcboost-wishlist) .gz-ratio{
+  background: var(--surface);
+}
+
+body.ip-site .catalog-top-categories .gz-ratio img,
+body.ip-site :is(.woocommerce-mini-cart-item, .search-modal, .modal__content-results, .wcboost-wishlist) img{
+  object-fit: contain;
+  padding: 6px;
+}
+
+body.ip-site .catalog-top-categories .gz-ratio{
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}

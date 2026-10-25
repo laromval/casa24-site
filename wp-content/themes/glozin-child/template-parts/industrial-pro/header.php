@@ -122,21 +122,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="ip-navrow">
 		<div class="container">
 			<div class="ip-catalog">
-				<button type="button" class="ip-catalog__toggle" aria-expanded="false" aria-haspopup="true">
+				<?php /* Открывается по нажатию (assets/ui-interactions.js), а не при наведении: при наведении список закрывался, пока курсор шёл к пункту (обратная связь 26.10.2026). */ ?>
+				<button type="button" class="ip-catalog__toggle" aria-expanded="false" aria-controls="ip-catalog-menu" data-ip-catalog-toggle>
 					<?php esc_html_e( 'Каталог', 'glozin-child' ); ?>
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
 				</button>
-				<nav class="ip-catalog__menu" aria-label="<?php esc_attr_e( 'Категории каталога', 'glozin-child' ); ?>">
-					<?php
-					wp_nav_menu(
-						array(
-							'theme_location' => 'primary',
-							'container'      => false,
-							'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-							'fallback_cb'    => 'glozin_child_primary_nav_fallback',
-						)
-					);
-					?>
+				<nav class="ip-catalog__menu" id="ip-catalog-menu" aria-label="<?php esc_attr_e( 'Категории каталога', 'glozin-child' ); ?>">
+					<?php glozin_child_catalog_menu(); ?>
 				</nav>
 			</div>
 
