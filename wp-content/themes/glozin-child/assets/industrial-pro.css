@@ -1186,6 +1186,11 @@ html[lang^="ro"] .ip-season-promo__scrim{
   text-decoration: none;
 }
 
+/* Сумма с валютой не разрывается: «1 650,00 MDL» всегда одной строкой. */
+.ip-product-card__price .amount{
+  white-space: nowrap;
+}
+
 .ip-product-card__cart-btn{
   width: 40px;
   height: 40px;
