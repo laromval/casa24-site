@@ -145,6 +145,108 @@ function glozin_child_category_url( $term_id ) {
 }
 
 /**
+ * Ссылка на страницу избранного плагина WCBoost Wishlist (на текущем языке WPML).
+ *
+ * @return string
+ */
+function glozin_child_wishlist_url() {
+	$page_id = (int) get_option( 'wcboost_wishlist_page_id' );
+
+	if ( $page_id ) {
+		$page_id = (int) apply_filters( 'wpml_object_id', $page_id, 'page', true );
+		$link    = get_permalink( $page_id );
+
+		if ( $link ) {
+			return $link;
+		}
+	}
+
+	return home_url( '/wishlist/' );
+}
+
+/**
+ * Счётчик в кружке шапки (корзина / избранное).
+ *
+ * Классы — те же, что у шапки Glozin (header-counter header-cart__counter,
+ * header-counter header-wishlist__counter): WooCommerce и WCBoost Wishlist
+ * обновляют счётчики через AJAX-фрагменты именно по этим селекторам
+ * ('span.header-cart__counter', 'span.header-wishlist__counter') и заменяют
+ * span целиком — поэтому стили в industrial-pro.css тоже повешены на них.
+ *
+ * @param string $type  'cart' или 'wishlist'.
+ * @param int    $count Количество.
+ */
+function glozin_child_header_counter( $type, $count ) {
+	$classes = 'header-counter header-' . $type . '__counter';
+
+	if ( ! $count ) {
+		$classes .= ' empty-counter';
+	}
+
+	printf( '<span class="%1$s">%2$s</span>', esc_attr( $classes ), esc_html( $count ) );
+}
+
+/**
+ * Количество товаров в корзине.
+ *
+ * @return int
+ */
+function glozin_child_cart_count() {
+	return ( function_exists( 'WC' ) && WC()->cart ) ? (int) WC()->cart->get_cart_contents_count() : 0;
+}
+
+/**
+ * Количество товаров в избранном (WCBoost Wishlist).
+ *
+ * @return int
+ */
+function glozin_child_wishlist_count() {
+	if ( ! class_exists( '\WCBoost\Wishlist\Helper' ) ) {
+		return 0;
+	}
+
+	$wishlist = \WCBoost\Wishlist\Helper::get_wishlist();
+
+	return $wishlist ? (int) $wishlist->count_items() : 0;
+}
+
+/**
+ * Кнопка «в корзину» в карточке товара.
+ *
+ * Простой товар в наличии — стандартная AJAX-кнопка WooCommerce
+ * (add_to_cart_button ajax_add_to_cart): товар добавляется без перезагрузки,
+ * Glozin после этого сам открывает боковую панель корзины. Вариативный или
+ * отсутствующий товар — ссылка на карточку, там выбирают вариант.
+ *
+ * @param WC_Product $product Товар.
+ */
+function glozin_child_card_cart_button( $product ) {
+	$ajax  = $product->is_type( 'simple' ) && $product->is_purchasable() && $product->is_in_stock();
+	$title = $product->get_name();
+
+	$classes = 'ip-product-card__cart-btn';
+	if ( $ajax ) {
+		$classes .= ' add_to_cart_button ajax_add_to_cart';
+		/* translators: %s: название товара */
+		$label = sprintf( __( 'Добавить «%s» в корзину', 'glozin-child' ), $title );
+	} else {
+		/* translators: %s: название товара */
+		$label = sprintf( __( 'Выбрать «%s»', 'glozin-child' ), $title );
+	}
+
+	printf(
+		'<a href="%1$s" class="%2$s" data-product_id="%3$d" data-product_sku="%4$s" data-quantity="1" aria-label="%5$s" rel="nofollow">',
+		esc_url( $ajax ? $product->add_to_cart_url() : $product->get_permalink() ),
+		esc_attr( $classes ),
+		(int) $product->get_id(),
+		esc_attr( $product->get_sku() ),
+		esc_attr( $label )
+	);
+	echo '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>';
+	echo '</a>';
+}
+
+/**
  * Переключатель языка RU/RO в верхней строке шапки (обратная связь 19.09.2026).
  * Использует WPML, если он активен на сайте; иначе — статический фолбэк.
  */

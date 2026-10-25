@@ -74,19 +74,7 @@ function glozin_child_render_product_card( $product ) {
 			</h3>
 			<div class="ip-product-card__footer">
 				<span class="ip-product-card__price"><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
-				<button
-					type="button"
-					class="ip-product-card__cart-btn"
-					aria-label="<?php echo esc_attr( sprintf( /* translators: %s: имя товара */ __( 'Добавить «%s» в корзину', 'glozin-child' ), get_the_title( $product_id ) ) ); ?>"
-					data-product-id="<?php echo esc_attr( $product_id ); ?>"
-				>
-					<?php /* Заглушка иконки корзины — реальное добавление в корзину подключить через woocommerce_add_to_cart / AJAX add-to-cart хуки WooCommerce. */ ?>
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-						<circle cx="9" cy="21" r="1"></circle>
-						<circle cx="20" cy="21" r="1"></circle>
-						<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-					</svg>
-				</button>
+				<?php glozin_child_card_cart_button( $product ); ?>
 			</div>
 		</div>
 	</li>
@@ -159,19 +147,20 @@ get_header();
 				 * Зарегистрироваться → Избранное → переключатель темы → Корзина → RU/RO.
 				 */
 				?>
-				<a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ) ); ?>" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Зарегистрироваться / Личный кабинет', 'glozin-child' ); ?>">
+				<?php /* Не вошёл — окно входа Glozin (#login-modal), вошёл — страница личного кабинета. */ ?>
+				<a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ) ); ?>" class="ip-icon-btn"<?php echo is_user_logged_in() ? '' : ' data-toggle="modal" data-target="login-modal"'; ?> aria-label="<?php esc_attr_e( 'Зарегистрироваться / Личный кабинет', 'glozin-child' ); ?>">
 					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
 						<circle cx="12" cy="7" r="4"></circle>
 					</svg>
 				</a>
 
-				<?php /* Избранное — разметка-заглушка. Подключить реальный счётчик через хуки плагина wishlist (например, YITH/TI WooCommerce Wishlist), когда плагин будет определён на живом сайте. */ ?>
-				<a href="#" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Избранное', 'glozin-child' ); ?>">
+				<?php /* Избранное — плагин WCBoost Wishlist, счётчик обновляется его AJAX-фрагментами. */ ?>
+				<a href="<?php echo esc_url( glozin_child_wishlist_url() ); ?>" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Избранное', 'glozin-child' ); ?>">
 					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
 					</svg>
-					<span class="ip-icon-btn__badge"><?php echo esc_html( '0' ); /* TODO: подключить реальное количество избранного. */ ?></span>
+					<?php glozin_child_header_counter( 'wishlist', glozin_child_wishlist_count() ); ?>
 				</a>
 
 				<button type="button" class="ip-theme-toggle" data-ip-theme-toggle aria-label="<?php esc_attr_e( 'Переключить светлую/тёмную тему сайта', 'glozin-child' ); ?>">
@@ -179,18 +168,14 @@ get_header();
 					<svg class="ip-theme-toggle__icon ip-theme-toggle__icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
 				</button>
 
-				<?php /* Корзина — заглушка счётчика. Подключить WC()->cart->get_cart_contents_count() и фрагменты WooCommerce (woocommerce_add_to_cart_fragments) для живого обновления без перезагрузки. */ ?>
-				<a href="<?php echo function_exists( 'wc_get_cart_url' ) ? esc_url( wc_get_cart_url() ) : '#'; ?>" class="ip-icon-btn" aria-label="<?php esc_attr_e( 'Корзина', 'glozin-child' ); ?>">
+				<?php /* Корзина — открывает боковую панель корзины Glozin (#cart-panel); без JS ведёт на страницу корзины. */ ?>
+				<a href="<?php echo function_exists( 'wc_get_cart_url' ) ? esc_url( wc_get_cart_url() ) : '#'; ?>" class="ip-icon-btn" data-toggle="off-canvas" data-target="cart-panel" aria-label="<?php esc_attr_e( 'Корзина', 'glozin-child' ); ?>">
 					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<circle cx="9" cy="21" r="1"></circle>
 						<circle cx="20" cy="21" r="1"></circle>
 						<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
 					</svg>
-					<span class="ip-icon-btn__badge">
-						<?php
-						echo ( function_exists( 'WC' ) && WC()->cart ) ? esc_html( WC()->cart->get_cart_contents_count() ) : '0';
-						?>
-					</span>
+					<?php glozin_child_header_counter( 'cart', glozin_child_cart_count() ); ?>
 				</a>
 
 				<?php glozin_child_language_switcher(); ?>
@@ -224,9 +209,17 @@ get_header();
 				</nav>
 			</div>
 
-			<form class="ip-search" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-				<input type="search" name="s" class="ip-search__input" placeholder="<?php esc_attr_e( 'Искать товары…', 'glozin-child' ); ?>">
-				<input type="hidden" name="post_type" value="product">
+			<?php
+			/*
+			 * Классы header-search__form / gz-instant-search__form и data-toggle —
+			 * как у формы поиска в шапке Glozin: скрипт glozin-addons подхватывает
+			 * её, показывает живые подсказки в окне #search-modal, а поиск по
+			 * штрихкоду подрядчика (inc/plugins/barcode-search.php) работает и тут.
+			 */
+			?>
+			<form class="ip-search header-search__form gz-instant-search__form" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>" data-toggle="modal" data-target="search-modal">
+				<input type="text" name="s" class="ip-search__input header-search__field gz-instant-search__field" placeholder="<?php esc_attr_e( 'Искать товары…', 'glozin-child' ); ?>" autocomplete="off">
+				<input type="hidden" name="post_type" class="header-search__post-type" value="product">
 				<button type="submit" class="ip-search__submit" aria-label="<?php esc_attr_e( 'Найти', 'glozin-child' ); ?>">
 					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
 				</button>

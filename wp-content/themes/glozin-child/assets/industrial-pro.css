@@ -345,7 +345,10 @@ body.ip-page .ip-footer{
   background: var(--accent);
 }
 
-.ip-icon-btn__badge{
+/* Счётчики корзины/избранного: классы Glozin, т.к. AJAX-фрагменты
+   WooCommerce/WCBoost заменяют span целиком (см. glozin_child_header_counter()).
+   Пустой счётчик (0) не показываем. */
+.ip-icon-btn .header-counter{
   position: absolute;
   top: -3px;
   right: -3px;
@@ -362,6 +365,11 @@ body.ip-page .ip-footer{
   align-items: center;
   justify-content: center;
   border: 2px solid var(--topbar-bg);
+  line-height: 1;
+}
+
+.ip-icon-btn .header-counter.empty-counter{
+  display: none;
 }
 
 .ip-lang-switch{
@@ -1130,9 +1138,32 @@ html[lang^="ro"] .ip-season-promo__scrim{
   cursor: pointer;
 }
 
-.ip-product-card__cart-btn:hover{
+.ip-product-card .ip-product-card__cart-btn{
+  /* Кнопка теперь <a> — без .ip-product-card в селекторе цвет перебивал
+     сброс .industrial-pro a{ color: inherit }. */
+  color: var(--accent);
+}
+
+.ip-product-card .ip-product-card__cart-btn:hover{
   background: var(--accent);
   color: var(--bg-dark);
+}
+
+/* WooCommerce на время AJAX-добавления ставит .loading, после — .added. */
+.ip-product-card__cart-btn.loading{
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ip-product-card .ip-product-card__cart-btn.added{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+/* Ссылку «Просмотр корзины», которую WooCommerce вставляет рядом с кнопкой,
+   прячем — она ломает карточку, а корзину Glozin и так открывает панелью. */
+.ip-product-card a.added_to_cart{
+  display: none;
 }
 
 @media (min-width: 576px){
@@ -1475,7 +1506,7 @@ html[lang^="ro"] .ip-season-promo__scrim{
     height: 14px;
   }
 
-  .ip-icon-btn__badge{
+  .ip-icon-btn .header-counter{
     /* Меньше самого кружка (28px) — иначе бейдж вылезает за его границы. */
     min-width: 13px;
     height: 13px;
