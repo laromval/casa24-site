@@ -338,3 +338,4 @@ require get_stylesheet_directory() . '/inc/plugins/barcode-search.php';
 require get_stylesheet_directory() . '/inc/plugins/top-categories-carousel.php';
 require get_stylesheet_directory() . '/inc/hide-flag.php';
 require get_stylesheet_directory() . '/inc/telsender-wpml-fix.php';
+require get_stylesheet_directory() . '/inc/industrial-pro.php';

@@ -1,13 +1,17 @@
 /*
-Theme Name: Glozin Child — Industrial Pro
-Theme URI: https://casa24.md
-Description: Дочерняя тема для casa24.md на базе Glozin. Реализует дизайн-направление «Industrial Pro» (ТЗ: docs/tz-redesign-phase1.md, раздел 4) — тёмная шапка/хиро с оранжевым акцентом, Barlow Condensed + Work Sans. Разработана как статический каркас без Elementor.
-Author: Casa24 dev-agent
-Author URI: https://casa24.md
-Template: glozin
-Version: 0.1.0
-Text Domain: glozin-child
-*/
+ * Industrial Pro — стили редизайна casa24.md (docs/tz-redesign-phase1.md, раздел 4).
+ * Подключается ТОЛЬКО на страницах с шаблоном «Industrial Pro — Главная»
+ * (inc/industrial-pro.php), остальной сайт выглядит как раньше.
+ */
+
+/* На странице Industrial Pro своя шапка и футер — шапку/футер родительской
+   темы Glozin прячем, чтобы не было двух шапок подряд. Модальные окна,
+   панель корзины и мобильное меню родителя остаются в разметке. */
+body.ip-page #topbar,
+body.ip-page #site-header,
+body.ip-page #site-footer{
+  display: none !important;
+}
 
 /* =====================================================================
    4.1 Цветовые токены (oklch) — ТЗ раздел 4.1, значения не изменять
