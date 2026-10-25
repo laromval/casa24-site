@@ -129,6 +129,22 @@ function glozin_child_industrial_pro_body_class( $classes ) {
 add_filter( 'body_class', 'glozin_child_industrial_pro_body_class' );
 
 /**
+ * Ссылка на категорию товаров по её ID — для кнопок на баннерах карусели.
+ *
+ * Через ID, а не жёстко прописанный адрес casa24.md: на staging ссылка
+ * ведёт на staging, а на RO-версии WPML подставляет румынскую категорию.
+ *
+ * @param int $term_id ID категории product_cat (на RU-версии сайта).
+ * @return string URL категории или '#', если категория не найдена.
+ */
+function glozin_child_category_url( $term_id ) {
+	$term_id = (int) apply_filters( 'wpml_object_id', $term_id, 'product_cat', true );
+	$link    = get_term_link( $term_id, 'product_cat' );
+
+	return is_wp_error( $link ) ? '#' : $link;
+}
+
+/**
  * Переключатель языка RU/RO в верхней строке шапки (обратная связь 19.09.2026).
  * Использует WPML, если он активен на сайте; иначе — статический фолбэк.
  */

@@ -280,29 +280,26 @@ get_header();
 				'title'    => __( 'Завершение дачного сезона', 'glozin-child' ),
 				'subtitle' => __( 'Всё для уборки', 'glozin-child' ),
 				'links'    => array(
+					// ID категорий — из каталога casa24.md (Store API, 25.10.2026).
 					array(
-						// TODO (content-agent): подтвердить реальный слаг категории
-						// "Инвентарь" (грабли/секаторы/лопаты) — сейчас ведёт на "#".
+						// Садово-огородные > Лопаты, грабли, вилы.
 						'label' => __( 'Инвентарь', 'glozin-child' ),
-						'href'  => '#',
+						'href'  => glozin_child_category_url( 820 ),
 					),
 					array(
-						// TODO (content-agent): подтвердить реальный слаг категории "Тачки".
+						// Садово-огородные > Тачки.
 						'label' => __( 'Тачки', 'glozin-child' ),
-						'href'  => '#',
+						'href'  => glozin_child_category_url( 836 ),
 					),
 					array(
-						// TODO (content-agent): подтвердить реальный слаг категории "Мешки"
-						// (для листвы/мусора).
+						// Садово-огородные > Для сбора мусора.
 						'label' => __( 'Мешки', 'glozin-child' ),
-						'href'  => '#',
+						'href'  => glozin_child_category_url( 823 ),
 					),
 					array(
-						// Родительская категория "Вёдра" — подкатегория "Пищевые вёдра"
-						// подтверждена на слайде "консервация" ниже, эта ссылка на
-						// уровень выше по тому же дереву категорий.
+						// Товары для дома > Ведра.
 						'label' => __( 'Вёдра', 'glozin-child' ),
-						'href'  => 'https://casa24.md/product-category/%d1%85%d0%be%d0%b7%d1%8f%d0%b9%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be-%d0%b1%d1%8b%d1%82%d0%be%d0%b2%d1%8b%d0%b5/%d0%b2%d0%b5%d0%b4%d1%80%d0%b0/',
+						'href'  => glozin_child_category_url( 869 ),
 					),
 				),
 			),
@@ -324,15 +321,15 @@ get_header();
 				'links'    => array(
 					array(
 						'label' => __( 'Банки', 'glozin-child' ),
-						'href'  => 'https://casa24.md/product-category/%d1%85%d0%be%d0%b7%d1%8f%d0%b9%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be-%d0%b1%d1%8b%d1%82%d0%be%d0%b2%d1%8b%d0%b5/%d1%82%d0%be%d0%b2%d0%b0%d1%80%d1%8b-%d0%b4%d0%bb%d1%8f-%d0%ba%d1%83%d1%85%d0%bd%d0%b8/%d0%b1%d0%b0%d0%bd%d0%ba%d0%b8-%d1%81%d1%82%d0%b5%d0%ba%d0%bb%d1%8f%d0%bd%d0%bd%d1%8b%d0%b5/',
+						'href'  => glozin_child_category_url( 868 ), // Банки стеклянные,
 					),
 					array(
 						'label' => __( 'Пищевые вёдра', 'glozin-child' ),
-						'href'  => 'https://casa24.md/product-category/%d1%85%d0%be%d0%b7%d1%8f%d0%b9%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be-%d0%b1%d1%8b%d1%82%d0%be%d0%b2%d1%8b%d0%b5/%d0%b2%d0%b5%d0%b4%d1%80%d0%b0/%d0%b2%d0%b5%d0%b4%d1%80%d0%b0-%d0%bf%d0%b8%d1%89%d0%b5%d0%b2%d1%8b%d0%b5/',
+						'href'  => glozin_child_category_url( 870 ), // Ведра пищевые,
 					),
 					array(
 						'label' => __( 'Бочки пищевые', 'glozin-child' ),
-						'href'  => 'https://casa24.md/product-category/bidoane-si-butoaie/',
+						'href'  => glozin_child_category_url( 961 ), // Бидоны, бочки,
 					),
 				),
 			),
