@@ -22,6 +22,19 @@ body.ip-page #site-content{
   padding-bottom: 0;
 }
 
+/* Glozin кладёт обычную страницу в контейнер с боковыми отступами — по
+   краям оставались белые полосы ~20px. Растягиваем на всю ширину окна;
+   overflow-x: clip (а не hidden) не ломает position: sticky у .ip-navrow. */
+body.ip-page{
+  overflow-x: clip;
+}
+
+body.ip-page .industrial-pro,
+body.ip-page .ip-footer{
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
 /* Glozin задаёт всем <button> свои отступы, фон, шрифт и межбуквенный
    интервал (base.min.css, правило «.button,button,…»). В круглых кнопках
    42px отступы съедали всё место — иконки темы и поиска пропадали.
@@ -509,6 +522,12 @@ body.ip-page #site-content{
   font-size: 14px;
   color: var(--text);
   background: transparent;
+}
+
+/* Цвет подсказки Glozin задаёт под светлый фон — в тёмной теме её не было видно. */
+.ip-search .ip-search__input::placeholder{
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 .ip-search__submit{
