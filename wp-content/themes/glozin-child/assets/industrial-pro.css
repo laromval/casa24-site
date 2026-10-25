@@ -140,7 +140,10 @@ body.ip-page .ip-footer{
   display: block;
 }
 
-.industrial-pro .container{
+.industrial-pro .container,
+.ip-footer .container{
+  /* .ip-footer — отдельно: футер вне .industrial-pro, и на телефоне его
+     содержимое прилипало к краю экрана. */
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
@@ -1102,6 +1105,9 @@ html[lang^="ro"] .ip-season-promo__scrim{
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
+  /* Отступ списка от Glozin сдвигал сетку правее заголовка секции. */
+  margin: 0;
+  padding: 0;
 }
 
 .ip-product-card{
@@ -1129,6 +1135,15 @@ html[lang^="ro"] .ip-season-promo__scrim{
   object-fit: contain;
 }
 
+/* Товар без фото: заглушка-логотип (SVG) — маленькая и бледная по центру,
+   а не растянутая на всю плашку с обрезанным «CASA24.MD». */
+.ip-product-card__photo img[src$=".svg"]{
+  width: 55%;
+  margin: 0 auto;
+  display: block;
+  opacity: 0.35;
+}
+
 .ip-product-card__body{
   padding: 16px;
   display: flex;
@@ -1137,8 +1152,11 @@ html[lang^="ro"] .ip-season-promo__scrim{
   flex-grow: 1;
 }
 
-.ip-product-card__name{
-  /* Glozin задаёт h3 свой шрифт заголовков и uppercase — по ТЗ 4.4
+.industrial-pro .ip-product-card__name{
+  /* .industrial-pro в селекторе: иначе общее правило «.industrial-pro h3»
+     (заглавные, шрифт заголовков) перебивало его — названия товаров шли
+     капслоком (видно на staging 25.10.2026).
+     Glozin задаёт h3 свой шрифт заголовков и uppercase — по ТЗ 4.4
      название товара Work Sans, 2 строки. max-height страхует обрезку:
      без него у длинных названий выглядывал кусок третьей строки. */
   font-family: "Work Sans", sans-serif;
@@ -1523,17 +1541,33 @@ html[lang^="ro"] .ip-season-promo__scrim{
     font-size: 22px;
   }
 
+  /* Каталог и поиск — одной строкой: закреплённая при прокрутке полоса
+     занимала 111px экрана телефона, теперь ~56px (проверка 375px, 25.10.2026). */
+  .ip-navrow{
+    padding: 8px 0;
+  }
+
   .ip-navrow .container{
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 8px;
   }
 
   .ip-catalog{
-    width: 100%;
+    width: auto;
+  }
+
+  .ip-catalog__toggle{
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  .ip-catalog__menu{
+    width: 240px;
   }
 
   .ip-search{
     max-width: none;
+    min-width: 0;
     margin: 0;
   }
 
@@ -1590,5 +1624,92 @@ html[lang^="ro"] .ip-season-promo__scrim{
 
   .ip-lang-switch a{
     padding: 3px 2px;
+  }
+}
+
+/* =====================================================================
+   Телефон (до 575px) — по проверке staging на 375px, 25.10.2026
+   ===================================================================== */
+@media (max-width: 575px){
+  /* Преимущества: только иконка и заголовок — с описаниями блок занимал
+     больше экрана телефона (321px), чем сама карусель. */
+  .ip-usp-bar__grid{
+    gap: 12px;
+    padding: 16px 16px;
+  }
+
+  .ip-usp-item{
+    gap: 8px;
+  }
+
+  .ip-usp-item__icon{
+    width: 34px;
+    height: 34px;
+  }
+
+  .ip-usp-item__icon svg{
+    width: 16px;
+    height: 16px;
+  }
+
+  .ip-usp-item__title{
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .ip-usp-item__text{
+    display: none;
+  }
+
+  /* Товары — по два в ряд, как в мобильных версиях магазинов: по одному
+     каждая карточка была на весь экран, раздел из 4 товаров — ~1900px. */
+  .ip-products-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .ip-product-card__photo{
+    padding: 6px;
+  }
+
+  .ip-product-card__body{
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .industrial-pro .ip-product-card__name{
+    font-size: 13px;
+    min-height: calc(13px * 1.4 * 2);
+    max-height: calc(13px * 1.4 * 2);
+  }
+
+  .ip-product-card__footer{
+    gap: 6px;
+  }
+
+  /* 16px: «1.650,00 MDL» иначе заезжал под кнопку корзины в карточке
+     шириной ~160px. */
+  .ip-product-card__price{
+    font-size: 16px;
+  }
+
+  .ip-product-card__price del{
+    font-size: 11px;
+  }
+
+  .ip-product-card__cart-btn{
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* На планшете и телефоне внизу экрана — нижняя панель Glozin (Главная,
+   Профиль, Каталог, Избранное, Корзина); кнопка «наверх» закрывала «Корзину». */
+@media (max-width: 991px){
+  .ip-scroll-top{
+    bottom: 84px;
+    right: 14px;
+    width: 42px;
+    height: 42px;
   }
 }
