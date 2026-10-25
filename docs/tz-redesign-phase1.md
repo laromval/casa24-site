@@ -60,6 +60,8 @@
 - Основной текст (параграфы, названия товаров в карточках) — **Work Sans**, начертания 400/500/600.
 - Шрифты подключаются через Google Fonts: `Barlow Condensed:wght@600;700` и `Work Sans:wght@400;500;600`.
 
+> **Изменение 25.10.2026 (решение владельца):** вместо Barlow Condensed используется **Roboto Condensed** (600/700). В Barlow Condensed нет кириллицы — на staging все русские заголовки выводились запасным шрифтом. Roboto Condensed близок по характеру и поддерживает и кириллицу, и румынские ș/ț/ă. Везде ниже, где написано «Barlow Condensed», читать «Roboto Condensed».
+
 ### 4.3 Кнопки
 
 - `.btn-accent`: фон `--accent`, текст тёмный (`oklch(0.15 0.02 255)`), без рамки, шрифт Barlow Condensed 700, uppercase, `border-radius: 2px`, паддинг `14px 26px`.

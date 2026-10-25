@@ -67,7 +67,10 @@ function glozin_child_primary_nav_fallback() {
  *
  * Стиль родительской темы Glozin сюда не подключаем: родитель грузит его сам
  * (хэндл 'glozin-css'), повторное подключение дало бы двойную загрузку.
- * Раздел 4.2 ТЗ: Barlow Condensed 600/700 (заголовки), Work Sans 400/500/600 (текст),
+ * Раздел 4.2 ТЗ: шрифт заголовков (названия категорий, цены, кнопки, навигация)
+ * — Roboto Condensed 600/700 вместо Barlow Condensed из ТЗ: в Barlow нет
+ * кириллицы, русские заголовки выводились запасным шрифтом (решение
+ * владельца 25.10.2026). Work Sans 400/500/600 — основной текст,
  * плюс 900 у обоих — акцентный текст на баннерах карусели.
  */
 function glozin_child_industrial_pro_assets() {
@@ -79,7 +82,7 @@ function glozin_child_industrial_pro_assets() {
 
 	wp_enqueue_style(
 		'glozin-child-google-fonts',
-		'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;900&family=Work+Sans:wght@400;500;600;800;900&display=swap',
+		'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@600;700;900&family=Work+Sans:wght@400;500;600;800;900&display=swap',
 		array(),
 		null
 	);

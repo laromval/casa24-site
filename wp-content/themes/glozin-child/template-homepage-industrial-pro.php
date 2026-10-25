@@ -129,8 +129,8 @@ get_header();
 						<path d="M7 17 V38 H33 V17"/>
 						<rect x="17" y="25" width="6" height="13" fill="oklch(0.27 0.02 255)" stroke="none"/>
 					</g>
-					<text class="ip-logo__line1" x="80" y="34" font-family="'Barlow Condensed', Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="1.2">MEȘTERUL CASEI</text>
-					<text x="80" y="56" font-family="'Barlow Condensed', Arial, sans-serif" font-weight="600" font-size="16" letter-spacing="2.8" fill="oklch(0.70 0.19 45)">CASA24.MD</text>
+					<text class="ip-logo__line1" x="80" y="34" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="1.2">MEȘTERUL CASEI</text>
+					<text x="80" y="56" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="600" font-size="16" letter-spacing="2.8" fill="oklch(0.70 0.19 45)">CASA24.MD</text>
 				</svg>
 			</a>
 
