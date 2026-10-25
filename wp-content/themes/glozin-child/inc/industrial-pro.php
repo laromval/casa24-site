@@ -78,8 +78,8 @@ function glozin_child_industrial_pro_assets() {
 		return;
 	}
 
-	$version = wp_get_theme()->get( 'Version' );
-
+	// Версия файлов — время изменения: после перезаливки браузер и кэш
+	// LiteSpeed сразу берут новый файл (Version темы подрядчика всегда 1.0.0).
 	wp_enqueue_style(
 		'glozin-child-google-fonts',
 		'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@600;700;900&family=Work+Sans:wght@400;500;600;800;900&display=swap',
@@ -100,7 +100,7 @@ function glozin_child_industrial_pro_assets() {
 		'glozin-child-theme-toggle',
 		get_stylesheet_directory_uri() . '/assets/theme-toggle.js',
 		array(),
-		$version,
+		filemtime( get_stylesheet_directory() . '/assets/theme-toggle.js' ),
 		true
 	);
 
@@ -109,7 +109,7 @@ function glozin_child_industrial_pro_assets() {
 		'glozin-child-ui-interactions',
 		get_stylesheet_directory_uri() . '/assets/ui-interactions.js',
 		array(),
-		$version,
+		filemtime( get_stylesheet_directory() . '/assets/ui-interactions.js' ),
 		true
 	);
 }

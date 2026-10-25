@@ -31,8 +31,11 @@ body.ip-page{
 
 body.ip-page .industrial-pro,
 body.ip-page .ip-footer{
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  /* 100vw включает полосу прокрутки — без поправки --ip-scrollbar
+     (ширина полосы, ставит ui-interactions.js) содержимое съезжало влево
+     на половину её ширины и прилипало к краю окна. */
+  margin-left: calc(50% - 50vw + var(--ip-scrollbar, 0px) / 2);
+  margin-right: calc(50% - 50vw + var(--ip-scrollbar, 0px) / 2);
 }
 
 /* Glozin задаёт всем <button> свои отступы, фон, шрифт и межбуквенный

@@ -7,6 +7,20 @@
 ( function () {
 	'use strict';
 
+	/*
+	 * Ширина полосы прокрутки → CSS-переменная --ip-scrollbar. Нужна для
+	 * растягивания страницы на всю ширину окна (industrial-pro.css,
+	 * body.ip-page .industrial-pro): 100vw включает полосу прокрутки.
+	 */
+	function updateScrollbarWidth() {
+		var width = window.innerWidth - document.documentElement.clientWidth;
+		document.documentElement.style.setProperty( '--ip-scrollbar', Math.max( width, 0 ) + 'px' );
+	}
+
+	updateScrollbarWidth();
+	window.addEventListener( 'resize', updateScrollbarWidth );
+	document.addEventListener( 'DOMContentLoaded', updateScrollbarWidth );
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		var button = document.querySelector( '[data-ip-scroll-top]' );
 		if ( ! button ) {
