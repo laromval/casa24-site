@@ -9,8 +9,32 @@
    панель корзины и мобильное меню родителя остаются в разметке. */
 body.ip-page #topbar,
 body.ip-page #site-header,
+body.ip-page #page-header,
 body.ip-page #site-footer{
   display: none !important;
+}
+
+/* Glozin задаёт всем <button> свои отступы, фон, шрифт и межбуквенный
+   интервал (base.min.css, правило «.button,button,…»). В круглых кнопках
+   42px отступы съедали всё место — иконки темы и поиска пропадали.
+   Сбрасываем на той же специфичности, что у Glozin (:where не добавляет
+   веса), поэтому собственные правила .ip-* ниже по файлу по-прежнему
+   побеждают. */
+:where(body.ip-page) button{
+  padding: 0;
+  min-width: 0;
+  line-height: 1;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+  border-radius: 0;
+  gap: 0;
+  transition: background-color .2s, color .2s;
+}
+
+:where(body.ip-page) button::after{
+  content: none;
+  animation: none;
 }
 
 /* =====================================================================

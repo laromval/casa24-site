@@ -32,3 +32,4 @@ wp-content/uploads/
 
 # Файлы, скачанные с хостинга, до разбора
 _incoming/
+_deploy/
