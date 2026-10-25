@@ -219,7 +219,6 @@ function glozin_child_force_badge_meta() {
 
 	$post_id = absint( $_POST['post_ID'] );
 	$value   = sanitize_text_field( wp_unslash( $_POST['custom_badges_text'] ) );
-	$lang    = $_POST['icl_post_language'] ?? 'NA';
 
 	global $wpdb;
 	$existing = $wpdb->get_var( $wpdb->prepare(
@@ -244,26 +243,6 @@ function glozin_child_force_badge_meta() {
 	}
 
 	wp_cache_delete( $post_id, 'post_meta' );
-	$verify = get_post_meta( $post_id, 'custom_badges_text', true );
-	error_log( "[BADGE-FIX] post_id={$post_id} lang={$lang} wrote='{$value}' verified='{$verify}'" );
-}
-
-/**
- * Log which post is being loaded in the WP admin editor.
- * Helps confirm the user is editing the right translation.
- */
-add_action( 'load-post.php', 'glozin_child_debug_badge_editor' );
-function glozin_child_debug_badge_editor() {
-	if ( empty( $_GET['post'] ) ) {
-		return;
-	}
-	$post_id = absint( $_GET['post'] );
-	$post    = get_post( $post_id );
-	if ( ! $post ) {
-		return;
-	}
-	$lang = apply_filters( 'wpml_post_language_details', null, $post_id );
-	error_log( "[BADGE-EDITOR] loading post_id={$post_id} type={$post->post_type} title='{$post->post_title}' lang_code=" . ( $lang['language_code'] ?? 'NA' ) . " source_lang=" . ( $lang['source_language_code'] ?? 'NA' ) . " trid=" . ( $lang['trid'] ?? 'NA' ) );
 }
 
 add_filter( 'wcboost_products_compare_button_add_text', 'glozin_child_compare_button_text' );
