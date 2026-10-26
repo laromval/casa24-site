@@ -425,26 +425,15 @@ body.ip-site #quick-view-modal .woocommerce-product-gallery__image img{
   padding: 10px;
 }
 
-/* Подсказка у кнопок на фото товара («Быстрый просмотр», «В избранное»)
-   выезжала за левый край карточки и обрезалась. Компактнее и с переносом
-   строки — помещается в карточку даже в две колонки на телефоне. */
-/* У кнопки быстрого просмотра класс gz-tooltip-inside, у избранного —
-   gz-tooltip: берём оба. !important — Glozin задаёт подсказке white-space
-   и ширину своими правилами с большим весом. */
-body.ip-site .product-featured-icons :is(.gz-tooltip, .gz-tooltip-inside)::after{
-  width: max-content !important;
-  max-width: 96px !important;
-  white-space: normal !important;
-  text-align: center;
-  line-height: 1.2;
-  font-size: 11px;
-  padding: 4px 6px;
-  background: var(--bg-dark) !important;
-  color: var(--on-dark) !important;
-  border-radius: 2px;
-}
+/* Подсказка «Быстрый просмотр» — отдельным элементом поверх страницы, как
+   у «В избранное»: ui-interactions.js меняет класс gz-tooltip-inside на
+   gz-tooltip (раньше подсказка рисовалась внутри фото и обрезалась). */
 
-/* Стрелка подсказки — того же тёмного цвета. */
-body.ip-site .product-featured-icons :is(.gz-tooltip, .gz-tooltip-inside)::before{
-  border-left-color: var(--bg-dark) !important;
+/* Всплывающая подсказка Glozin (.gz-tooltip--data) берёт цвета из
+   --gz-color-dark/--gz-color-light; в тёмной теме сайта --gz-color-dark
+   становится светлым и белый текст пропадал. Постоянные цвета: тёмный фон,
+   белый текст — в обеих темах. */
+body.ip-site .gz-tooltip--data{
+  --gz-color-dark: oklch(0.15 0.02 255);
+  --gz-color-light: #ffffff;
 }

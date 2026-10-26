@@ -6,6 +6,8 @@
  *   wp eval-file category-collages.php            — пробный прогон: какие товары попадут
  *   wp eval-file category-collages.php apply      — собрать коллажи и поставить картинками разделов
  *   wp eval-file category-collages.php rollback   — вернуть прежние картинки
+ *   wp eval-file category-collages.php report 813 — все кандидаты раздела с оценкой фото
+ *   wp eval-file category-collages.php apply 813 961 — пересобрать только эти разделы
  *
  * Разделы — верхнего уровня (RU). Товары: опубликованы, видимы в каталоге, в
  * наличии, с фото не меньше 300px. Продаж на сайте нет (счётчики 0), поэтому
@@ -32,22 +34,106 @@ const CASA24_COLLAGE_GAP  = 2;
 const CASA24_CELL_PAD     = 24;
 
 /**
+ * Оценка фото по уменьшенной копии 48×48: доля белых пикселей по краю
+ * (white — 1.0 = чистый белый фон, снимки с телефона на сером фоне ~0) и
+ * средняя яркость центра (lum — чем ниже, тем контрастнее товар на белом).
+ *
+ * @param string $file Путь к файлу.
+ * @return array{white: float, lum: float}
+ */
+function casa24_collage_quality( $file ) {
+	$src = @imagecreatefromstring( file_get_contents( $file ) ); // phpcs:ignore
+	if ( ! $src ) {
+		return array( 'white' => 0.0, 'lum' => 255.0 );
+	}
+
+	$n     = 48;
+	$small = imagecreatetruecolor( $n, $n );
+	imagecopyresampled( $small, $src, 0, 0, 0, 0, $n, $n, imagesx( $src ), imagesy( $src ) );
+	imagedestroy( $src );
+
+	$edge  = 0;
+	$white = 0;
+	$lum   = 0;
+	$cnt   = 0;
+	for ( $y = 0; $y < $n; $y++ ) {
+		for ( $x = 0; $x < $n; $x++ ) {
+			$rgb = imagecolorat( $small, $x, $y );
+			$r   = ( $rgb >> 16 ) & 255;
+			$g   = ( $rgb >> 8 ) & 255;
+			$b   = $rgb & 255;
+			if ( $x < 3 || $y < 3 || $x >= $n - 3 || $y >= $n - 3 ) {
+				++$edge;
+				if ( $r > 232 && $g > 232 && $b > 232 ) {
+					++$white;
+				}
+			} elseif ( $x > $n / 4 && $x < $n * 3 / 4 && $y > $n / 4 && $y < $n * 3 / 4 ) {
+				$lum += 0.299 * $r + 0.587 * $g + 0.114 * $b;
+				++$cnt;
+			}
+		}
+	}
+	imagedestroy( $small );
+
+	return array(
+		'white' => $edge ? $white / $edge : 0.0,
+		'lum'   => $cnt ? $lum / $cnt : 255.0,
+	);
+}
+
+/**
+ * Ручные правки подбора по замечаниям владельца (26.10.2026).
+ * include — эти товары ставятся первыми; exclude — никогда не берутся.
+ *
+ * @return array<int, array>
+ */
+function casa24_collage_overrides() {
+	return array(
+		// Бидоны, бочки: металлическая канистра вместо рассеивателя для поливалки (тот — не из этого раздела).
+		961 => array(
+			'include'      => array( 1069224 ),
+			'exclude_name' => '/рассеиватель/iu',
+		),
+		// Двери: сразу видно оба подраздела, контрастные двери (белые на белом
+		// фоне терялись). Сверху входные KM003 и KM01, снизу межкомнатные
+		// Fortis «орех» и Model 189. Фото у дверей мелкие (178×283) — min 170.
+		813  => array(
+			'include'   => array( 1055385, 1055398, 1053767, 1055401 ),
+			'any_stock' => true,
+			'min'       => 170,
+		),
+		// Сетка для штукатурки: три разных вида; у серпянки 100мм/15см/45м одно
+		// и то же фото — берём одно. «Сетка стеклотканная 5×5» — фото с телефона
+		// на сером фоне, не берём (отсеивается по белизне фона).
+		1381 => array( 'include' => array( 1068363, 1091276, 1068373 ), 'only_include' => true ),
+		// Сетка метал, проволока: в наличии ничего нет — фото из каталога, от 170px.
+		1379 => array( 'any_stock' => true, 'min' => 170 ),
+	);
+}
+
+/**
  * Подходящие товары раздела (с подразделами), сгруппированные по подразделу.
  *
- * @param WP_Term $top Раздел верхнего уровня.
- * @return array<int, array> [ term_id подраздела => [ [id, file, w, h, name], ... ] ]
+ * Если в наличии нет ничего — вызывается с $any_stock = true: фото товара
+ * годится для картинки раздела, даже если его сейчас нет на складе.
+ *
+ * @param WP_Term $top       Раздел верхнего уровня.
+ * @param bool    $any_stock Брать и товары не в наличии / скрытые.
+ * @param int     $min_px    Минимальная сторона фото.
+ * @return array<int, array> [ term_id подраздела => [ [id, file, w, h, name, white, lum, price], ... ] ]
  */
-function casa24_collage_candidates( $top ) {
-	$ids = wc_get_products(
-		array(
-			'status'       => 'publish',
-			'limit'        => -1,
-			'category'     => array( $top->slug ),
-			'visibility'   => 'visible',
-			'stock_status' => 'instock',
-			'return'       => 'ids',
-		)
+function casa24_collage_candidates( $top, $any_stock = false, $min_px = 300 ) {
+	$query = array(
+		'status'     => 'publish',
+		'limit'      => -1,
+		'category'   => array( $top->slug ),
+		'return'     => 'ids',
 	);
+	if ( ! $any_stock ) {
+		$query['visibility']   = 'visible';
+		$query['stock_status'] = 'instock';
+	}
+	$ids = wc_get_products( $query );
 
 	$groups = array();
 	foreach ( $ids as $id ) {
@@ -63,7 +149,7 @@ function casa24_collage_candidates( $top ) {
 		}
 
 		$size = @getimagesize( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- битые файлы просто пропускаем.
-		if ( ! $size || min( $size[0], $size[1] ) < 300 ) {
+		if ( ! $size || min( $size[0], $size[1] ) < $min_px ) {
 			continue;
 		}
 
@@ -81,12 +167,17 @@ function casa24_collage_candidates( $top ) {
 			}
 		}
 
+		$quality = casa24_collage_quality( $file );
+
 		$groups[ $group ][] = array(
-			'id'   => $id,
-			'file' => $file,
-			'w'    => $size[0],
-			'h'    => $size[1],
-			'name' => $product->get_name(),
+			'id'    => $id,
+			'file'  => $file,
+			'w'     => $size[0],
+			'h'     => $size[1],
+			'name'  => $product->get_name(),
+			'white' => $quality['white'],
+			'lum'   => $quality['lum'],
+			'price' => (float) $product->get_price(),
 		);
 	}
 
@@ -99,7 +190,61 @@ function casa24_collage_candidates( $top ) {
  * @param array $groups Результат casa24_collage_candidates().
  * @return array
  */
-function casa24_collage_pick( $groups ) {
+function casa24_collage_pick( $groups, $overrides = array() ) {
+	$include = isset( $overrides['include'] ) ? $overrides['include'] : array();
+	$exclude = isset( $overrides['exclude'] ) ? $overrides['exclude'] : array();
+	$picked  = array();
+
+	// Товары, выбранные владельцем, — первыми (даже если не прошли фильтры
+	// наличия/размера); исключённые — убрать.
+	foreach ( $include as $inc_id ) {
+		$product = wc_get_product( $inc_id );
+		$file    = $product && $product->get_image_id() ? get_attached_file( $product->get_image_id() ) : '';
+		if ( $file && file_exists( $file ) ) {
+			$size     = getimagesize( $file );
+			$quality  = casa24_collage_quality( $file );
+			$picked[] = array(
+				'id'    => $inc_id,
+				'file'  => $file,
+				'w'     => $size[0],
+				'h'     => $size[1],
+				'name'  => $product->get_name(),
+				'white' => $quality['white'],
+				'lum'   => $quality['lum'],
+				'price' => (float) $product->get_price(),
+			);
+		}
+	}
+	$include = array();
+	foreach ( $groups as $gid => $items ) {
+		foreach ( $items as $k => $item ) {
+			$bad_name = isset( $overrides['exclude_name'] ) && preg_match( $overrides['exclude_name'], $item['name'] );
+			if ( in_array( $item['id'], $exclude, true ) || $bad_name ) {
+				unset( $groups[ $gid ][ $k ] );
+			} elseif ( in_array( $item['id'], $include, true ) ) {
+				$picked[] = $item;
+				unset( $groups[ $gid ][ $k ] );
+			}
+		}
+		$groups[ $gid ] = array_values( $groups[ $gid ] );
+		if ( ! $groups[ $gid ] ) {
+			unset( $groups[ $gid ] );
+		}
+	}
+
+	// Фото с телефона на сером/цветном фоне (белого по краю < 55%) — только
+	// если без них не набирается хотя бы 2 фото.
+	$clean = array();
+	foreach ( $groups as $gid => $items ) {
+		$ok = array_values( array_filter( $items, function ( $i ) { return $i['white'] >= 0.55; } ) );
+		if ( $ok ) {
+			$clean[ $gid ] = $ok;
+		}
+	}
+	if ( array_sum( array_map( 'count', $clean ) ) + count( $picked ) >= 2 ) {
+		$groups = $clean;
+	}
+
 	uasort(
 		$groups,
 		function ( $a, $b ) {
@@ -107,31 +252,85 @@ function casa24_collage_pick( $groups ) {
 		}
 	);
 
+	// В подразделе — лучшее фото: белый фон, контрастный товар (тёмный на
+	// белом виден лучше), крупный размер. Одинаковые названия без размеров
+	// («Серпянка 100мм*20», «…*45») — не больше одного на коллаж.
 	foreach ( $groups as &$items ) {
 		usort(
 			$items,
 			function ( $a, $b ) {
-				return min( $b['w'], $b['h'] ) - min( $a['w'], $a['h'] );
+				$sa = $a['white'] * 2 + ( 255 - $a['lum'] ) / 255 + min( $a['w'], $a['h'] ) / 2000;
+				$sb = $b['white'] * 2 + ( 255 - $b['lum'] ) / 255 + min( $b['w'], $b['h'] ) / 2000;
+				return $sb <=> $sa;
 			}
 		);
 	}
 	unset( $items );
 
-	$picked = array();
-	for ( $round = 0; count( $picked ) < 4; $round++ ) {
+	$seen = array();
+	foreach ( $picked as $p ) {
+		$seen[ casa24_collage_name_key( $p['name'] ) ] = true;
+	}
+
+	for ( $round = 0; count( $picked ) < 4 && $round < 50; $round++ ) {
 		$added = false;
 		foreach ( $groups as $items ) {
-			if ( isset( $items[ $round ] ) && count( $picked ) < 4 ) {
-				$picked[] = $items[ $round ];
-				$added    = true;
+			if ( count( $picked ) >= 4 ) {
+				break;
+			}
+			// В каждом подразделе берём следующее фото с новым «видом» товара.
+			while ( isset( $items[ $round ] ) ) {
+				$key = casa24_collage_name_key( $items[ $round ]['name'] );
+				if ( ! isset( $seen[ $key ] ) ) {
+					$seen[ $key ] = true;
+					$picked[]     = $items[ $round ];
+					$added        = true;
+				}
+				break;
 			}
 		}
-		if ( ! $added ) {
+		if ( ! $added && $round > 10 ) {
 			break;
 		}
 	}
 
-	return $picked;
+	if ( ! empty( $overrides['only_include'] ) ) {
+		return array_slice( $picked, 0, 4 );
+	}
+
+	// Видов меньше 4 (в разделе один-два вида товара) — добираем фото с другим
+	// «отпечатком» (белизна фона + яркость), чтобы не было одинаковых картинок.
+	$prints = array();
+	foreach ( $picked as $p ) {
+		$prints[ round( $p['white'] * 20 ) . ':' . round( $p['lum'] / 8 ) ] = true;
+	}
+	foreach ( $groups as $items ) {
+		foreach ( $items as $item ) {
+			if ( count( $picked ) >= 4 ) {
+				break 2;
+			}
+			$print = round( $item['white'] * 20 ) . ':' . round( $item['lum'] / 8 );
+			if ( ! isset( $prints[ $print ] ) && ! in_array( $item['id'], wp_list_pluck( $picked, 'id' ), true ) ) {
+				$prints[ $print ] = true;
+				$picked[]         = $item;
+			}
+		}
+	}
+
+	return array_slice( $picked, 0, 4 );
+}
+
+/**
+ * «Вид» товара для отсечения почти одинаковых фото: первые два слова названия
+ * без цифр и размеров («Серпянка 100мм*20 Premium» → «серпянка premium»).
+ *
+ * @param string $name Название товара.
+ * @return string
+ */
+function casa24_collage_name_key( $name ) {
+	$words = preg_split( '/\s+/u', mb_strtolower( preg_replace( '/[0-9][0-9.,*xх×\/a-zа-я]*|[^\p{L}\s]/u', ' ', $name ) ) );
+	$words = array_values( array_filter( $words, function ( $w ) { return mb_strlen( $w ) > 2; } ) );
+	return implode( ' ', array_slice( $words, 0, 2 ) );
 }
 
 /**
@@ -258,8 +457,33 @@ $upload = wp_upload_dir();
 $dir    = trailingslashit( $upload['basedir'] ) . 'category-collages';
 wp_mkdir_p( $dir );
 
+$casa24_only = array_map( 'intval', array_slice( $args, 1 ) );
+$overrides   = casa24_collage_overrides();
+
 foreach ( $tops as $top ) {
-	$picked = casa24_collage_pick( casa24_collage_candidates( $top ) );
+	if ( $casa24_only && ! in_array( $top->term_id, $casa24_only, true ) ) {
+		continue;
+	}
+
+	$opt    = isset( $overrides[ $top->term_id ] ) ? $overrides[ $top->term_id ] : array();
+	$min_px = isset( $opt['min'] ) ? $opt['min'] : 300;
+	$groups = casa24_collage_candidates( $top, ! empty( $opt['any_stock'] ), $min_px );
+	if ( array_sum( array_map( 'count', $groups ) ) < 2 ) {
+		$groups = casa24_collage_candidates( $top, true, min( $min_px, 250 ) );
+	}
+
+	if ( 'report' === $casa24_mode ) {
+		echo '== ' . $top->term_id . ' ' . $top->name . "\n";
+		foreach ( $groups as $gid => $items ) {
+			$g = get_term( $gid, 'product_cat' );
+			foreach ( $items as $i ) {
+				printf( "  [%s] #%d white=%.2f lum=%3d %dx%d %s\n", $g ? $g->name : $gid, $i['id'], $i['white'], $i['lum'], $i['w'], $i['h'], $i['name'] );
+			}
+		}
+		continue;
+	}
+
+	$picked = casa24_collage_pick( $groups, $opt );
 
 	echo $top->term_id . "\t" . $top->name . "\t" . count( $picked ) . ' фото: ' . implode( ' | ', wp_list_pluck( $picked, 'name' ) ) . "\n";
 
@@ -267,7 +491,9 @@ foreach ( $tops as $top ) {
 		continue;
 	}
 
-	$dest = $dir . '/category-' . $top->term_id . '.webp';
+	// Дата сборки в имени файла — после пересборки браузеры и кэш LiteSpeed не
+	// показывают старый коллаж под тем же адресом.
+	$dest = $dir . '/category-' . $top->term_id . '-' . gmdate( 'YmdHis' ) . '.webp';
 	if ( ! casa24_collage_render( $picked, $dest ) ) {
 		echo "  ! не удалось собрать коллаж\n";
 		continue;
@@ -287,6 +513,17 @@ foreach ( $tops as $top ) {
 
 	if ( $existing ) {
 		$attachment_id = $existing[0];
+
+		// Удалить прежний файл коллажа и его уменьшенные копии.
+		$old_file = get_attached_file( $attachment_id );
+		$old_meta = wp_get_attachment_metadata( $attachment_id );
+		if ( $old_file && $old_file !== $dest && file_exists( $old_file ) ) {
+			foreach ( isset( $old_meta['sizes'] ) ? $old_meta['sizes'] : array() as $sz ) {
+				@unlink( path_join( dirname( $old_file ), $sz['file'] ) ); // phpcs:ignore
+			}
+			@unlink( $old_file ); // phpcs:ignore
+		}
+
 		update_attached_file( $attachment_id, $dest );
 	} else {
 		$attachment_id = wp_insert_attachment(

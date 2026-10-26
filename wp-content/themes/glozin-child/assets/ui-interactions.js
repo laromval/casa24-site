@@ -57,6 +57,23 @@
 		} );
 	} );
 
+	/*
+	 * Подсказка «Быстрый просмотр» — как у «Добавить в список желаний»
+	 * (обратная связь 26.10.2026). У глазика Glozin ставит класс
+	 * gz-tooltip-inside: подсказка рисуется внутри фото и обрезается им.
+	 * С классом gz-tooltip Glozin показывает её отдельным элементом поверх
+	 * страницы (обработчик повешен на body, поэтому работает и для карточек,
+	 * подгруженных прокруткой). Меняем класс при первом наведении — до того,
+	 * как сработает обработчик Glozin (фаза перехвата).
+	 */
+	document.addEventListener( 'mouseover', function ( event ) {
+		var el = event.target.closest ? event.target.closest( '.gz-tooltip-inside[data-tooltip]' ) : null;
+		if ( el ) {
+			el.classList.remove( 'gz-tooltip-inside' );
+			el.classList.add( 'gz-tooltip' );
+		}
+	}, true );
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		var button = document.querySelector( '[data-ip-scroll-top]' );
 		if ( ! button ) {
