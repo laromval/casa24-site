@@ -437,3 +437,86 @@ body.ip-site .gz-tooltip--data{
   --gz-color-dark: oklch(0.15 0.02 255);
   --gz-color-light: #ffffff;
 }
+
+/* Окно согласия на cookie (плагин NB Cookie Consent) — у плагина свои серый
+   фон, бордовая кнопка и круглые углы (обратная связь 26.10.2026). Плашка как
+   футер: тёмная, оранжевая полоса слева, углы почти квадратные. У плагина
+   правила с !important на двух id — здесь специфичность выше, плагин не
+   трогаем, цвета в его настройках можно не менять. */
+body.ip-site #nbcc-cookie-root #nbcc-cookie-box{
+  padding: 22px 28px !important;
+  gap: 28px !important;
+  background: var(--bg-dark) !important;
+  color: var(--on-dark) !important;
+  border: 1px solid var(--bg-dark-chip) !important;
+  border-left: 4px solid var(--accent) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 12px 32px oklch(0 0 0 / 0.28) !important;
+  font-family: "Work Sans", Arial, sans-serif !important;
+}
+
+body.ip-site #nbcc-cookie-root #nbcc-cookie-title{
+  margin: 0 0 6px !important;
+  color: var(--on-dark) !important;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif !important;
+  font-size: 20px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+}
+
+body.ip-site #nbcc-cookie-root #nbcc-cookie-description{
+  color: var(--on-dark-muted) !important;
+  font-size: 15px !important;
+}
+
+body.ip-site #nbcc-cookie-root #nbcc-cookie-policy{
+  color: var(--accent) !important;
+}
+
+body.ip-site #nbcc-cookie-root #nbcc-cookie-policy:hover{
+  opacity: 1;
+  color: var(--on-dark) !important;
+}
+
+body.ip-site #nbcc-cookie-root #nbcc-cookie-accept{
+  min-width: 180px !important;
+  padding: 14px 24px !important;
+  border-radius: 2px !important;
+  background: var(--accent) !important;
+  color: oklch(0.15 0.02 255) !important;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif !important;
+  font-size: 15px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+}
+
+body.ip-site #nbcc-cookie-root #nbcc-cookie-accept:hover{
+  background: var(--on-dark) !important;
+  transform: none !important;
+}
+
+body.ip-site #nbcc-cookie-root #nbcc-cookie-accept:focus-visible{
+  outline: 2px solid var(--accent) !important;
+}
+
+@media (max-width: 900px){
+  body.ip-site #nbcc-cookie-root #nbcc-cookie-box{
+    padding: 18px 20px !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 767px){
+  body.ip-site #nbcc-cookie-root #nbcc-cookie-box{
+    padding: 16px !important;
+    border-radius: 2px !important;
+  }
+
+  body.ip-site #nbcc-cookie-root #nbcc-cookie-title{
+    font-size: 17px !important;
+  }
+
+  body.ip-site #nbcc-cookie-root #nbcc-cookie-description{
+    font-size: 14px !important;
+  }
+}
