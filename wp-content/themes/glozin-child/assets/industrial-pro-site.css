@@ -428,11 +428,23 @@ body.ip-site #quick-view-modal .woocommerce-product-gallery__image img{
 /* Подсказка у кнопок на фото товара («Быстрый просмотр», «В избранное»)
    выезжала за левый край карточки и обрезалась. Компактнее и с переносом
    строки — помещается в карточку даже в две колонки на телефоне. */
-body.ip-site .product-featured-icons .gz-tooltip::after{
-  max-width: 96px;
-  white-space: normal;
+/* У кнопки быстрого просмотра класс gz-tooltip-inside, у избранного —
+   gz-tooltip: берём оба. !important — Glozin задаёт подсказке white-space
+   и ширину своими правилами с большим весом. */
+body.ip-site .product-featured-icons :is(.gz-tooltip, .gz-tooltip-inside)::after{
+  width: max-content !important;
+  max-width: 96px !important;
+  white-space: normal !important;
   text-align: center;
   line-height: 1.2;
   font-size: 11px;
   padding: 4px 6px;
+  background: var(--bg-dark) !important;
+  color: var(--on-dark) !important;
+  border-radius: 2px;
+}
+
+/* Стрелка подсказки — того же тёмного цвета. */
+body.ip-site .product-featured-icons :is(.gz-tooltip, .gz-tooltip-inside)::before{
+  border-left-color: var(--bg-dark) !important;
 }
