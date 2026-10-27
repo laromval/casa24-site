@@ -455,6 +455,14 @@ get_header();
 						'meta_key'       => 'total_sales', // Реальные продажи товара (нативное поле WooCommerce).
 						'orderby'        => 'meta_value_num',
 						'order'          => 'DESC',
+						// Только в наличии (проверка qa-agent 27.10.2026, Н-3): первым
+						// в блоке стоял товар «нет в наличии» с неактивной кнопкой.
+						'meta_query'     => array(
+							array(
+								'key'   => '_stock_status',
+								'value' => 'instock',
+							),
+						),
 						'no_found_rows'  => true,
 					)
 				);

@@ -438,6 +438,73 @@ body.ip-site .gz-tooltip--data{
   --gz-color-light: #ffffff;
 }
 
+/* Тёмная тема: панели и списки Glozin (проверка qa-agent 27.10.2026, Б-1).
+   У Glozin фон панелей жёстко белый (.panel__container в overlay.min.css)
+   или берётся из --gz-color-light (.bg-light), а текст — из --text, который
+   в тёмной теме светлый: мини-корзина, мобильное меню, нижняя панель на
+   телефоне, аккаунт, быстрый просмотр и сортировка становились белыми
+   с белым текстом. Здесь фон — как у карточек тёмной темы. */
+:root[data-ip-theme="dark"] body.ip-site :is(
+  .panel__container,
+  .panel__header,
+  .panel__content,
+  .panel__footer,
+  .modal__wrapper,
+  .popover__content,
+  .bg-light,
+  .glozin-mobile-navigation-bar,
+  .catalog-toolbar__orderby-list,
+  .glozin-mini-products-recommended,
+  .products-recommended-header,
+  .wcboost-products-compare-popup__body,
+  .product-navigation__tooltip,
+  .currency-dropdown,
+  .preferences-menu__item-child,
+  .sub-menu
+){
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+:root[data-ip-theme="dark"] body.ip-site :is(
+  input:not([type="checkbox"], [type="radio"], [type="submit"], [type="button"]),
+  select,
+  textarea
+){
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Белые круглые кнопки (стрелки, закрыть) и контурные кнопки в панелях. */
+:root[data-ip-theme="dark"] body.ip-site :is(
+  .gz-button-light,
+  .gz-button-outline,
+  .modal__button-close
+){
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+:root[data-ip-theme="dark"] body.ip-site .gz-button-outline-dark{
+  background-color: transparent;
+  color: var(--text);
+  border-color: var(--text);
+}
+
+/* Подменю мобильного меню: у Glozin правило специфичнее общего выше. */
+:root[data-ip-theme="dark"] body.ip-site .hamburger-panel ul.menu li.menu-item-has-children > ul.sub-menu{
+  background-color: var(--surface);
+}
+
+/* Текстовые кнопки («В корзину» в мини-корзине, «Написать отзыв»):
+   у Glozin цвет текста #111. */
+:root[data-ip-theme="dark"] body.ip-site .gz-button-subtle{
+  --gz-button-color: var(--text);
+  color: var(--text);
+}
+
 /* Окно согласия на cookie (плагин NB Cookie Consent) — у плагина свои серый
    фон, бордовая кнопка и круглые углы (обратная связь 26.10.2026). Плашка как
    футер: тёмная, оранжевая полоса слева, углы почти квадратные. У плагина
