@@ -54,13 +54,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				 */
 				?>
 				<svg width="200" height="48" viewBox="0 0 300 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
-					<rect x="0" y="4" width="64" height="64" rx="12" fill="oklch(0.27 0.02 255)"/>
-					<g transform="translate(12,16)" fill="none" stroke="oklch(0.70 0.19 45)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="0" y="4" width="64" height="64" rx="12" fill="#202730"/>
+					<g transform="translate(12,16)" fill="none" stroke="#fa6e1d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M2 20 L20 4 L38 20"/>
 						<path d="M7 17 V38 H33 V17"/>
 					</g>
-					<rect x="29" y="41" width="6" height="13" fill="oklch(0.70 0.19 45)"/>
-					<text x="80" y="54" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="700" font-size="46" letter-spacing="1.5"><tspan class="ip-logo__line1">CASA</tspan><tspan fill="oklch(0.70 0.19 45)">24</tspan></text>
+					<rect x="29" y="41" width="6" height="13" fill="#fa6e1d"/>
+					<text x="80" y="54" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="700" font-size="46" letter-spacing="1.5"><tspan class="ip-logo__line1">CASA</tspan><tspan fill="#fa6e1d">24</tspan></text>
 				</svg>
 			</a>
 
