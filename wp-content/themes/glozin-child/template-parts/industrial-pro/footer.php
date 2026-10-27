@@ -9,6 +9,33 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/*
+ * Ссылки футера — по ID страниц/разделов (RU-оригиналы), а не по слагам:
+ * слаги вида /o-nas/, /contacte/, /obmen-i-vozvrat/ на сайте не существуют
+ * (404 на проде 27.10.2026, отчёт qa), а RO-версии у страниц свои адреса.
+ * wpml_object_id подставляет перевод на текущем языке. ID одинаковые на
+ * проде и staging (проверено 27.10.2026).
+ */
+$ip_footer_page = static function ( $page_id ) {
+	$url = get_permalink( apply_filters( 'wpml_object_id', $page_id, 'page', true ) );
+
+	return $url ? $url : home_url( '/' );
+};
+
+$ip_footer_cat = static function ( $term_id ) {
+	$url = get_term_link( (int) apply_filters( 'wpml_object_id', $term_id, 'product_cat', true ), 'product_cat' );
+
+	return is_wp_error( $url ) ? home_url( '/' ) : $url;
+};
+
+/* Соцсети и карта: пустая строка — пункт не выводится (адресов пока нет, ссылки "#" вели в никуда). */
+$ip_footer_social = array(
+	'Facebook'  => '',
+	'Instagram' => '',
+	'Telegram'  => '',
+);
+$ip_footer_map_url = '';
 ?>
 <!-- =====================================================================
      7. Полный футер — переделан по обратной связи 19.09.2026 (референс:
@@ -48,13 +75,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php esc_html_e( '+373 68 338 813', 'glozin-child' ); ?>
 				</a>
 				<?php
-				/* TODO (media-agent/marketing-agent): подставить реальные ссылки соцсетей — сейчас "#". */
+				/* TODO (marketing-agent): реальные адреса соцсетей — в $ip_footer_social вверху файла. */
+				$ip_social_icons = array(
+					'Facebook'  => '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>',
+					'Instagram' => '<rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1"></circle>',
+					'Telegram'  => '<path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path>',
+				);
+				$ip_social_links = array_filter( $ip_footer_social );
 				?>
-				<div class="ip-footer__social-links">
-					<a href="#" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
-					<a href="#" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1"></circle></svg></a>
-					<a href="#" aria-label="Telegram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg></a>
-				</div>
+				<?php if ( $ip_social_links ) : ?>
+					<div class="ip-footer__social-links">
+						<?php foreach ( $ip_social_links as $ip_social_name => $ip_social_url ) : ?>
+							<a href="<?php echo esc_url( $ip_social_url ); ?>" aria-label="<?php echo esc_attr( $ip_social_name ); ?>" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><?php echo $ip_social_icons[ $ip_social_name ]; // phpcs:ignore WordPress.Security.EscapeOutput -- статичный SVG. ?></svg></a>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
 			</div>
 
 		</div>
@@ -68,30 +103,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="ip-footer__col">
 					<h3><?php esc_html_e( 'Интернет-магазин', 'glozin-child' ); ?></h3>
 					<ul>
-						<li><a href="<?php echo esc_url( home_url( '/dostavka-i-oplata/' ) ); ?>"><?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/oferta/' ) ); ?>"><?php esc_html_e( 'Публичная оферта', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/obmen-i-vozvrat/' ) ); ?>"><?php esc_html_e( 'Обмен и возврат товара', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>"><?php esc_html_e( 'Политика конфиденциальности', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/contacte/' ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1000696 ) ); ?>"><?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1085732 ) ); ?>"><?php esc_html_e( 'Публичная оферта', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1085726 ) ); ?>"><?php esc_html_e( 'Обмен и возврат товара', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1080727 ) ); ?>"><?php esc_html_e( 'Политика конфиденциальности', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1000804 ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
 					</ul>
 				</div>
 
 				<div class="ip-footer__col">
 					<h3><?php esc_html_e( 'Каталог', 'glozin-child' ); ?></h3>
 					<ul>
-						<li><a href="#"><?php esc_html_e( 'Двери', 'glozin-child' ); ?></a></li>
-						<li><a href="#"><?php esc_html_e( 'Электроинструмент', 'glozin-child' ); ?></a></li>
-						<li><a href="#"><?php esc_html_e( 'Сад и огород', 'glozin-child' ); ?></a></li>
-						<li><a href="#"><?php esc_html_e( 'Хозтовары', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_cat( 813 ) ); ?>"><?php esc_html_e( 'Двери', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_cat( 886 ) ); ?>"><?php esc_html_e( 'Электроинструмент', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_cat( 815 ) ); ?>"><?php esc_html_e( 'Сад и огород', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_cat( 841 ) ); ?>"><?php esc_html_e( 'Хозтовары', 'glozin-child' ); ?></a></li>
 					</ul>
 				</div>
 
 				<div class="ip-footer__col">
 					<h3><?php esc_html_e( 'О компании', 'glozin-child' ); ?></h3>
 					<ul>
-						<li><a href="<?php echo esc_url( home_url( '/o-nas/' ) ); ?>"><?php esc_html_e( 'О нас', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>"><?php esc_html_e( 'Статьи', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/contacte/' ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1000810 ) ); ?>"><?php esc_html_e( 'О нас', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1000799 ) ); ?>"><?php esc_html_e( 'Статьи', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1000804 ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
 					</ul>
 				</div>
 
@@ -102,11 +137,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="ip-footer__bottom">
 		<div class="container ip-footer__bottom-row">
-			<a class="ip-footer__bottom-link" href="#" target="_blank" rel="noopener">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-				<?php esc_html_e( 'Как нас найти', 'glozin-child' ); ?>
-			</a>
-			<a class="ip-footer__bottom-link" href="<?php echo esc_url( home_url( '/dostavka-i-oplata/' ) ); ?>">
+			<?php if ( $ip_footer_map_url ) : ?>
+				<a class="ip-footer__bottom-link" href="<?php echo esc_url( $ip_footer_map_url ); ?>" target="_blank" rel="noopener">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+					<?php esc_html_e( 'Как нас найти', 'glozin-child' ); ?>
+				</a>
+			<?php endif; ?>
+			<a class="ip-footer__bottom-link" href="<?php echo esc_url( $ip_footer_page( 1000696 ) ); ?>">
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="7" width="15" height="13" rx="1"></rect><path d="M16 10h4l3 3v4h-7z"></path><circle cx="6" cy="20" r="2"></circle><circle cx="18" cy="20" r="2"></circle></svg>
 				<?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?>
 			</a>

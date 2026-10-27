@@ -51,6 +51,16 @@
 7. Коллажи разделов: `tools/category-collages/category-collages.php` (dry → apply).
 8. Проверка: главная, каталог, товар, корзина, оформление до шага оплаты (без заказа), RU/RO, телефон; журнал PHP; затем qa-agent.
 
+**Выполнено 27.10.2026** (директор утвердила дизайн; PR laromval/casa24-site#1 → `dev`, #2 → `main`, выложено из `main` @ `584507a`):
+1. Резервная копия: `~/backups/db-20261027-redesign.sql.gz`, `~/backups/glozin-child-20261027-redesign.tar.gz` (вне `public_html`).
+2. Тема залита (37 файлов, без README/TODO); главная, каталог, корзина, товар — 200, без ошибок.
+3. favicon — вложение **1096748**, og:image — **1096749** (`~/backups/brand-ids-20261027.txt`); `blogname` = «Casa24», строка WPML 167 (ro) = «Casa24». Попутно `wp transient delete --all` удалил 16 431 временную запись (кеши, пересоздаются сами).
+4. Новая главная: RU **1096751** «Главная», RO **1096752** «Pagina principală», шаблон Industrial Pro, связаны в WPML; SEO-заголовок Rank Math (`rank_math_title`) = заголовок старой главной + `%sep% %sitename%`, чтобы `<title>` не сменился на «Главная». `page_on_front` = 1096751.
+5. `casa24_ip_sitewide` = 1.
+6. `rebrand-casa24.php apply 1000810 415 1001000 392` — 4 записи, исходники в `_casa24_rebrand_backup`; на «О нас» нет «Meșterul Casei».
+7. Коллажи — `category-collages.php apply`, журнал `~/backups/collages-apply-20261027.log`, 82 записи `_casa24_prev_thumbnail_id` (RU+RO).
+8. Проверено в браузере: главная RU/RO, категории, карточка товара 375 px без горизонтальной прокрутки, все ресурсы страниц грузятся (нет 404). **Не проверено:** оформление заказа до шага оплаты и личный кабинет — отдельной проверкой qa-agent.
+
 **Откат.** `casa24_ip_sitewide 0`, `page_on_front = 1000548`, `site_icon`/og:image = 1001637, `blogname` и строка WPML 167 — прежние значения, `rebrand-casa24.php rollback`, `category-collages.php rollback`; в крайнем случае — тема и база из резервной копии шага 1.
 
 **Критерии приёмки.** Рабочий сайт выглядит как staging; заказ оформляется до шага оплаты; RU/RO открываются; ошибок в журнале PHP нет.
