@@ -107,6 +107,7 @@ $ip_footer_map_url = '';
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1085732 ) ); ?>"><?php esc_html_e( 'Публичная оферта', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1085726 ) ); ?>"><?php esc_html_e( 'Обмен и возврат товара', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1080727 ) ); ?>"><?php esc_html_e( 'Политика конфиденциальности', 'glozin-child' ); ?></a></li>
+						<li><a href="#" data-c24-consent-open><?php esc_html_e( 'Настройки cookie', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1000804 ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
 					</ul>
 				</div>
