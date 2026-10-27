@@ -23,7 +23,7 @@ body.ip-site{
   --gz-color-base: var(--text);
   --gz-color-dark: var(--text);
   --gz-color-primary: var(--accent);
-  --gz-text-color-on-primary: oklch(0.15 0.02 255);
+  --gz-text-color-on-primary: #060c13;
   --gz-link-color: var(--text);
   --gz-link-color-hover: var(--accent-dark);
   --gz-color-price-sale: var(--accent-dark);
@@ -44,7 +44,7 @@ body.ip-site{
   --gz-button-color: var(--on-dark);
   --gz-button-bg-color: var(--bg-dark);
   --gz-button-border-color: var(--bg-dark);
-  --gz-button-color-hover: oklch(0.15 0.02 255);
+  --gz-button-color-hover: #060c13;
   --gz-button-bg-color-hover: var(--accent);
   --gz-button-border-color-hover: var(--accent);
   --gz-button-eff-bg-color-hover: var(--accent);
@@ -76,7 +76,7 @@ body.ip-site a:hover{
 body.ip-site :is(.single_add_to_cart_button, .checkout-button, #place_order, .wc-proceed-to-checkout .button){
   background: var(--accent);
   border-color: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
 }
 
 body.ip-site :is(.single_add_to_cart_button, .checkout-button, #place_order, .wc-proceed-to-checkout .button):hover{
@@ -120,7 +120,7 @@ body.ip-site ul.products li.product .product-inner{
 
 body.ip-site ul.products li.product .product-inner:hover{
   border-color: var(--accent);
-  box-shadow: 0 6px 18px oklch(0 0 0 / 8%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 body.ip-site ul.products li.product .product-thumbnail{
@@ -192,7 +192,7 @@ body.ip-site .catalog-filters-sidebar .selected > a{
 /* Счётчик/бейджи «-10%», «Новинка». */
 body.ip-site :is(.onsale, .woocommerce-badge, .gz-badge, .product-badge){
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   border-radius: 2px;
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
   font-weight: 700;
@@ -278,7 +278,7 @@ body.ip-site :is(.woocommerce-message, .woocommerce-info){
 }
 
 body.ip-site .woocommerce-error{
-  border-left: 3px solid oklch(0.55 0.2 25);
+  border-left: 3px solid #cc272e;
   border-radius: 2px;
 }
 
@@ -301,7 +301,7 @@ body.ip-site .woocommerce-product-gallery__image img{
 body.ip-site .wc-block-cart__submit-button,
 body.ip-site .wc-block-components-checkout-place-order-button{
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   border: none;
   border-radius: 2px;
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
@@ -353,7 +353,7 @@ body.ip-site .gz-button-light{
   --gz-button-color: var(--accent);
   --gz-button-bg-color: var(--bg-dark);
   --gz-button-border-color: var(--bg-dark);
-  --gz-button-color-hover: oklch(0.15 0.02 255);
+  --gz-button-color-hover: #060c13;
   --gz-button-bg-color-hover: var(--accent);
   --gz-button-border-color-hover: var(--accent);
 }
@@ -434,7 +434,7 @@ body.ip-site #quick-view-modal .woocommerce-product-gallery__image img{
    становится светлым и белый текст пропадал. Постоянные цвета: тёмный фон,
    белый текст — в обеих темах. */
 body.ip-site .gz-tooltip--data{
-  --gz-color-dark: oklch(0.15 0.02 255);
+  --gz-color-dark: #060c13;
   --gz-color-light: #ffffff;
 }
 
@@ -511,7 +511,7 @@ body.ip-site .gz-tooltip--data{
 :root[data-ip-theme="dark"] body.ip-site .cart-panel .checkout{
   --gz-button-bg-color: var(--accent);
   --gz-button-border-color: var(--accent);
-  --gz-button-color: oklch(0.15 0.02 255);
+  --gz-button-color: #060c13;
   --gz-button-bg-color-hover: var(--on-dark);
   --gz-button-border-color-hover: var(--on-dark);
   --gz-button-eff-bg-color-hover: var(--on-dark);
@@ -521,7 +521,7 @@ body.ip-site .gz-tooltip--data{
    --gz-color-dark, в тёмной теме светлый. Только в результатах поиска:
    в таблицах заказов у mark фон прозрачный. */
 :root[data-ip-theme="dark"] body.ip-site .modal__content-results mark{
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
 }
 
 /* Подменю мобильного меню: у Glozin правило специфичнее общего выше. */
@@ -549,7 +549,7 @@ body.ip-site #nbcc-cookie-root #nbcc-cookie-box{
   border: 1px solid var(--bg-dark-chip) !important;
   border-left: 4px solid var(--accent) !important;
   border-radius: 2px !important;
-  box-shadow: 0 12px 32px oklch(0 0 0 / 0.28) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28) !important;
   font-family: "Work Sans", Arial, sans-serif !important;
 }
 
@@ -581,7 +581,7 @@ body.ip-site #nbcc-cookie-root #nbcc-cookie-accept{
   padding: 14px 24px !important;
   border-radius: 2px !important;
   background: var(--accent) !important;
-  color: oklch(0.15 0.02 255) !important;
+  color: #060c13 !important;
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif !important;
   font-size: 15px !important;
   text-transform: uppercase !important;

@@ -107,25 +107,30 @@ button:where(.ip-scroll-top)::after{
 }
 
 /* =====================================================================
-   4.1 Цветовые токены (oklch) — ТЗ раздел 4.1, значения не изменять
+   4.1 Цветовые токены — ТЗ раздел 4.1, значения не изменять
+   ТЗ задаёт цвета в oklch(); здесь они пересчитаны в #hex / rgba() один
+   к одному (27.10.2026): oklch() не понимают Chrome до 111 — в т.ч.
+   последний Chrome для Windows 7 (109) — и пропускают такие цвета:
+   прозрачный фон каталога, чёрный логотип. В новых правилах — только
+   #hex / rgba(), без oklch().
    ===================================================================== */
 :root{
   /* Шапка/хиро/футер/навроу — фиксированные, не зависят от переключателя
      темы (обратная связь 19.09.2026: попытка их осветлить в light-теме
      не понравилась ["блёклая"] — вернули как было изначально). */
-  --bg-dark: oklch(0.20 0.02 255);      /* фон хиро/футера */
-  --bg-dark-2: oklch(0.27 0.02 255);    /* фон навроу (каталог+поиск), цвет текста первой строки */
-  --bg-dark-alt: oklch(0.24 0.02 255);  /* альтернативная плашка (хиро-категории) */
-  --bg-dark-chip: oklch(0.38 0.02 255); /* кружки-кнопки и hover на тёмных фонах вне шапки */
-  --accent: oklch(0.70 0.19 45);        /* фирменный оранжевый — акценты, кнопки, цены */
-  --accent-dark: oklch(0.52 0.17 45);   /* оранжевый для текста на светлом фоне (цены в карточках) */
-  --bg-light: oklch(0.985 0.004 90);    /* фон страницы */
-  --surface: oklch(1 0 0);              /* карточки/плашки на светлом фоне */
-  --border: oklch(0.90 0.005 90);       /* тонкие разделители */
-  --text: oklch(0.24 0.01 255);         /* основной текст */
-  --text-muted: oklch(0.50 0.01 255);   /* вторичный текст */
-  --on-dark: oklch(0.97 0.005 90);      /* текст на тёмном фоне */
-  --on-dark-muted: oklch(0.72 0.01 255);/* вторичный текст на тёмном фоне */
+  --bg-dark: #10171f;      /* фон хиро/футера */
+  --bg-dark-2: #202730;    /* фон навроу (каталог+поиск), цвет текста первой строки */
+  --bg-dark-alt: #192029;  /* альтернативная плашка (хиро-категории) */
+  --bg-dark-chip: #3b434d; /* кружки-кнопки и hover на тёмных фонах вне шапки */
+  --accent: #fa6e1d;        /* фирменный оранжевый — акценты, кнопки, цены */
+  --accent-dark: #b33c00;   /* оранжевый для текста на светлом фоне (цены в карточках) */
+  --bg-light: #fbfaf7;    /* фон страницы */
+  --surface: #ffffff;              /* карточки/плашки на светлом фоне */
+  --border: #dfdeda;       /* тонкие разделители */
+  --text: #1c2024;         /* основной текст */
+  --text-muted: #5f6469;   /* вторичный текст */
+  --on-dark: #f6f5f1;      /* текст на тёмном фоне */
+  --on-dark-muted: #a0a5ab;/* вторичный текст на тёмном фоне */
 
   /* Первая строка (topbar) — по обратной связи 19.09.2026: в теме "light"
      полностью белая, текст/логотип/кружки-кнопки — цвета второй строки
@@ -143,11 +148,11 @@ button:where(.ip-scroll-top)::after{
    товаров/футера — остальное (хиро/навроу/футер-полоса) фиксировано.
    ===================================================================== */
 :root[data-ip-theme="dark"]{
-  --bg-light: oklch(0.17 0.02 255);
-  --surface: oklch(0.22 0.015 255);
-  --border: oklch(0.30 0.015 255);
-  --text: oklch(0.95 0.005 90);
-  --text-muted: oklch(0.72 0.01 255);
+  --bg-light: #091018;
+  --surface: #161b22;
+  --border: #292e35;
+  --text: #f0eeeb;
+  --text-muted: #a0a5ab;
 
   --topbar-bg: var(--bg-dark);
   --topbar-text: var(--on-dark);
@@ -236,7 +241,7 @@ button:where(.ip-scroll-top)::after{
 .industrial-pro .btn-accent{
   display: inline-block;
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   border: none;
   border-radius: 2px;
   padding: 14px 26px;
@@ -250,7 +255,7 @@ button:where(.ip-scroll-top)::after{
 
 .industrial-pro .btn-accent:hover{
   opacity: 0.88;
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
 }
 
 .industrial-pro .btn-outline{
@@ -386,7 +391,7 @@ button:where(.ip-scroll-top)::after{
 }
 
 .ip-topbar__actions .ip-icon-btn:hover{
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   background: var(--accent);
 }
 
@@ -402,7 +407,7 @@ button:where(.ip-scroll-top)::after{
   padding: 0 3px;
   border-radius: 50%;
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
   font-weight: 700;
   font-size: 10px;
@@ -451,7 +456,7 @@ button:where(.ip-scroll-top)::after{
 }
 
 .ip-theme-toggle:hover{
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   background: var(--accent);
 }
 
@@ -494,7 +499,7 @@ button:where(.ip-scroll-top)::after{
   justify-content: space-between;
   gap: 8px;
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   border: none;
   border-radius: 2px;
   padding: 10px 16px;
@@ -521,7 +526,7 @@ button:where(.ip-scroll-top)::after{
   border: 1px solid var(--border);
   border-top: 3px solid var(--accent);
   border-radius: 0 0 2px 2px;
-  box-shadow: 0 16px 32px oklch(0 0 0 / 22%);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
   margin-top: 6px;
 }
 
@@ -671,7 +676,7 @@ button:where(.ip-scroll-top)::after{
    ===================================================================== */
 .ip-season-promo{
   position: relative;
-  border-top: 1px solid oklch(1 0 0 / 8%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   background: var(--bg-dark);
 }
@@ -781,7 +786,7 @@ button:where(.ip-scroll-top)::after{
 
 html[lang^="ro"] .ip-season-promo__scrim{
   /* 35% → 15% → 5% → обратно 15% (обратная связь 23.09.2026, финально). */
-  background: linear-gradient(90deg, oklch(0.15 0.02 255 / 15%) 0%, oklch(0.15 0.02 255 / 0%) 100%);
+  background: linear-gradient(90deg, rgba(6, 12, 19, 0.15) 0%, rgba(6, 12, 19, 0) 100%);
 }
 
 /* Текстовый оверлей поверх затемнения — только у слайдов с ключом 'overlay'
@@ -832,11 +837,11 @@ html[lang^="ro"] .ip-season-promo__scrim{
   font-weight: 900;
   margin: 0;
   text-shadow:
-    -1.5px -1.5px 0 oklch(0.12 0.02 255 / 90%),
-    1.5px -1.5px 0 oklch(0.12 0.02 255 / 90%),
-    -1.5px 1.5px 0 oklch(0.12 0.02 255 / 90%),
-    1.5px 1.5px 0 oklch(0.12 0.02 255 / 90%),
-    0 3px 16px oklch(0 0 0 / 65%);
+    -1.5px -1.5px 0 rgba(2, 6, 13, 0.9),
+    1.5px -1.5px 0 rgba(2, 6, 13, 0.9),
+    -1.5px 1.5px 0 rgba(2, 6, 13, 0.9),
+    1.5px 1.5px 0 rgba(2, 6, 13, 0.9),
+    0 3px 16px rgba(0, 0, 0, 0.65);
 }
 
 /* Селектор с двумя классами (не один) — намеренно: глобальный сброс
@@ -866,11 +871,11 @@ html[lang^="ro"] .ip-season-promo__scrim{
   font-size: 20px;
   margin: 0;
   text-shadow:
-    -1px -1px 0 oklch(0.12 0.02 255 / 90%),
-    1px -1px 0 oklch(0.12 0.02 255 / 90%),
-    -1px 1px 0 oklch(0.12 0.02 255 / 90%),
-    1px 1px 0 oklch(0.12 0.02 255 / 90%),
-    0 2px 12px oklch(0 0 0 / 60%);
+    -1px -1px 0 rgba(2, 6, 13, 0.9),
+    1px -1px 0 rgba(2, 6, 13, 0.9),
+    -1px 1px 0 rgba(2, 6, 13, 0.9),
+    1px 1px 0 rgba(2, 6, 13, 0.9),
+    0 2px 12px rgba(0, 0, 0, 0.6);
 }
 
 .ip-season-promo__overlay-links{
@@ -886,7 +891,7 @@ html[lang^="ro"] .ip-season-promo__scrim{
 .ip-season-promo__overlay-link{
   display: inline-block;
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -916,9 +921,9 @@ html[lang^="ro"] .ip-season-promo__scrim{
   width: 8px;
   height: 8px;
   padding: 0;
-  border: 1.5px solid oklch(1 0 0 / 45%);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
   border-radius: 999px;
-  background: oklch(1 0 0 / 25%);
+  background: rgba(255, 255, 255, 0.25);
   cursor: pointer;
   transition: background-color 0.2s ease, width 0.2s ease, border-color 0.2s ease;
 }
@@ -1096,7 +1101,7 @@ html[lang^="ro"] .ip-season-promo__scrim{
 
 .ip-category-card:hover{
   border-color: var(--accent);
-  box-shadow: 0 6px 18px oklch(0 0 0 / 8%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .ip-category-card__link{
@@ -1409,13 +1414,13 @@ html[lang^="ro"] .ip-season-promo__scrim{
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: oklch(1 0 0 / 8%);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--on-dark);
 }
 
 .ip-footer__social-links a:hover{
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
 }
 
 .ip-footer__main{
@@ -1517,15 +1522,15 @@ html[lang^="ro"] .ip-season-promo__scrim{
 
 .ip-footer__bottom{
   background: var(--bg-dark-2);
-  border-top: 1px solid oklch(1 0 0 / 8%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 16px 0;
 }
 
 .ip-footer__payments{
   /* Намеренно всегда светлая — не завязана на --bg-light, который в
      тёмной теме сайта (data-ip-theme="dark") становится тёмным. */
-  background: oklch(0.99 0 0);
-  border-top: 1px solid oklch(0 0 0 / 8%);
+  background: #fcfcfc;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .ip-footer__payments-row{
@@ -1549,7 +1554,7 @@ html[lang^="ro"] .ip-season-promo__scrim{
   font-family: "Work Sans", sans-serif;
   font-weight: 700;
   font-size: 15px;
-  color: oklch(0.25 0.02 255);
+  color: #1b222b;
 }
 
 .ip-footer__payment-icon--visa{
@@ -1596,13 +1601,13 @@ html[lang^="ro"] .ip-season-promo__scrim{
   height: 46px;
   border-radius: 50%;
   background: var(--accent);
-  color: oklch(0.15 0.02 255);
+  color: #060c13;
   border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 16px oklch(0 0 0 / 25%);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .ip-scroll-top:hover{
