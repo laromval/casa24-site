@@ -22,6 +22,34 @@ body.ip-page #page-header{
   display: contents;
 }
 
+/* Админ-панель WordPress (только для вошедших): правый блок «Привет, admin»
+   переносился на вторую строку поверх кружков шапки. Подписи у пунктов
+   с иконкой прячем — остаются иконки (название — во всплывающем меню),
+   у аккаунта — только аватар. На узких экранах убираем ещё «Копировать
+   это» и значок «Публичный». Пункты поиска и «Настроить» сняты в PHP. */
+#wpadminbar :is(#wp-admin-bar-new-content .ab-label, .rank-math-text, #wp-admin-bar-my-account .display-name){
+  display: none;
+}
+
+/* «Привет,» — голый текст без обёртки, поэтому font-size: 0; flex держит
+   аватар по центру полосы (без текста он прилипал к верху). */
+#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-item{
+  display: flex;
+  align-items: center;
+  height: 32px;
+  font-size: 0;
+}
+
+#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-item img{
+  margin-left: 0;
+}
+
+@media (max-width: 1280px){
+  #wpadminbar :is(#wp-admin-bar-cdp-copy-bar-x, #wp-admin-bar-woocommerce-site-visibility-badge){
+    display: none;
+  }
+}
+
 /* Glozin даёт .site-content отступы 54px сверху и 90px снизу — над нашей
    шапкой оставалась пустая белая полоса (обратная связь 25.10.2026). */
 body.ip-page #site-content{

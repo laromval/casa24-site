@@ -460,3 +460,23 @@ function glozin_child_disable_users_sitemap( $provider, $name ) {
 	return $provider;
 }
 add_filter( 'wp_sitemaps_add_provider', 'glozin_child_disable_users_sitemap', 10, 2 );
+
+/**
+ * Админ-панель WordPress на витрине (видна только вошедшим): пункты слева
+ * не помещались в строку, и блок «Привет, admin» + поиск переносился вниз,
+ * поверх кружков шапки (обратная связь 27.10.2026). Убираем то, что на витрине
+ * не нужно: поиск WordPress (ищет записи и страницы, дублирует наш поиск
+ * товаров) и «Настроить» (Customizer Glozin, дизайн задаётся не там).
+ * Остальные пункты ужимаются до иконок в industrial-pro.css.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar Админ-панель.
+ */
+function glozin_child_ip_trim_admin_bar( $wp_admin_bar ) {
+	if ( is_admin() || ! glozin_child_ip_chrome_enabled() ) {
+		return;
+	}
+
+	$wp_admin_bar->remove_node( 'search' );
+	$wp_admin_bar->remove_node( 'customize' );
+}
+add_action( 'admin_bar_menu', 'glozin_child_ip_trim_admin_bar', 999 );
