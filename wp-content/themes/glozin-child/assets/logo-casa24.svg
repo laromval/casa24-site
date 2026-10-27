@@ -1,0 +1,21 @@
+<!--
+  Логотип торговой марки "Casa24" (решение владельца 27.10.2026, вариант A:
+  домик + "CASA24", "24" акцентным цветом). Заменил logo-mesterul-casei.svg.
+  Вариант для тёмного фона (футер); в шапке тот же знак встроен инлайном
+  в template-parts/industrial-pro/header.php.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 72" width="300" height="72" role="img" aria-labelledby="logoTitle">
+  <title id="logoTitle">Casa24</title>
+
+  <!-- Иконка: домик в тёмном бейдже -->
+  <rect x="0" y="4" width="64" height="64" rx="12" fill="oklch(0.27 0.02 255)"/>
+  <g transform="translate(12,16)" fill="none" stroke="oklch(0.70 0.19 45)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 20 L20 4 L38 20"/>
+    <path d="M7 17 V38 H33 V17"/>
+  </g>
+  <rect x="29" y="41" width="6" height="13" fill="oklch(0.70 0.19 45)"/>
+
+  <!-- Воркмарк -->
+  <text x="80" y="54" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="700"
+        font-size="46" letter-spacing="1.5"><tspan fill="oklch(0.97 0.005 90)">CASA</tspan><tspan fill="oklch(0.70 0.19 45)">24</tspan></text>
+</svg>

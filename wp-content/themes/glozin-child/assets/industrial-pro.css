@@ -1,0 +1,1814 @@
+/*
+ * Industrial Pro — стили редизайна casa24.md (docs/tz-redesign-phase1.md, раздел 4).
+ * Подключается ТОЛЬКО на страницах с шаблоном «Industrial Pro — Главная»
+ * (inc/industrial-pro.php), остальной сайт выглядит как раньше.
+ */
+
+/* На странице Industrial Pro своя шапка и футер — шапку/футер родительской
+   темы Glozin прячем, чтобы не было двух шапок подряд. Модальные окна,
+   панель корзины и мобильное меню родителя остаются в разметке. */
+body.ip-chrome #topbar,
+body.ip-chrome #site-header,
+body.ip-chrome #site-footer,
+body.ip-chrome #gotop,
+body.ip-page #page-header{
+  display: none !important;
+}
+
+/* Обёртка шапки (template-parts/industrial-pro/header.php) не создаёт
+   своего блока — иначе position: sticky у .ip-navrow ограничивался бы её
+   высотой и строка «Каталог + поиск» не закреплялась бы при прокрутке. */
+.ip-site-header{
+  display: contents;
+}
+
+/* Админ-панель WordPress (только для вошедших): правый блок «Привет, admin»
+   переносился на вторую строку поверх кружков шапки. Подписи у пунктов
+   с иконкой прячем — остаются иконки (название — во всплывающем меню),
+   у аккаунта — только аватар. На узких экранах убираем ещё «Копировать
+   это» и значок «Публичный». Пункты поиска и «Настроить» сняты в PHP. */
+#wpadminbar :is(#wp-admin-bar-new-content .ab-label, .rank-math-text, #wp-admin-bar-my-account .display-name){
+  display: none;
+}
+
+/* «Привет,» — голый текст без обёртки, поэтому font-size: 0; flex держит
+   аватар по центру полосы (без текста он прилипал к верху). */
+#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-item{
+  display: flex;
+  align-items: center;
+  height: 32px;
+  font-size: 0;
+}
+
+#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-item img{
+  margin-left: 0;
+}
+
+@media (max-width: 1280px){
+  #wpadminbar :is(#wp-admin-bar-cdp-copy-bar-x, #wp-admin-bar-woocommerce-site-visibility-badge){
+    display: none;
+  }
+}
+
+/* Glozin даёт .site-content отступы 54px сверху и 90px снизу — над нашей
+   шапкой оставалась пустая белая полоса (обратная связь 25.10.2026). */
+body.ip-page #site-content{
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Glozin кладёт обычную страницу в контейнер с боковыми отступами — по
+   краям оставались белые полосы ~20px. Растягиваем на всю ширину окна;
+   overflow-x: clip (а не hidden) не ломает position: sticky у .ip-navrow. */
+body.ip-page{
+  overflow-x: clip;
+}
+
+body.ip-page .industrial-pro,
+body.ip-page .ip-footer{
+  /* 100vw включает полосу прокрутки — без поправки --ip-scrollbar
+     (ширина полосы, ставит ui-interactions.js) содержимое съезжало влево
+     на половину её ширины и прилипало к краю окна. */
+  margin-left: calc(50% - 50vw + var(--ip-scrollbar, 0px) / 2);
+  margin-right: calc(50% - 50vw + var(--ip-scrollbar, 0px) / 2);
+}
+
+/* Glozin задаёт всем <button> свои отступы, фон, шрифт и межбуквенный
+   интервал (base.min.css, правило «.button,button,…»). В круглых кнопках
+   42px отступы съедали всё место — иконки темы и поиска пропадали.
+   Сбрасываем на той же специфичности, что у Glozin (:where не добавляет
+   веса), поэтому собственные правила .ip-* ниже по файлу по-прежнему
+   побеждают. */
+/* Только наши кнопки (шапка, секции, футер, «наверх») — раньше сброс шёл на
+   все <button> страницы и задевал кнопки Glozin в панели корзины и окнах. */
+:where(.industrial-pro, .ip-footer) button,
+button:where(.ip-scroll-top){
+  padding: 0;
+  min-width: 0;
+  line-height: 1;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+  border-radius: 0;
+  gap: 0;
+  transition: background-color .2s, color .2s;
+}
+
+:where(.industrial-pro, .ip-footer) button::after,
+button:where(.ip-scroll-top)::after{
+  content: none;
+  animation: none;
+}
+
+/* Glozin оставляет маркеры у списков в контенте страницы — в наших
+   сетках карточек (ul > li) они вылезали точками слева от карточек. */
+:where(.industrial-pro, .ip-footer) :is(ul, ol){
+  list-style: none;
+}
+
+/* =====================================================================
+   4.1 Цветовые токены (oklch) — ТЗ раздел 4.1, значения не изменять
+   ===================================================================== */
+:root{
+  /* Шапка/хиро/футер/навроу — фиксированные, не зависят от переключателя
+     темы (обратная связь 19.09.2026: попытка их осветлить в light-теме
+     не понравилась ["блёклая"] — вернули как было изначально). */
+  --bg-dark: oklch(0.20 0.02 255);      /* фон хиро/футера */
+  --bg-dark-2: oklch(0.27 0.02 255);    /* фон навроу (каталог+поиск), цвет текста первой строки */
+  --bg-dark-alt: oklch(0.24 0.02 255);  /* альтернативная плашка (хиро-категории) */
+  --bg-dark-chip: oklch(0.38 0.02 255); /* кружки-кнопки и hover на тёмных фонах вне шапки */
+  --accent: oklch(0.70 0.19 45);        /* фирменный оранжевый — акценты, кнопки, цены */
+  --accent-dark: oklch(0.52 0.17 45);   /* оранжевый для текста на светлом фоне (цены в карточках) */
+  --bg-light: oklch(0.985 0.004 90);    /* фон страницы */
+  --surface: oklch(1 0 0);              /* карточки/плашки на светлом фоне */
+  --border: oklch(0.90 0.005 90);       /* тонкие разделители */
+  --text: oklch(0.24 0.01 255);         /* основной текст */
+  --text-muted: oklch(0.50 0.01 255);   /* вторичный текст */
+  --on-dark: oklch(0.97 0.005 90);      /* текст на тёмном фоне */
+  --on-dark-muted: oklch(0.72 0.01 255);/* вторичный текст на тёмном фоне */
+
+  /* Первая строка (topbar) — по обратной связи 19.09.2026: в теме "light"
+     полностью белая, текст/логотип/кружки-кнопки — цвета второй строки
+     (--bg-dark-2), иконки внутри кружков — светлые для контраста с их
+     собственной заливкой. */
+  --topbar-bg: var(--surface);
+  --topbar-text: var(--bg-dark-2);
+  --topbar-chip-bg: var(--bg-dark-2);
+  --topbar-chip-icon: var(--accent);
+}
+
+/* =====================================================================
+   Переключатель светлая/тёмная тема сайта (обратная связь 19.09.2026).
+   Меняет только первую строку шапки (topbar) и светлые секции категорий/
+   товаров/футера — остальное (хиро/навроу/футер-полоса) фиксировано.
+   ===================================================================== */
+:root[data-ip-theme="dark"]{
+  --bg-light: oklch(0.17 0.02 255);
+  --surface: oklch(0.22 0.015 255);
+  --border: oklch(0.30 0.015 255);
+  --text: oklch(0.95 0.005 90);
+  --text-muted: oklch(0.72 0.01 255);
+
+  --topbar-bg: var(--bg-dark);
+  --topbar-text: var(--on-dark);
+  --topbar-chip-bg: var(--bg-dark-chip);
+  --topbar-chip-icon: var(--accent);
+}
+
+/* =====================================================================
+   Базовый reset для каркаса (минимальный — не переопределяем родителя)
+   ===================================================================== */
+.industrial-pro *,
+.industrial-pro *::before,
+.industrial-pro *::after{
+  box-sizing: border-box;
+}
+
+.industrial-pro{
+  background: var(--bg-light);
+  color: var(--text);
+}
+
+.industrial-pro a{
+  color: inherit;
+  text-decoration: none;
+}
+
+.industrial-pro img{
+  max-width: 100%;
+  display: block;
+}
+
+.industrial-pro .container,
+.ip-footer .container{
+  /* .ip-footer — отдельно: футер вне .industrial-pro, и на телефоне его
+     содержимое прилипало к краю экрана. */
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* =====================================================================
+   4.2 Типографика
+   ===================================================================== */
+.industrial-pro h1,
+.industrial-pro h2,
+.industrial-pro h3{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.industrial-pro h1{
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.industrial-pro h2,
+.industrial-pro h3{
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.industrial-pro,
+.industrial-pro p,
+.industrial-pro .ip-product-name,
+.industrial-pro .ip-body-text{
+  font-family: "Work Sans", sans-serif;
+  font-weight: 400;
+}
+
+.industrial-pro .ip-product-name{
+  font-weight: 500;
+}
+
+.industrial-pro strong,
+.industrial-pro .ip-body-strong{
+  font-weight: 600;
+}
+
+/* =====================================================================
+   4.3 Кнопки
+   ===================================================================== */
+.industrial-pro .btn-accent{
+  display: inline-block;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border: none;
+  border-radius: 2px;
+  padding: 14px 26px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.industrial-pro .btn-accent:hover{
+  opacity: 0.88;
+  color: oklch(0.15 0.02 255);
+}
+
+.industrial-pro .btn-outline{
+  display: inline-block;
+  background: transparent;
+  color: var(--on-dark);
+  border: 2px solid var(--on-dark);
+  border-radius: 2px;
+  padding: 14px 26px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.industrial-pro .btn-outline:hover{
+  background: var(--on-dark);
+  color: var(--bg-dark);
+}
+
+/* =====================================================================
+   4.4.1 Верхняя строка (topbar) — логотип, телефон/часы, избранное,
+   корзина, язык, переключатель темы. Заменяет прежние отдельные
+   утилити-полосу и шапку по обратной связи 19.09.2026.
+   ===================================================================== */
+.ip-topbar{
+  background: var(--topbar-bg);
+  /* 14px → 10px и без второй строки с телефоном/часами — шапка ниже
+     (обратная связь 25.10.2026). */
+  padding: 10px 0;
+}
+
+.ip-topbar .container{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Логотип и кнопки — жёстко одной строкой, без переноса (обратная связь
+   22.09.2026: раньше логотип/телефон-часы/кнопки были тремя элементами
+   одного flex-ряда с wrap, и то, что переносилось на новую строку при
+   сужении окна, менялось непредсказуемо на разных промежуточных ширинах —
+   кнопки визуально "прыгали" между строкой логотипа и отдельной строкой).
+   25.10.2026: отдельная строка с телефоном/часами убрана — часы удалены,
+   телефон стоит в этом ряду сразу за логотипом. */
+.ip-topbar__row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.ip-logo{
+  display: flex;
+  align-items: center;
+  /* Ширина = ширине кнопки "Каталог"/выпадающего списка ниже (обратная
+     связь 19.09.2026) — визуально логотип и каталог образуют один блок. */
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.ip-logo img,
+.ip-logo svg{
+  /* Заполняет весь блок (220px, см. .ip-logo) — раньше картинка была
+     фиксированной высоты и визуально не менялась, хотя блок расширили;
+     теперь сам логотип растягивается вместе с блоком (обратная связь 19.09.2026). */
+  width: 100%;
+  height: auto;
+}
+
+/* Первая строка воркмарка в шапке — SVG инлайнится в шаблоне (не через
+   <img>), чтобы её можно было перекрашивать через CSS-токен вместо
+   фиксированного fill в файле логотипа: белая шапка -> текст цвета
+   второй строки, тёмная шапка -> светлый текст (обратная связь 19.09.2026). */
+.ip-logo__line1{
+  fill: var(--topbar-text);
+}
+
+.ip-topbar__phone{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* Отодвигает кнопки справа к краю — телефон остаётся рядом с логотипом. */
+  margin-right: auto;
+  margin-left: 12px;
+  color: var(--topbar-text);
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ip-topbar__phone svg{
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.ip-topbar__phone:hover{
+  color: var(--accent);
+}
+
+.ip-topbar__actions{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Иконки регистрации/избранного/корзины — крупнее и заметнее на тёмном
+   фоне (обратная связь 19.09.2026): непрозрачный светло-серый фон вместо
+   полупрозрачной белой заливки, которая была плохо видна. */
+/* .ip-topbar__actions в селекторе — не для красоты: без него специфичность
+   этого правила (0-1-0) проигрывает сбросу `.industrial-pro a{ color: inherit }`
+   (0-1-1) выше по файлу, и три кружка-ссылки (кабинет/избранное/корзина)
+   остаются тёмными на тёмном фоне вместо оранжевых (баг найден по скриншоту
+   19.09.2026 — переключатель темы, единственный тут <button>, а не <a>,
+   сброс не затрагивал и оставался оранжевым). */
+.ip-topbar__actions .ip-icon-btn{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--topbar-chip-icon);
+  background: var(--topbar-chip-bg);
+  border: none;
+  cursor: pointer;
+}
+
+.ip-topbar__actions .ip-icon-btn:hover{
+  color: oklch(0.15 0.02 255);
+  background: var(--accent);
+}
+
+/* Счётчики корзины/избранного: классы Glozin, т.к. AJAX-фрагменты
+   WooCommerce/WCBoost заменяют span целиком (см. glozin_child_header_counter()).
+   Пустой счётчик (0) не показываем. */
+.ip-icon-btn .header-counter{
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--topbar-bg);
+  line-height: 1;
+}
+
+.ip-icon-btn .header-counter.empty-counter{
+  display: none;
+}
+
+.ip-lang-switch{
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+.ip-lang-switch a{
+  color: var(--topbar-text);
+  padding: 4px 6px;
+}
+
+.ip-lang-switch a.is-active,
+.ip-lang-switch a:hover{
+  color: var(--accent);
+}
+
+.ip-theme-toggle{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--topbar-chip-icon);
+  background: var(--topbar-chip-bg);
+  border: none;
+  cursor: pointer;
+}
+
+.ip-theme-toggle:hover{
+  color: oklch(0.15 0.02 255);
+  background: var(--accent);
+}
+
+/* По умолчанию (тема "light") показываем солнце — кнопка предлагает включить тёмную */
+.ip-theme-toggle__icon--moon{ display: none; }
+:root[data-ip-theme="dark"] .ip-theme-toggle__icon--sun{ display: none; }
+:root[data-ip-theme="dark"] .ip-theme-toggle__icon--moon{ display: block; }
+
+/* =====================================================================
+   4.4.2 Вторая строка (navrow) — каталог с выпадающим списком слева,
+   поиск по центру.
+   ===================================================================== */
+.ip-navrow{
+  background: var(--bg-dark-2);
+  padding: 10px 0;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.ip-navrow .container{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ip-catalog{
+  position: relative;
+  /* Та же ширина, что у .ip-logo — по обратной связи 19.09.2026, чтобы
+     логотип и кнопка "Каталог" образовывали единый блок по вертикали. */
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.ip-catalog__toggle{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border: none;
+  border-radius: 2px;
+  padding: 10px 16px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.ip-catalog__menu{
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 40;
+  /* Широкая панель на все разделы (~40) в три колонки, с прокруткой,
+     если не помещается по высоте (обратная связь 26.10.2026). */
+  width: min(900px, calc(100vw - 40px));
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 0 0 2px 2px;
+  box-shadow: 0 16px 32px oklch(0 0 0 / 22%);
+  margin-top: 6px;
+}
+
+/* Открытие — только по нажатию (класс is-open ставит ui-interactions.js). */
+.ip-catalog.is-open .ip-catalog__menu{
+  display: block;
+}
+
+.ip-catalog.is-open .ip-catalog__toggle svg{
+  transform: rotate(180deg);
+}
+
+.ip-catalog__toggle svg{
+  transition: transform .2s;
+}
+
+.ip-catalog__list{
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px 12px;
+}
+
+.ip-catalog__menu a{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  color: var(--text);
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.3;
+  border-radius: 2px;
+}
+
+.ip-catalog__menu a:hover{
+  background: var(--bg-light);
+  color: var(--accent-dark);
+}
+
+.ip-catalog__count{
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* «Все категории» — первой строкой на всю ширину панели. */
+.ip-catalog__item--all{
+  grid-column: 1 / -1;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+
+.ip-catalog__item--all a{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent-dark);
+}
+
+@media (max-width: 991px){
+  .ip-catalog__list{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px){
+  .ip-catalog__list{
+    grid-template-columns: 1fr;
+  }
+}
+
+.ip-search{
+  flex-grow: 1;
+  max-width: 520px;
+  height: 40px;
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+/* .ip-search в селекторе — чтобы перебить правило Glozin
+   input[type=search] (рамка, скругление, высота 50px — внутри квадратного
+   поля получалась закруглённая «таблетка», обратная связь 25.10.2026).
+   Высота поля = высоте кнопки поиска. */
+.ip-search .ip-search__input{
+  flex-grow: 1;
+  min-width: 0;
+  height: 40px;
+  min-height: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  padding: 0 14px;
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: transparent;
+}
+
+/* Цвет подсказки Glozin задаёт под светлый фон — в тёмной теме её не было видно. */
+.ip-search .ip-search__input::placeholder{
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.ip-search__submit{
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  color: var(--accent);
+  border: none;
+  cursor: pointer;
+}
+
+.ip-search__submit:hover{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+/* =====================================================================
+   4.4.3 Рекламные баннеры — полноширинная карусель из готовых картинок
+   (переданы владельцем 21.09.2026), без наложения HTML-текста поверх —
+   текст уже впечатан в само изображение. Слайды автоматически сменяют
+   друг друга, точки-навигация внизу кликабельны (см.
+   assets/ui-interactions.js — [data-ip-carousel]). Секция намеренно
+   full-bleed — от края до края экрана, без .container.
+
+   22.09.2026: обе картинки теперь ~2.4 (1942×809), aspect-ratio ниже подогнан
+   под них — слот заполняется вплотную, без полей. object-fit:contain
+   сохранён на случай, если очередную картинку пришлют с другим
+   соотношением сторон (тогда по бокам/сверху-снизу появятся поля цвета
+   фона --bg-dark, а не обрежется впечатанный в картинку текст).
+   ===================================================================== */
+.ip-season-promo{
+  position: relative;
+  border-top: 1px solid oklch(1 0 0 / 8%);
+  overflow: hidden;
+  background: var(--bg-dark);
+}
+
+.ip-season-promo__viewport{
+  overflow: hidden;
+}
+
+.ip-season-promo__track{
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.ip-season-promo__slide{
+  position: relative;
+  flex: 0 0 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 2.4;
+}
+
+.ip-season-promo__banner{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Слайд с текстовым оверлеем (сейчас "дачный сезон") — декоративное фото
+   под текстом, а не самостоятельная картинка с важной информацией по всей
+   площади (как у слайда с дисконтной картой). У этого слота на мобильном
+   брейкпоинте другое соотношение сторон (1.5), чем у самого фото (2.4) —
+   с contain это давало пустые тёмные полосы сверху/снизу на узких экранах,
+   и текст, привязанный к верху блока, попадал в пустую полосу, а не на
+   фото (обратная связь 22.09.2026). cover всегда заполняет слот целиком,
+   без полос, ценой небольшой обрезки краёв фото — для этого фона это
+   не критично. */
+.ip-season-promo__slide--overlay .ip-season-promo__banner{
+  object-fit: cover;
+}
+
+/* Анимация падающих кленовых листьев поверх сезонного баннера (обратная
+   связь 21.09.2026) — только у слайда "Завершение дачного сезона", сама
+   картинка не меняется. Листья генерируются в JS (см.
+   assets/ui-interactions.js, [data-ip-falling-leaves]), тут — только
+   раскладка и keyframes. */
+.ip-season-promo__leaves{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ip-leaf{
+  position: absolute;
+  top: -10%;
+  width: 22px;
+  height: 22px;
+  animation-name: ip-leaf-fall, ip-leaf-sway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  animation-direction: normal, alternate;
+  opacity: 0.9;
+}
+
+.ip-leaf svg{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@keyframes ip-leaf-fall{
+  from{ transform: translateY(-10%) rotate(0deg); }
+  to{ transform: translateY(1100%) rotate(360deg); }
+}
+
+@keyframes ip-leaf-sway{
+  from{ margin-left: -26px; }
+  to{ margin-left: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ip-leaf{
+    animation: none;
+    display: none;
+  }
+}
+
+/* Затемнение отключено на RU по просьбе владельца (обратная связь
+   23.09.2026) — на 100% прозрачное, фото ничем не тонировано, читаемость
+   текста держит только обводка (см. .ip-season-promo__overlay-* ниже).
+   Для RO — намеренно другое решение (та же обратная связь, уточнение
+   владельца): лёгкое затемнение + обводка вместе (было предложено как
+   рекомендация из нескольких вариантов). Разметка (HTML) одна и та же
+   для обоих языков — переключение только через селектор html[lang="ro"]
+   ниже (WPML сам меняет lang у <html> в зависимости от языка страницы,
+   без правок шаблона с нашей стороны). */
+.ip-season-promo__scrim{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  pointer-events: none;
+}
+
+html[lang^="ro"] .ip-season-promo__scrim{
+  /* 35% → 15% → 5% → обратно 15% (обратная связь 23.09.2026, финально). */
+  background: linear-gradient(90deg, oklch(0.15 0.02 255 / 15%) 0%, oklch(0.15 0.02 255 / 0%) 100%);
+}
+
+/* Текстовый оверлей поверх затемнения — только у слайдов с ключом 'overlay'
+   (сейчас это "дачный сезон", см. комментарий в шаблоне о причине).
+   Сам оверлей не перехватывает клики (pointer-events: none), чтобы карусель
+   свайпалась под ним как обычно — кликабельны только ссылки внутри. Фона
+   у самого оверлея больше нет (обратная связь 22.09.2026 — сплошная плашка
+   под текстом выглядела отдельным "приклеенным" блоком) — держит текст
+   затемнение слоем ниже. */
+.ip-season-promo__overlay{
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  /* Верхний левый угол, а не центр: центрирование по вертикали "убегало"
+     при ресайзе, потому что высота баннера зависит от aspect-ratio и
+     меняется вместе с шириной окна — центр съезжает вместе с ней. Верхний
+     край стабилен независимо от высоты (обратная связь 22.09.2026). */
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  /* Те же 20px и max-width 1280px, что у .container — чтобы текст начинался
+     строго под кнопкой "Каталог"/поисковой строкой выше, а не съезжал левее
+     или правее них (секция сама намеренно full-bleed, без .container). */
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 20px;
+  pointer-events: none;
+}
+
+/* Обратная связь 23.09.2026: сплошного затемнения фото под текстом больше
+   нет (владелец попросил фото без тонировки, см. .ip-season-promo__scrim
+   выше — оно на 100% прозрачное), поэтому читаемость держит только сам
+   текст — плотная тёмная обводка со всех 4 сторон (имитация text-stroke
+   через 4 смещённые тени без блюра — надёжно работает на любом фоне,
+   в отличие от одной размытой тени) плюс мягкое свечение снизу для глубины.
+   Плюс крупнее и жирнее (тоже обратная связь 23.09.2026: было 28px/700).
+
+   Селектор с двумя классами — та же причина, что и у -subtitle ниже:
+   глобальный ".industrial-pro h2, .industrial-pro h3{ font-weight: 700 }"
+   (класс+тег, специфичность 0-1-1) перебивал бы "font-weight: 900" у
+   одного класса (0-1-0), несмотря на то, что этот объявлен позже в файле —
+   специфичность важнее порядка объявления. */
+.ip-season-promo__overlay .ip-season-promo__overlay-title{
+  color: var(--on-dark);
+  font-size: 36px;
+  font-weight: 900;
+  margin: 0;
+  text-shadow:
+    -1.5px -1.5px 0 oklch(0.12 0.02 255 / 90%),
+    1.5px -1.5px 0 oklch(0.12 0.02 255 / 90%),
+    -1.5px 1.5px 0 oklch(0.12 0.02 255 / 90%),
+    1.5px 1.5px 0 oklch(0.12 0.02 255 / 90%),
+    0 3px 16px oklch(0 0 0 / 65%);
+}
+
+/* Селектор с двумя классами (не один) — намеренно: глобальный сброс
+   ".industrial-pro p" (см. начало файла) имеет специфичность класс+тег
+   (0-1-1), которая выше, чем у одного класса ".ip-season-promo__overlay-
+   subtitle" (0-1-0) — при одном классе "font-weight: 800" ниже физически
+   не мог победить и тихо проигрывал глобальному "font-weight: 400" для
+   всех <p>, несмотря на то, что был объявлен позже в файле (специфичность
+   всегда важнее порядка). Обратная связь 22.09.2026 (повторно): текст
+   на слайдах карусели фактически не был жирным, хотя предыдущая правка
+   (комментарий ниже) думала, что чинит именно это — на самом деле дело
+   было не в наборе начертаний шрифта (800 и так уже грузится), а в этой
+   специфичности. */
+.ip-season-promo__overlay .ip-season-promo__overlay-subtitle{
+  /* Оранжевый акцент по обратной связи 22.09.2026 (текст сменили на
+     "Сохрани вкус лета" — это призыв к действию, выделяем фирменным
+     цветом, как акцентные фразы в остальной теме).
+     23.09.2026: без сплошного затемнения фото (убрали по просьбе владельца)
+     оранжевый текст сливался с осенним фото — тоже оранжево-жёлтым. Чиним
+     не возвратом затемнения, а плотной тёмной обводкой текста (4 смещённые
+     тени без блюра + мягкое свечение) — работает независимо от того, что
+     именно на фото под конкретной буквой. Заодно крупнее и жирнее
+     (было 16px/800) — тоже обратная связь 23.09.2026. */
+  color: var(--accent);
+  font-family: "Work Sans", sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  margin: 0;
+  text-shadow:
+    -1px -1px 0 oklch(0.12 0.02 255 / 90%),
+    1px -1px 0 oklch(0.12 0.02 255 / 90%),
+    -1px 1px 0 oklch(0.12 0.02 255 / 90%),
+    1px 1px 0 oklch(0.12 0.02 255 / 90%),
+    0 2px 12px oklch(0 0 0 / 60%);
+}
+
+.ip-season-promo__overlay-links{
+  display: flex;
+  /* В столбик, не в ряд (обратная связь 22.09.2026). */
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  pointer-events: auto;
+}
+
+.ip-season-promo__overlay-link{
+  display: inline-block;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 2px;
+  transition: opacity 0.15s ease;
+}
+
+.ip-season-promo__overlay-link:hover{
+  opacity: 0.85;
+}
+
+.ip-season-promo__dots{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 2;
+}
+
+.ip-season-promo__dot{
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 1.5px solid oklch(1 0 0 / 45%);
+  border-radius: 999px;
+  background: oklch(1 0 0 / 25%);
+  cursor: pointer;
+  transition: background-color 0.2s ease, width 0.2s ease, border-color 0.2s ease;
+}
+
+.ip-season-promo__dot.is-active{
+  width: 22px;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 767px){
+  .ip-season-promo__slide{
+    aspect-ratio: 1.5;
+  }
+
+  .ip-season-promo__overlay{
+    max-width: 100%;
+    padding: 14px 16px;
+    gap: 6px;
+  }
+
+  .ip-season-promo__overlay .ip-season-promo__overlay-title{
+    font-size: 22px;
+  }
+
+  .ip-season-promo__overlay .ip-season-promo__overlay-subtitle{
+    font-size: 16px;
+  }
+
+  .ip-season-promo__overlay-links{
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .ip-season-promo__overlay-link{
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
+/* =====================================================================
+   4.4.3b Полоса преимуществ (доставка/гарантия/оплата/поддержка) —
+   сразу под баннерами карусели, по референсу 21.09.2026. Светлая секция,
+   не full-bleed (внутри .container, как обычные секции ниже).
+   ===================================================================== */
+.ip-usp-bar{
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.ip-usp-bar__grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 16px;
+  padding: 24px 20px;
+}
+
+.ip-usp-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ip-usp-item__icon{
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.ip-usp-item__body{
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ip-usp-item__title{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* Описание переносится на вторую строку, а не обрезается многоточием:
+   на 992–1100 в 4 колонки RO-тексты не помещались (повторная проверка
+   qa-agent 27.10.2026, Н-4). */
+.ip-usp-item__text{
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+/* 4 в ряд — только с 992px: на 768 четыре пункта с описаниями (nowrap)
+   не помещались и последний уходил за край (проверка qa-agent 27.10.2026,
+   Н-4). На планшете — 2×2. */
+@media (min-width: 768px){
+  .ip-usp-bar__grid{
+    padding: 28px 20px;
+  }
+}
+
+@media (min-width: 992px){
+  .ip-usp-bar__grid{
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 992px){
+  .ip-navrow .container{
+    flex-wrap: nowrap;
+  }
+}
+
+/* =====================================================================
+   4.4.4 Категории (светлый фон)
+   ===================================================================== */
+.ip-section{
+  padding: 56px 0;
+}
+
+.ip-section__head{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.ip-section__head h2{
+  font-size: 28px;
+  margin: 0;
+  color: var(--text);
+}
+
+.ip-section__link{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent-dark);
+  white-space: nowrap;
+}
+
+.ip-section__link:hover{
+  text-decoration: underline;
+}
+
+.ip-categories-grid{
+  display: grid;
+  /* minmax(0, 1fr): длинные слова («Электрооборудование») не распирают колонку. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Карточка категории: квадратный значок + название и число товаров.
+   Вся карточка — одна ссылка; при наведении значок и рамка оранжевые. */
+.ip-category-card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.ip-category-card:hover{
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px oklch(0 0 0 / 8%);
+}
+
+.ip-category-card__link{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  padding: 16px;
+}
+
+.ip-category-card__badge{
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  background: var(--bg-dark);
+  color: var(--accent);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color .2s, color .2s;
+}
+
+.ip-category-card:hover .ip-category-card__badge{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+.ip-category-card__badge svg{
+  width: 26px;
+  height: 26px;
+}
+
+.ip-category-card__text{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ip-category-card__name{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  color: var(--text);
+  margin: 0;
+}
+
+.ip-category-card__desc{
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Значок над названием: на телефоне (2 колонки) и на средних экранах
+   (4 узкие колонки) — иначе «Электроинструмент» рвётся посреди слова. */
+@media (max-width: 575px), (min-width: 992px) and (max-width: 1279px){
+  .ip-category-card__link{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .ip-category-card__badge{
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Без этого блок текста шире карточки (align-items: flex-start даёт ему
+     ширину по содержимому) и длинное название вылезает за рамку. */
+  .ip-category-card__text{
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 575px){
+  .ip-category-card__name{
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 992px){
+  .ip-categories-grid{
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .ip-category-card__link{
+    padding: 20px;
+  }
+}
+
+/* =====================================================================
+   4.4.5 Сетка товаров («Топ продаж» / «Популярные товары»)
+   ===================================================================== */
+.ip-products-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  /* Отступ списка от Glozin сдвигал сетку правее заголовка секции. */
+  margin: 0;
+  padding: 0;
+}
+
+.ip-product-card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ip-product-card__photo{
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-light);
+  overflow: hidden;
+}
+
+.ip-product-card__photo img{
+  width: 100%;
+  height: 100%;
+  /* contain, не cover: товар должен быть виден целиком (двери — в полный
+     рост), а не обрезан по краям квадратной плашки. */
+  object-fit: contain;
+}
+
+/* Товар без фото: заглушка-логотип (SVG) — маленькая и бледная по центру,
+   а не растянутая на всю плашку с обрезанным «CASA24.MD». */
+.ip-product-card__photo img[src$=".svg"]{
+  width: 55%;
+  margin: 0 auto;
+  display: block;
+  opacity: 0.35;
+}
+
+.ip-product-card__body{
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.industrial-pro .ip-product-card__name{
+  /* .industrial-pro в селекторе: иначе общее правило «.industrial-pro h3»
+     (заглавные, шрифт заголовков) перебивало его — названия товаров шли
+     капслоком (видно на staging 25.10.2026).
+     Glozin задаёт h3 свой шрифт заголовков и uppercase — по ТЗ 4.4
+     название товара Work Sans, 2 строки. max-height страхует обрезку:
+     без него у длинных названий выглядывал кусок третьей строки. */
+  font-family: "Work Sans", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(14px * 1.4 * 2);
+  max-height: calc(14px * 1.4 * 2);
+}
+
+.ip-product-card__footer{
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ip-product-card__price{
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.1;
+  color: var(--accent-dark);
+  min-width: 0;
+}
+
+/* Товар со скидкой: старая цена мелко строкой выше, новая — основной.
+   Раньше обе стояли в одну строку и выталкивали кнопку корзины за край
+   карточки; жёлтый фон <ins> — от Glozin, убираем. */
+.ip-product-card__price del{
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ip-product-card__price ins{
+  background: none;
+  text-decoration: none;
+}
+
+/* Сумма с валютой не разрывается: «1 650,00 MDL» всегда одной строкой. */
+.ip-product-card__price .amount{
+  white-space: nowrap;
+}
+
+.ip-product-card__cart-btn{
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: var(--bg-dark);
+  border: none;
+  border-radius: 2px;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ip-product-card .ip-product-card__cart-btn{
+  /* Кнопка теперь <a> — без .ip-product-card в селекторе цвет перебивал
+     сброс .industrial-pro a{ color: inherit }. */
+  color: var(--accent);
+}
+
+.ip-product-card .ip-product-card__cart-btn:hover{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+/* WooCommerce на время AJAX-добавления ставит .loading, после — .added. */
+.ip-product-card__cart-btn.loading{
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ip-product-card .ip-product-card__cart-btn.added{
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+/* Ссылку «Просмотр корзины», которую WooCommerce вставляет рядом с кнопкой,
+   прячем — она ломает карточку, а корзину Glozin и так открывает панелью. */
+.ip-product-card a.added_to_cart{
+  display: none;
+}
+
+@media (min-width: 576px){
+  .ip-products-grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px){
+  .ip-products-grid{
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.ip-section--muted{
+  background: var(--bg-light);
+}
+
+/* =====================================================================
+   4.4.6 Футер — переделан по обратной связи 19.09.2026 (референс: футер
+   конкурента Supraten.md, контент — только наши реальные страницы)
+   ===================================================================== */
+.ip-footer__social-bar{
+  background: var(--bg-dark-2);
+}
+
+.ip-footer__social-bar-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 0;
+}
+
+.ip-footer__contact-row{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  color: var(--on-dark-muted);
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+}
+
+.ip-footer__social-links{
+  display: flex;
+  gap: 10px;
+}
+
+.ip-footer__social-links a{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: oklch(1 0 0 / 8%);
+  color: var(--on-dark);
+}
+
+.ip-footer__social-links a:hover{
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+}
+
+.ip-footer__main{
+  background: var(--bg-dark);
+}
+
+.ip-footer__brand-row{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.ip-footer__info-toggle{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--on-dark);
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ip-footer__info-toggle-icon{
+  flex: none;
+  transition: transform 0.2s ease;
+}
+
+.ip-footer__info-toggle[aria-expanded="true"] .ip-footer__info-toggle-icon{
+  transform: rotate(180deg);
+}
+
+.ip-footer__phone{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+}
+
+.ip-footer__phone:hover{
+  color: var(--accent);
+}
+
+.ip-footer__col h3{
+  color: var(--on-dark);
+  font-size: 15px;
+  margin: 0 0 16px;
+}
+
+.ip-footer__col ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ip-footer__col a{
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+}
+
+.ip-footer__col a:hover{
+  color: var(--accent);
+}
+
+/* Аккордеон "Полезная информация" — колонки со ссылками скрыты по
+   умолчанию на ЛЮБОЙ ширине экрана (обратная связь 22.09.2026): без клика
+   .ip-footer__main нулевой высоты (паддинг живёт на .is-open, а не на
+   .ip-footer__main), по клику появляется широкая панель со ссылками. */
+.ip-footer__cols{
+  display: none;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.ip-footer__cols.is-open{
+  display: flex;
+  padding: 40px 0;
+}
+
+@media (min-width: 768px){
+  .ip-footer__cols.is-open{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ip-footer__bottom{
+  background: var(--bg-dark-2);
+  border-top: 1px solid oklch(1 0 0 / 8%);
+  padding: 16px 0;
+}
+
+.ip-footer__payments{
+  /* Намеренно всегда светлая — не завязана на --bg-light, который в
+     тёмной теме сайта (data-ip-theme="dark") становится тёмным. */
+  background: oklch(0.99 0 0);
+  border-top: 1px solid oklch(0 0 0 / 8%);
+}
+
+.ip-footer__payments-row{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 0;
+}
+
+.ip-footer__payment-icons{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ip-footer__payment-icon{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Work Sans", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: oklch(0.25 0.02 255);
+}
+
+.ip-footer__payment-icon--visa{
+  color: #1a1f71;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+}
+
+.ip-footer__bottom-row{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ip-footer__bottom-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+}
+
+.ip-footer__bottom-link:hover{
+  color: var(--accent);
+}
+
+.ip-footer__copy{
+  margin-left: auto;
+  color: var(--on-dark-muted);
+  font-family: "Work Sans", sans-serif;
+  font-size: 13px;
+}
+
+.ip-scroll-top{
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: oklch(0.15 0.02 255);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px oklch(0 0 0 / 25%);
+}
+
+.ip-scroll-top:hover{
+  opacity: 0.9;
+}
+
+/* =====================================================================
+   Мобильная адаптивность — контрольные брейкпоинты 375px и 768px
+   ===================================================================== */
+@media (max-width: 991px){
+  /* Номер не помещается рядом с логотипом и кнопками — остаётся иконка
+     телефона (по нажатию звонок), номер есть в футере. */
+  .ip-topbar__phone-number{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .ip-topbar__phone{
+    margin-left: 6px;
+  }
+}
+
+@media (max-width: 767px){
+  .ip-section{
+    padding: 36px 0;
+  }
+
+  .ip-section__head h2{
+    font-size: 22px;
+  }
+
+  /* Каталог и поиск — одной строкой: закреплённая при прокрутке полоса
+     занимала 111px экрана телефона, теперь ~56px (проверка 375px, 25.10.2026). */
+  .ip-navrow{
+    padding: 8px 0;
+  }
+
+  .ip-navrow .container{
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .ip-catalog{
+    width: auto;
+  }
+
+  .ip-catalog__toggle{
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  .ip-catalog__menu{
+    /* На телефоне панель — почти на всю ширину экрана под кнопкой. */
+    width: calc(100vw - 32px);
+    max-height: 65vh;
+  }
+
+  .ip-search{
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .ip-footer__bottom-row{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ip-footer__copy{
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 424px){
+  /* Логотип и круглые кнопки должны остаться в один ряд на любой ширине
+     (обратная связь 22.09.2026) — на самых узких экранах для этого не
+     хватает места при исходных размерах, поэтому здесь сжимаем логотип и
+     кнопки, а не переносим их на разные строки. */
+  .ip-logo{
+    width: 110px;
+  }
+
+  .ip-topbar__row{
+    gap: 6px;
+  }
+
+  .ip-topbar__actions{
+    gap: 2px;
+  }
+
+  .ip-topbar__actions .ip-icon-btn,
+  .ip-theme-toggle{
+    width: 28px;
+    height: 28px;
+  }
+
+  .ip-topbar__actions .ip-icon-btn svg,
+  .ip-theme-toggle svg{
+    width: 14px;
+    height: 14px;
+  }
+
+  .ip-icon-btn .header-counter{
+    /* Меньше самого кружка (28px) — иначе бейдж вылезает за его границы. */
+    min-width: 13px;
+    height: 13px;
+    font-size: 8px;
+  }
+
+  .ip-lang-switch{
+    font-size: 10px;
+    gap: 0;
+  }
+
+  .ip-lang-switch a{
+    padding: 3px 2px;
+  }
+}
+
+/* =====================================================================
+   Телефон (до 575px) — по проверке staging на 375px, 25.10.2026
+   ===================================================================== */
+@media (max-width: 575px){
+  /* Преимущества: только иконка и заголовок — с описаниями блок занимал
+     больше экрана телефона (321px), чем сама карусель. */
+  .ip-usp-bar__grid{
+    gap: 12px;
+    padding: 16px 16px;
+  }
+
+  .ip-usp-item{
+    gap: 8px;
+  }
+
+  .ip-usp-item__icon{
+    width: 34px;
+    height: 34px;
+  }
+
+  .ip-usp-item__icon svg{
+    width: 16px;
+    height: 16px;
+  }
+
+  .ip-usp-item__title{
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .ip-usp-item__text{
+    display: none;
+  }
+
+  /* Товары — по два в ряд, как в мобильных версиях магазинов: по одному
+     каждая карточка была на весь экран, раздел из 4 товаров — ~1900px. */
+  .ip-products-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .ip-product-card__photo{
+    padding: 6px;
+  }
+
+  .ip-product-card__body{
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .industrial-pro .ip-product-card__name{
+    font-size: 13px;
+    min-height: calc(13px * 1.4 * 2);
+    max-height: calc(13px * 1.4 * 2);
+  }
+
+  .ip-product-card__footer{
+    gap: 6px;
+  }
+
+  /* 16px: «1.650,00 MDL» иначе заезжал под кнопку корзины в карточке
+     шириной ~160px. */
+  .ip-product-card__price{
+    font-size: 16px;
+  }
+
+  .ip-product-card__price del{
+    font-size: 11px;
+  }
+
+  .ip-product-card__cart-btn{
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* На планшете и телефоне внизу экрана — нижняя панель Glozin (Главная,
+   Профиль, Каталог, Избранное, Корзина); кнопка «наверх» закрывала «Корзину». */
+@media (max-width: 991px){
+  .ip-scroll-top{
+    bottom: 84px;
+    right: 14px;
+    width: 42px;
+    height: 42px;
+  }
+}
