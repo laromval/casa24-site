@@ -39,15 +39,19 @@
 `feature/redesign-industrial-pro` → `dev` → `main` через Pull Request с описанием изменений.
 
 ### 2.4. Перенос на рабочий сайт
-**Порядок (каждый шаг — с проверкой сайта после него):**
-1. Резервная копия: файлы темы `glozin-child` и база данных (JetBackup в cPanel или `wp db export` вне `public_html`).
-2. Залить тему `wp-content/themes/glozin-child/` из `main` (без файлов `README-*`, `TODO-*`).
-3. `wp option update casa24_ip_sitewide 1` — новый вид на всех страницах.
-4. Создать страницу «Главная» с шаблоном «Industrial Pro — Главная» и её RO-перевод «Pagina principală», связать в WPML; назначить главной (`page_on_front`).
-5. Коллажи разделов: `wp eval-file category-collages.php apply` (сначала `dry`).
-6. Сбросить кэш LiteSpeed.
+**Сверка перед выкладкой (27.10.2026, только чтение):** тема на проде — версия подрядчика без изменений после 25.10 (22 общих файла совпадают с репозиторием, `functions.php` = коммит `09eb654`; 16 файлов Industrial Pro на проде нет); staging = репозиторий. На проде: `page_on_front` = 1000548, `blogname` = «MESTERUL CASEI», RO-перевод названия (строка WPML 167) — «MEȘTERUL CASEI», favicon и og:image по умолчанию — вложение 1001637 (Larom VAL), опция `casa24_ip_sitewide` не задана, коллажи и ребрендинг текстов не применялись. ID страниц «О нас» (1000810) и футера Glozin (1001000) на проде те же, что на staging. Вложения favicon/og со staging (1093468, 1093473) на проде **не переносить по ID** — на проде эти ID заняты товарами; загрузить файлы заново.
 
-**Откат.** `wp option update casa24_ip_sitewide 0`, `page_on_front = 1000548` (старая главная), `category-collages.php rollback`, при необходимости — вернуть тему из резервной копии.
+**Порядок (каждый шаг — с проверкой сайта после него):**
+1. Резервная копия вне `public_html`: `wp db export` (сжатый) + архив папки темы `glozin-child`.
+2. Залить тему `wp-content/themes/glozin-child/` из репозитория (без `README-*`, `TODO-*`). Пока опция не включена, сайт выглядит как прежде.
+3. Бренд: загрузить favicon-домик и картинку превью `casa24-og-1200x630` в медиатеку → `site_icon`, og:image по умолчанию в Rank Math; `blogname` = «Casa24», RO-перевод строки WPML «Blog Title» = «Casa24».
+4. Создать страницу «Главная» с шаблоном «Industrial Pro — Главная» и её RO-перевод «Pagina principală», связать в WPML; назначить главной (`page_on_front`).
+5. `wp option update casa24_ip_sitewide 1` — новый вид на всех страницах.
+6. Тексты: `tools/rebrand/rebrand-casa24.php` (dry → apply) для «О нас» RU 1000810 / RO 415 и футера Glozin RU 1001000 / RO 392.
+7. Коллажи разделов: `tools/category-collages/category-collages.php` (dry → apply).
+8. Проверка: главная, каталог, товар, корзина, оформление до шага оплаты (без заказа), RU/RO, телефон; журнал PHP; затем qa-agent.
+
+**Откат.** `casa24_ip_sitewide 0`, `page_on_front = 1000548`, `site_icon`/og:image = 1001637, `blogname` и строка WPML 167 — прежние значения, `rebrand-casa24.php rollback`, `category-collages.php rollback`; в крайнем случае — тема и база из резервной копии шага 1.
 
 **Критерии приёмки.** Рабочий сайт выглядит как staging; заказ оформляется до шага оплаты; RU/RO открываются; ошибок в журнале PHP нет.
 
