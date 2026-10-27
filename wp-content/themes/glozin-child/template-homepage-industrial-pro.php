@@ -88,6 +88,9 @@ get_header();
 
 	<?php /* Шапка — template-parts/industrial-pro/header.php, выводится на wp_body_open (inc/industrial-pro.php). */ ?>
 
+	<?php /* Единственный h1 страницы (для поисковиков и экранных дикторов): у главной нет видимого заголовка — сверху карусель баннеров. */ ?>
+	<h1 class="screen-reader-text"><?php esc_html_e( 'Строительные материалы, инструмент и хозтовары в Кишинёве', 'glozin-child' ); ?></h1>
+
 	<!-- =================================================================
 	     3. Рекламные баннеры — полноширинная карусель из 3 слайдов.
 
@@ -213,7 +216,7 @@ get_header();
 							<img
 								class="ip-season-promo__banner"
 								src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . $ip_banner['file'] ); ?>"
-								alt=""
+								alt="<?php echo esc_attr( $ip_banner['overlay']['title'] ); ?>"
 								width="<?php echo esc_attr( $ip_banner['w'] ); ?>"
 								height="<?php echo esc_attr( $ip_banner['h'] ); ?>"
 								loading="lazy"

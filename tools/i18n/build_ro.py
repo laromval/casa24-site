@@ -29,6 +29,7 @@ RO = {
     "Бочки пищевые": "Butoaie alimentare",
     "Дисконтная карта «Meșterul Casei» — максимальная скидка по карте на кассе": "Card-discount „Meșterul Casei” — reducere maximă cu cardul la casă",
     "Акции и предложения": "Promoții și oferte",
+    "Строительные материалы, инструмент и хозтовары в Кишинёве": "Materiale de construcții, instrumente și mărfuri de uz casnic în Chișinău",
     "Выбор слайда": "Alege slide-ul",
     "Слайд %d": "Slide-ul %d",
     "Бесплатная доставка": "Livrare gratuită",

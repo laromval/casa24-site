@@ -13,38 +13,8 @@ msgstr ""
 msgid "Фото товара Casa24"
 msgstr "Fotografia mărfii Casa24"
 
-msgid "Casa24.md — на главную"
-msgstr "Casa24.md — pagina principală"
-
-msgid "Позвонить: +373 68 338 813"
-msgstr "Sunați: +373 68 338 813"
-
-msgid "+373 68 338 813"
-msgstr "+373 68 338 813"
-
-msgid "Зарегистрироваться / Личный кабинет"
-msgstr "Înregistrare / Cabinet personal"
-
-msgid "Избранное"
-msgstr "Favorite"
-
-msgid "Переключить светлую/тёмную тему сайта"
-msgstr "Comută tema deschisă/întunecată a site-ului"
-
-msgid "Корзина"
-msgstr "Coș"
-
-msgid "Каталог"
-msgstr "Catalog"
-
-msgid "Категории каталога"
-msgstr "Categoriile catalogului"
-
-msgid "Искать товары…"
-msgstr "Caută mărfuri…"
-
-msgid "Найти"
-msgstr "Caută"
+msgid "Строительные материалы, инструмент и хозтовары в Кишинёве"
+msgstr "Materiale de construcții, instrumente și mărfuri de uz casnic în Chișinău"
 
 msgid "Завершение дачного сезона"
 msgstr "Încheierea sezonului la vilă"
@@ -141,63 +111,6 @@ msgstr "Acum nu sunt mărfuri la reducere — blocul va apărea imediat ce în W
 
 msgid "WooCommerce не активен — блоки \"Топ продаж\" и \"Товары на скидках\" появятся после активации плагина."
 msgstr "WooCommerce nu este activ — blocurile „Top vânzări” și „Mărfuri la reducere” vor apărea după activarea modulului."
-
-msgid "Meșterul Casei — Casa24.md"
-msgstr "Meșterul Casei — Casa24.md"
-
-msgid "Полезная информация"
-msgstr "Informații utile"
-
-msgid "Будьте на связи"
-msgstr "Rămâneți în legătură"
-
-msgid "Интернет-магазин"
-msgstr "Magazin online"
-
-msgid "Доставка и оплата"
-msgstr "Livrare și achitare"
-
-msgid "Публичная оферта"
-msgstr "Ofertă publică"
-
-msgid "Обмен и возврат товара"
-msgstr "Schimbul și returnarea mărfii"
-
-msgid "Политика конфиденциальности"
-msgstr "Politica de confidențialitate"
-
-msgid "Контакты"
-msgstr "Contacte"
-
-msgid "Двери"
-msgstr "Uși"
-
-msgid "Электроинструмент"
-msgstr "Instrumente electrice"
-
-msgid "Сад и огород"
-msgstr "Grădină"
-
-msgid "Хозтовары"
-msgstr "Mărfuri de uz casnic"
-
-msgid "О компании"
-msgstr "Despre companie"
-
-msgid "О нас"
-msgstr "Despre noi"
-
-msgid "Статьи"
-msgstr "Articole"
-
-msgid "Как нас найти"
-msgstr "Cum ne găsiți"
-
-msgid "Все права защищены."
-msgstr "Toate drepturile rezervate."
-
-msgid "Наверх страницы"
-msgstr "Sus"
 
 msgid "Главное меню (шапка)"
 msgstr "Meniul principal (antet)"
