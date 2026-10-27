@@ -33,3 +33,7 @@ wp-content/uploads/
 # Файлы, скачанные с хостинга, до разбора
 _incoming/
 _deploy/
+
+# Выгрузки сверки цен (tools/price-sync) — промежуточные данные
+tools/price-sync/*.json
+tools/price-sync/*.csv
