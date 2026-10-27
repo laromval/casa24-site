@@ -462,6 +462,32 @@ function glozin_child_disable_users_sitemap( $provider, $name ) {
 add_filter( 'wp_sitemaps_add_provider', 'glozin_child_disable_users_sitemap', 10, 2 );
 
 /**
+ * Один h1 на главной (проверка прода 27.10.2026, М-2): Glozin выводил два —
+ * скрытое название сайта у логотипа своей шапки («Casa24») и заголовок
+ * страницы в page-header («Главная»). Оба скрыты стилями Industrial Pro,
+ * но поисковики видят разметку. Логотип Glozin — всегда <p>, page-header
+ * на главной Industrial Pro не выводится; осмысленный h1 — в самом
+ * шаблоне главной (template-homepage-industrial-pro.php).
+ *
+ * @return string
+ */
+function glozin_child_site_title_tag() {
+	return 'p';
+}
+add_filter( 'glozin_site_branding_title_tag', 'glozin_child_site_title_tag' );
+
+/**
+ * Без page-header Glozin («Главная» в h1) на главной Industrial Pro.
+ *
+ * @param array $items Элементы page-header.
+ * @return array
+ */
+function glozin_child_ip_home_page_header( $items ) {
+	return is_page_template( 'template-homepage-industrial-pro.php' ) ? array() : $items;
+}
+add_filter( 'glozin_get_page_header_elements', 'glozin_child_ip_home_page_header', 100 );
+
+/**
  * Админ-панель WordPress на витрине (видна только вошедшим): пункты слева
  * не помещались в строку, и блок «Привет, admin» + поиск переносился вниз,
  * поверх кружков шапки (обратная связь 27.10.2026). Убираем то, что на витрине
