@@ -493,6 +493,37 @@ body.ip-site .gz-tooltip--data{
   border-color: var(--text);
 }
 
+/* Повторная проверка qa-agent 27.10.2026: Н-9 и мелочи тёмной темы.
+   Стрелки «предыдущий/следующий товар» у хлебных крошек и прочий
+   .text-dark-grey: у Glozin полупрозрачный чёрный. */
+:root[data-ip-theme="dark"] body.ip-site{
+  --gz-color-dark-grey: var(--text-muted);
+}
+
+/* Поле количества с «−/+»: светлую подложку Glozin задаёт прямо на
+   .quantity (у контурного варианта — прозрачная, его не трогаем). */
+:root[data-ip-theme="dark"] body.ip-site .quantity:not(.quantity-outline){
+  --gz-quantity-background-color: var(--border);
+}
+
+/* «Оформить заказ» в мини-корзине: тёмная кнопка на тёмной панели
+   сливалась — в тёмной теме она оранжевая, как основное действие. */
+:root[data-ip-theme="dark"] body.ip-site .cart-panel .checkout{
+  --gz-button-bg-color: var(--accent);
+  --gz-button-border-color: var(--accent);
+  --gz-button-color: oklch(0.15 0.02 255);
+  --gz-button-bg-color-hover: var(--on-dark);
+  --gz-button-border-color-hover: var(--on-dark);
+  --gz-button-eff-bg-color-hover: var(--on-dark);
+}
+
+/* Подсветка совпадений в поиске: жёлтый фон Glozin, а цвет текста —
+   --gz-color-dark, в тёмной теме светлый. Только в результатах поиска:
+   в таблицах заказов у mark фон прозрачный. */
+:root[data-ip-theme="dark"] body.ip-site .modal__content-results mark{
+  color: oklch(0.15 0.02 255);
+}
+
 /* Подменю мобильного меню: у Glozin правило специфичнее общего выше. */
 :root[data-ip-theme="dark"] body.ip-site .hamburger-panel ul.menu li.menu-item-has-children > ul.sub-menu{
   background-color: var(--surface);

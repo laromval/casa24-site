@@ -1010,13 +1010,14 @@ html[lang^="ro"] .ip-season-promo__scrim{
   color: var(--text);
 }
 
+/* Описание переносится на вторую строку, а не обрезается многоточием:
+   на 992–1100 в 4 колонки RO-тексты не помещались (повторная проверка
+   qa-agent 27.10.2026, Н-4). */
 .ip-usp-item__text{
   font-family: "Work Sans", sans-serif;
   font-size: 13px;
+  line-height: 1.35;
   color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* 4 в ряд — только с 992px: на 768 четыре пункта с описаниями (nowrap)
@@ -1031,12 +1032,6 @@ html[lang^="ro"] .ip-season-promo__scrim{
 @media (min-width: 992px){
   .ip-usp-bar__grid{
     grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 424px){
-  .ip-usp-item__text{
-    white-space: normal;
   }
 }
 
