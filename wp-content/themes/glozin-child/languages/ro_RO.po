@@ -10,8 +10,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
 
-msgid "Фото товара Casa24.md — Meșterul Casei"
-msgstr "Fotografia mărfii Casa24.md — Meșterul Casei"
+msgid "Фото товара Casa24"
+msgstr "Fotografia mărfii Casa24"
 
 msgid "Casa24.md — на главную"
 msgstr "Casa24.md — pagina principală"

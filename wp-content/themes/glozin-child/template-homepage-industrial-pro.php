@@ -30,7 +30,7 @@ function glozin_child_product_image_alt( $product_id ) {
 		return $title;
 	}
 
-	return __( 'Фото товара Casa24.md — Meșterul Casei', 'glozin-child' );
+	return __( 'Фото товара Casa24', 'glozin-child' );
 }
 
 /**
@@ -61,7 +61,7 @@ function glozin_child_render_product_card( $product ) {
 		);
 	} else {
 		// Плейсхолдер, если у товара вовсе нет изображения (см. TODO.md, пункт 5 ТЗ — Clasica KN SS 70 G).
-		$image_html = '<img src="' . esc_url( get_stylesheet_directory_uri() . '/assets/logo-mesterul-casei.svg' ) . '" alt="' . esc_attr( $alt ) . '" loading="lazy">';
+		$image_html = '<img src="' . esc_url( get_stylesheet_directory_uri() . '/assets/logo-casa24.svg' ) . '" alt="' . esc_attr( $alt ) . '" loading="lazy">';
 	}
 	?>
 	<li class="ip-product-card">

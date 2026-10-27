@@ -4,7 +4,7 @@ return array(
 	'domain' => 'glozin-child',
 	'language' => 'ro_RO',
 	'messages' => array(
-		'Фото товара Casa24.md — Meșterul Casei' => 'Fotografia mărfii Casa24.md — Meșterul Casei',
+		'Фото товара Casa24' => 'Fotografia mărfii Casa24',
 		'Casa24.md — на главную' => 'Casa24.md — pagina principală',
 		'Позвонить: +373 68 338 813' => 'Sunați: +373 68 338 813',
 		'+373 68 338 813' => '+373 68 338 813',

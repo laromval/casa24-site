@@ -45,23 +45,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<a class="ip-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Casa24.md — на главную', 'glozin-child' ); ?>">
 				<?php
 				/*
-				 * Логотип-заглушка (не финальный дизайн, см. README.md). Заменяет прежний
-				 * логотип "Larom Val" — пункт 1 раздела 5 ТЗ. Здесь, в отличие от футера,
-				 * SVG встроен прямо в разметку (не через <img>), чтобы строка "MEȘTERUL
-				 * CASEI" могла перекрашиваться через CSS-токен --topbar-text в зависимости
-				 * от темы (обратная связь 19.09.2026: белая шапка -> тёмный текст цвета
-				 * второй строки, тёмная шапка -> светлый текст).
+				 * Логотип торговой марки "Casa24" (решение владельца 27.10.2026, вариант A:
+				 * домик + "CASA24", без "Meșterul Casei"). Заменяет прежний логотип
+				 * "Larom Val" — пункт 1 раздела 5 ТЗ. Здесь, в отличие от футера, SVG
+				 * встроен прямо в разметку (не через <img>), чтобы "CASA" могла
+				 * перекрашиваться через CSS-токен --topbar-text в зависимости от темы
+				 * (обратная связь 19.09.2026: белая шапка -> тёмный текст, тёмная -> светлый).
 				 */
 				?>
-				<svg width="220" height="47" viewBox="0 0 340 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+				<svg width="200" height="48" viewBox="0 0 300 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
 					<rect x="0" y="4" width="64" height="64" rx="12" fill="oklch(0.27 0.02 255)"/>
-					<g transform="translate(12,16)" fill="none" stroke="oklch(0.70 0.19 45)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+					<g transform="translate(12,16)" fill="none" stroke="oklch(0.70 0.19 45)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M2 20 L20 4 L38 20"/>
 						<path d="M7 17 V38 H33 V17"/>
-						<rect x="17" y="25" width="6" height="13" fill="oklch(0.27 0.02 255)" stroke="none"/>
 					</g>
-					<text class="ip-logo__line1" x="80" y="34" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="1.2">MEȘTERUL CASEI</text>
-					<text x="80" y="56" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="600" font-size="16" letter-spacing="2.8" fill="oklch(0.70 0.19 45)">CASA24.MD</text>
+					<rect x="29" y="41" width="6" height="13" fill="oklch(0.70 0.19 45)"/>
+					<text x="80" y="54" font-family="'Roboto Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="700" font-size="46" letter-spacing="1.5"><tspan class="ip-logo__line1">CASA</tspan><tspan fill="oklch(0.70 0.19 45)">24</tspan></text>
 				</svg>
 			</a>
 

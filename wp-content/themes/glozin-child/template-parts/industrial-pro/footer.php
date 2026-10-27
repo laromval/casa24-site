@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="container ip-footer__social-bar-row">
 
 			<div class="ip-footer__brand-row">
-				<img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/logo-mesterul-casei.svg' ); ?>" alt="<?php esc_attr_e( 'Meșterul Casei — Casa24.md', 'glozin-child' ); ?>" width="170" height="38">
+				<img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/logo-casa24.svg' ); ?>" alt="Casa24" width="160" height="38">
 				<button type="button" class="ip-footer__info-toggle" data-ip-footer-toggle aria-expanded="false" aria-controls="ip-footer-cols">
 					<?php esc_html_e( 'Полезная информация', 'glozin-child' ); ?>
 					<svg class="ip-footer__info-toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -111,7 +111,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?>
 			</a>
 			<span class="ip-footer__copy">
-				&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> Casa24.md — LAROMVAL SRL. <?php esc_html_e( 'Все права защищены.', 'glozin-child' ); ?>
+				&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> Casa24. <?php esc_html_e( 'Все права защищены.', 'glozin-child' ); ?>
 			</span>
 		</div>
 	</div>
