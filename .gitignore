@@ -10,6 +10,13 @@ wp-config.php
 docs/secrets/
 docs/*credentials*
 
+# Акт сдачи сайта содержит пароли от wp-admin и хостинга в открытом виде — см. docs/security-notes.md
+акт сдачи*.pdf
+*акт сдачи*
+
+# Локальный черновик-предпросмотр дизайна в браузере (не часть проекта)
+.preview-temp/
+
 # === Технические файлы ===
 node_modules/
 vendor/
@@ -22,3 +29,11 @@ Thumbs.db
 *.sql.gz
 uploads-backup/
 wp-content/uploads/
+
+# Файлы, скачанные с хостинга, до разбора
+_incoming/
+_deploy/
+
+# Выгрузки сверки цен (tools/price-sync) — промежуточные данные
+tools/price-sync/*.json
+tools/price-sync/*.csv

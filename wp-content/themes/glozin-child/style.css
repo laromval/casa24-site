@@ -1,0 +1,477 @@
+/*
+Theme Name: Glozin Child
+Theme URI: https://wpglozin.com/
+Author: UIXThemes
+Author URI: https://uix.store
+Description: Multipurpose WooCommerce WordPress Theme
+Version: 1.0.0
+Requires at least: 5.0
+Tested up to: 5.8
+Requires PHP: 7.0
+License: GNU General Public License v2+
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: glozin
+Tags: one-column, two-columns, left-sidebar, right-sidebar, full-width-template, post-formats, theme-options, threaded-comments, translation-ready
+Template: glozin
+*/
+
+.woocommerce-checkout #billing_country_field,
+.woocommerce-checkout #shipping_country_field,
+.woocommerce-checkout #billing_postcode_field,
+.woocommerce-checkout #shipping_postcode_field,
+.woocommerce-checkout #ship-to-different-address {
+	display: none !important;
+}
+
+.woocommerce-account #billing_country_field,
+.woocommerce-account #shipping_country_field,
+.woocommerce-account #billing_postcode_field,
+.woocommerce-account #shipping_postcode_field {
+	display: none !important;
+}
+
+
+.nav-menu li.menu-item-has-icon > a {
+	gap: 0;
+}
+
+
+.header-search {
+	width: 100%;
+}
+
+.header-search .header-search__field.gz-instant-search__field {
+	width: 100%;
+	/* border-radius: 10px; */
+}
+
+.product .gz-product-countdown .glozin-countdown {
+	color: #fff;
+}
+
+/* ================================================================
+   Style .catalog-top-categories on /shop like homepage carousel
+   ================================================================ */
+
+/* 1.  Carousel container */
+.catalog-top-categories {
+	--gz-ratio-percent: 100%;
+	margin-bottom: 24px;
+	overflow-x: clip;
+	overflow-y: visible;
+}
+
+/* 2.  Slide items */
+.catalog-top-categories__item {
+	text-align: center;
+}
+
+/* 3.  Image wrapper – make it square & perfectly round */
+.catalog-top-categories__inner {
+	--gz-ratio-percent: 100%;
+	border-radius: 10px;
+	overflow: hidden;
+	position: relative;
+	display: block;
+	margin: 0 auto 12px;
+}
+
+.catalog-top-categories__inner img {
+	border-radius: 10px;
+}
+
+/* 4.  Title / link under the image */
+.catalog-top-categories__button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	text-decoration: none;
+	color: #111111;
+	font-weight: 600;
+	font-size: 15px;
+	line-height: 1.4;
+	transition: color 0.3s ease;
+}
+
+.catalog-top-categories__button:hover {
+	color: #b12704;
+}
+
+/* 5.  Pagination – ensure visible and add bottom spacing */
+.catalog-top-categories .swiper-pagination {
+	display: flex !important;
+	position: relative;
+	margin-top: 20px;
+	padding-bottom: 20px;
+	justify-content: center;
+}
+
+/* 6.  Navigation arrows – leave positioning to theme */
+.catalog-top-categories .swiper-button-prev,
+.catalog-top-categories .swiper-button-next {
+	width: 44px;
+	height: 44px;
+	background: #fff;
+	border-radius: 50%;
+	box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: box-shadow 0.3s;
+}
+
+.catalog-top-categories .swiper-button-prev:hover,
+.catalog-top-categories .swiper-button-next:hover {
+	box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.catalog-top-categories .swiper-button-prev::after,
+.catalog-top-categories .swiper-button-next::after {
+	font-size: 14px;
+	color: #111;
+}
+
+.catalog-top-categories .swiper-button-prev.swiper-button-lock,
+.catalog-top-categories .swiper-button-next.swiper-button-lock {
+	display: none;
+}
+
+/* Count badge styling to match homepage carousel */
+.catalog-top-categories .catalog-top-categories__button .badge {
+	position: absolute;
+	top: 0;
+	right: -10px;
+	transform: translateY(-50%);
+	font-size: 0.75rem;
+	padding: 0.25em 0.5em;
+}
+
+.catalog-top-categories .swiper-wrapper {
+	    height: auto;
+}
+
+
+.woocommerce-Reviews .woocommerce-noreviews {
+	display: none;
+}
+
+/* ================================================================
+   Products Categories Grid - Circle Style (on /all-categories/)
+   ================================================================ */
+
+/* 1. Establish new positioning context on the item (parent of .gz-ratio) */
+.circle-style .glozin-categories-grid__item {
+    position: relative;
+}
+
+
+
+/* 4. Position text *below* the image using the item as the containing block */
+.circle-style .glozin-categories-grid__item .glozin-categories-grid__button {
+    position: absolute !important;
+    top: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: -25px !important;      /* 25px below the image container */
+    transform: translateX(-50%) !important;
+    width: 100%;
+    text-align: center;
+    white-space: normal;
+    padding: 0;
+}
+
+
+/* 3. Make the image itself circular */
+/* Note: border-radius on <img> clips corners in modern browsers without parent overflow */
+.circle-style .glozin-categories-grid__item .gz-ratio img {
+    border-radius: 10px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* 4. Place text below image */
+.circle-style .glozin-categories-grid__item .glozin-categories-grid__button {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    white-space: normal;
+}
+
+/* 2. Make image container circular */
+.circle-style .glozin-categories-grid__item .gz-ratio {
+    border-radius: 0%;
+    overflow: visible;
+    aspect-ratio: 1 / 1;
+    display: block;
+    width: 100%;
+    flex-shrink: 0;
+	position: static !important;
+}
+
+
+.circle-style  .glozin-categories-grid__button {
+	max-width: 100%;
+}
+
+/* 3. Move title below the image (remove absolute positioning) */
+.circle-style .glozin-categories-grid__item .glozin-categories-grid__button {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding-top: 12px;
+    margin-top: 0;
+    z-index: 1;
+}
+
+.circle-style .glozin-categories-grid__item .glozin-categories-grid__text {
+    display: inline;
+    white-space: normal;
+}
+
+.single-product div.product .woocommerce-Reviews ol.commentlist li img.avatar,
+.comment-list .avatar {
+	display: none;
+}
+
+.woocommerce-checkout-review-order-table .product-name{
+	font-size: 1rem;
+}
+
+.woocommerce-account .woocommerce-form .woocommerce-form-row .password-input {
+	position: relative!important;
+}
+
+.woocommerce-account .woocommerce-form .woocommerce-form-row>label {
+	z-index: 99;
+}
+
+/* ================================================================
+   Product review form: wider on desktop, name+email on one line
+   ================================================================ */
+@media (min-width: 768px) {
+	.glozin-review-form {
+		max-width: 800px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.review-form-name-email {
+		display: flex;
+		gap: 20px;
+	}
+
+	.review-form-name-email .comment-form-author,
+	.review-form-name-email .comment-form-email {
+		flex: 1;
+	}
+}
+
+
+@media (min-width: 768px) {
+    .glozin-review-form {
+        max-width: 870px!important;
+    }
+}
+
+.single-product div.product .woocommerce-Reviews .glozin-review-form .comment-respond {
+	max-width: 870px!important;
+}
+
+.site-footer .elementor-divider .elementor-divider-separator {
+    border-block-start: var(--divider-border-width) var(--divider-border-style) var(--divider-color);
+    display: flex;
+}
+
+.account-panel .panel__header .avatar {
+	display: none;
+}
+
+.ask-question-content .contact-form-row {
+	margin-bottom: 20px;
+}
+
+.woocommerce-ResetPassword.lost_reset_password .woocommerce-form-row--first {
+	    margin-bottom: 30px;
+}
+
+.woocommerce-ResetPassword.lost_reset_password .woocommerce-form-row--first input {
+	    margin-top: 10px;
+}
+
+:where(.gz-ratio):before {
+	padding-bottom: 100%;
+}
+
+
+.nav-menu li.glozin-primary-products-menu > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+
+  padding: 10px 16px;
+  border-radius: 10px;
+
+  background: var(--gz-color-primary, #436dc8);
+  color: #fff;
+  text-decoration: none;
+
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  transition: all 0.2s ease;
+
+}
+
+.nav-menu li.glozin-primary-products-menu > a svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-menu li.glozin-primary-products-menu > a:hover {
+  background: #111111;
+  color: #fff;
+}
+
+.nav-menu li.glozin-primary-products-menu > a:active {
+}
+
+.primary-navigation .nav-menu>li.glozin-primary-products-menu.menu-item-has-children>a:before {
+    inset-inline-end: 16px;
+}
+
+.primary-navigation .nav-menu>li.glozin-primary-products-menu.menu-item-has-children>a {
+      padding-inline-end: 40px;
+}
+
+.search-modal ul.products li.product .rounded-product-image, .search-modal ul.products li.product .rounded-product-image img {
+	z-index: 9;
+}
+
+.menu-promotions > a {
+	border-width: var(--gz-input-border-width);
+    border-style: solid;
+    border-color: var(--gz-input-border-color);
+    border-radius: 10px;
+    padding: 6px 10px;
+	height: 40px;
+}
+
+.catalog-top-categories__text {
+    white-space: normal;
+    text-overflow: initial;
+    hyphens: auto;
+    word-break: auto;
+}
+
+.woocommerce-badges .woocommerce-badge {
+	text-transform: none;
+}
+
+ul.products li.product.outofstock .product-thumbnail .product-thumbnails--fadein img {
+	filter: grayscale(100%);
+}
+
+.home-category-section .glozin-banner .glozin-banner__summary {
+    background: #20462f;
+    display: inline-flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    width: auto;
+    border-radius: 10px;
+    margin: 10px auto 10px 10px;
+    max-width: 400px;
+}
+
+
+a.glozin-child-contact-us-button {
+	flex-grow: 1;
+}
+
+
+.comments-content .comment-notes #email-notes {
+	display: block;
+}
+
+.site-content {
+	padding-top: 2.36rem;
+}
+
+#glozin-sticky-add-to-cart .glozin-sticky-atc__image img {
+	border-radius: 0.3125rem !important;
+}
+
+/* Footer fix */
+.glozin-navigation-menu-element{
+	text-align:center !important;
+}
+.glozin-navigation-menu-element h2{
+	justify-content: center !important;
+}
+.elementor-392 .elementor-element.elementor-element-17d76495,
+.elementor-1013157 .elementor-element.elementor-element-96d0d86{
+	margin-right:160px;
+}
+@media (max-width: 1200px){
+	.elementor-392 .elementor-element.elementor-element-17d76495,
+.elementor-1013157 .elementor-element.elementor-element-96d0d86{
+	margin-right:100px;
+}
+	
+}
+.elementor-1013157 .elementor-element.elementor-element-7c1bce1,
+.elementor-392 .elementor-element.elementor-element-68227182{
+	align-items: flex-start !important;
+    --align-items: flex-start !important;
+    justify-content: flex-start !important;
+    column-gap: 0 ;
+}
+.elementor-392 .elementor-element.elementor-element-3b333ae.elementor-element,
+.elementor-1013157 .elementor-element.elementor-element-20823db.elementor-element{
+	padding-left: 50px;
+}
+@media (max-width: 1024px){
+	.elementor-392 .elementor-element.elementor-element-17d76495{
+	margin-right:0;
+}
+	.elementor-392 .elementor-element.elementor-element-68227182,
+	.elementor-1013157 .elementor-element.elementor-element-7c1bce1{
+	
+    justify-content: center !important;
+   
+}
+}
+.site-footer .elementor-element-7ead77c .e-con-inner,
+.site-footer .elementor-element-15bba230  .e-con-inner,
+.site-footer .elementor-element-7df5352  .e-con-inner{
+justify-content: center !important;
+}
+.glozin-toggle-mobile__title--toggle .gz-collapse-icon
+{
+	margin-left: 10px !important;
+}
+.img-bank-foot{
+	width:55px ;
+	height:auto;
+	background-size:contain;
+	
+}
+/* Footer fix END */
+
+	

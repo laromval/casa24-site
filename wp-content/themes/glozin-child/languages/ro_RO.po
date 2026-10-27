@@ -1,0 +1,209 @@
+# Румынский (Молдова) для строк Industrial Pro, text domain glozin-child.
+# Лексика — по docs/glossary-ro-md.md. Источник для ro_RO.mo (собирается
+# скриптом, при правке перевода пересобрать .mo).
+msgid ""
+msgstr ""
+"Project-Id-Version: glozin-child Industrial Pro\n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
+
+msgid "Фото товара Casa24"
+msgstr "Fotografia mărfii Casa24"
+
+msgid "Casa24.md — на главную"
+msgstr "Casa24.md — pagina principală"
+
+msgid "Позвонить: +373 68 338 813"
+msgstr "Sunați: +373 68 338 813"
+
+msgid "+373 68 338 813"
+msgstr "+373 68 338 813"
+
+msgid "Зарегистрироваться / Личный кабинет"
+msgstr "Înregistrare / Cabinet personal"
+
+msgid "Избранное"
+msgstr "Favorite"
+
+msgid "Переключить светлую/тёмную тему сайта"
+msgstr "Comută tema deschisă/întunecată a site-ului"
+
+msgid "Корзина"
+msgstr "Coș"
+
+msgid "Каталог"
+msgstr "Catalog"
+
+msgid "Категории каталога"
+msgstr "Categoriile catalogului"
+
+msgid "Искать товары…"
+msgstr "Caută mărfuri…"
+
+msgid "Найти"
+msgstr "Caută"
+
+msgid "Завершение дачного сезона"
+msgstr "Încheierea sezonului la vilă"
+
+msgid "Всё для уборки"
+msgstr "Totul pentru curățenie"
+
+msgid "Инвентарь"
+msgstr "Inventar"
+
+msgid "Тачки"
+msgstr "Roabe"
+
+msgid "Мешки"
+msgstr "Saci"
+
+msgid "Вёдра"
+msgstr "Găleți"
+
+msgid "Сохрани вкус лета"
+msgstr "Păstrează gustul verii"
+
+msgid "Банки"
+msgstr "Borcane"
+
+msgid "Пищевые вёдра"
+msgstr "Găleți alimentare"
+
+msgid "Бочки пищевые"
+msgstr "Butoaie alimentare"
+
+msgid "Дисконтная карта «Meșterul Casei» — максимальная скидка по карте на кассе"
+msgstr "Card-discount „Meșterul Casei” — reducere maximă cu cardul la casă"
+
+msgid "Акции и предложения"
+msgstr "Promoții și oferte"
+
+msgid "Выбор слайда"
+msgstr "Alege slide-ul"
+
+msgid "Слайд %d"
+msgstr "Slide-ul %d"
+
+msgid "Бесплатная доставка"
+msgstr "Livrare gratuită"
+
+msgid "При заказе от 1000 лей."
+msgstr "La comanda de la 1000 lei."
+
+msgid "Гарантия качества"
+msgstr "Garanția calității"
+
+msgid "Высокое качество всех товаров."
+msgstr "Calitate înaltă a tuturor mărfurilor."
+
+msgid "Удобная оплата"
+msgstr "Achitare comodă"
+
+msgid "Любым удобным способом."
+msgstr "Prin orice metodă comodă."
+
+msgid "Мы на связи"
+msgstr "Suntem la telefon"
+
+msgid "Поддержка в один клик."
+msgstr "Suport dintr-un clic."
+
+msgid "Категории"
+msgstr "Categorii"
+
+msgid "Все категории"
+msgstr "Toate categoriile"
+
+msgid "Товаров: %s"
+msgstr "Mărfuri: %s"
+
+msgid "Категории товаров появятся здесь после подключения каталога WooCommerce."
+msgstr "Categoriile de mărfuri vor apărea aici după conectarea catalogului WooCommerce."
+
+msgid "Топ продаж"
+msgstr "Top vânzări"
+
+msgid "Смотреть всё"
+msgstr "Vezi tot"
+
+msgid "Товары появятся здесь после подключения каталога WooCommerce."
+msgstr "Mărfurile vor apărea aici după conectarea catalogului WooCommerce."
+
+msgid "Товары на скидках"
+msgstr "Mărfuri la reducere"
+
+msgid "Сейчас нет товаров со скидкой — блок появится, как только в WooCommerce будет хотя бы один товар с указанной акционной ценой."
+msgstr "Acum nu sunt mărfuri la reducere — blocul va apărea imediat ce în WooCommerce va exista cel puțin o marfă cu preț promoțional."
+
+msgid "WooCommerce не активен — блоки \"Топ продаж\" и \"Товары на скидках\" появятся после активации плагина."
+msgstr "WooCommerce nu este activ — blocurile „Top vânzări” și „Mărfuri la reducere” vor apărea după activarea modulului."
+
+msgid "Meșterul Casei — Casa24.md"
+msgstr "Meșterul Casei — Casa24.md"
+
+msgid "Полезная информация"
+msgstr "Informații utile"
+
+msgid "Будьте на связи"
+msgstr "Rămâneți în legătură"
+
+msgid "Интернет-магазин"
+msgstr "Magazin online"
+
+msgid "Доставка и оплата"
+msgstr "Livrare și achitare"
+
+msgid "Публичная оферта"
+msgstr "Ofertă publică"
+
+msgid "Обмен и возврат товара"
+msgstr "Schimbul și returnarea mărfii"
+
+msgid "Политика конфиденциальности"
+msgstr "Politica de confidențialitate"
+
+msgid "Контакты"
+msgstr "Contacte"
+
+msgid "Двери"
+msgstr "Uși"
+
+msgid "Электроинструмент"
+msgstr "Instrumente electrice"
+
+msgid "Сад и огород"
+msgstr "Grădină"
+
+msgid "Хозтовары"
+msgstr "Mărfuri de uz casnic"
+
+msgid "О компании"
+msgstr "Despre companie"
+
+msgid "О нас"
+msgstr "Despre noi"
+
+msgid "Статьи"
+msgstr "Articole"
+
+msgid "Как нас найти"
+msgstr "Cum ne găsiți"
+
+msgid "Все права защищены."
+msgstr "Toate drepturile rezervate."
+
+msgid "Наверх страницы"
+msgstr "Sus"
+
+msgid "Главное меню (шапка)"
+msgstr "Meniul principal (antet)"
+
+msgid "Добавить «%s» в корзину"
+msgstr "Adaugă „%s” în coș"
+
+msgid "Выбрать «%s»"
+msgstr "Alege „%s”"
