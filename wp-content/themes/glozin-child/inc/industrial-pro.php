@@ -479,4 +479,5 @@ function glozin_child_ip_trim_admin_bar( $wp_admin_bar ) {
 	$wp_admin_bar->remove_node( 'search' );
 	$wp_admin_bar->remove_node( 'customize' );
 }
-add_action( 'admin_bar_menu', 'glozin_child_ip_trim_admin_bar', 999 );
+// После ядра: поиск WordPress добавляет на приоритете 9999.
+add_action( 'admin_bar_menu', 'glozin_child_ip_trim_admin_bar', 10000 );
