@@ -791,6 +791,21 @@ function casa24_catalog_storefront_object_terms( $terms, $object_ids, $taxonomie
 add_filter( 'get_object_terms', 'casa24_catalog_storefront_object_terms', 20, 3 );
 
 /**
+ * То же для get_the_terms(): категории товара часто уже лежат в кеше (их
+ * подгружает основной запрос до template_redirect), и тогда get_object_terms
+ * не вызывается — в «Категория:» на карточке всплывала группа 1С (28.10.2026).
+ *
+ * @param WP_Term[]|false|WP_Error $terms    Категории.
+ * @param int                      $post_id  ID записи.
+ * @param string                   $taxonomy Таксономия.
+ * @return WP_Term[]|false|WP_Error
+ */
+function casa24_catalog_storefront_the_terms( $terms, $post_id, $taxonomy ) {
+	return casa24_catalog_storefront_object_terms( $terms, array( $post_id ), array( $taxonomy ) );
+}
+add_filter( 'get_the_terms', 'casa24_catalog_storefront_the_terms', 20, 3 );
+
+/**
  * Куда вести со страницы старой категории 1С: ключ новой категории.
  *
  * @param WP_Term $term Старая категория (любой язык).
