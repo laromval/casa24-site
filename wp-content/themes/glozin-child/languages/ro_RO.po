@@ -120,3 +120,81 @@ msgstr "Adaugă „%s” în coș"
 
 msgid "Выбрать «%s»"
 msgstr "Alege „%s”"
+
+msgid "Casa24.md — на главную"
+msgstr "Casa24.md — pagina principală"
+
+msgid "Позвонить: +373 68 338 813"
+msgstr "Sunați: +373 68 338 813"
+
+msgid "+373 68 338 813"
+msgstr "+373 68 338 813"
+
+msgid "Зарегистрироваться / Личный кабинет"
+msgstr "Înregistrare / Cabinet personal"
+
+msgid "Избранное"
+msgstr "Favorite"
+
+msgid "Переключить светлую/тёмную тему сайта"
+msgstr "Comută tema deschisă/întunecată a site-ului"
+
+msgid "Корзина"
+msgstr "Coș"
+
+msgid "Каталог"
+msgstr "Catalog"
+
+msgid "Категории каталога"
+msgstr "Categoriile catalogului"
+
+msgid "Искать товары…"
+msgstr "Caută mărfuri…"
+
+msgid "Найти"
+msgstr "Caută"
+
+msgid "Полезная информация"
+msgstr "Informații utile"
+
+msgid "Будьте на связи"
+msgstr "Rămâneți în legătură"
+
+msgid "Интернет-магазин"
+msgstr "Magazin online"
+
+msgid "Доставка и оплата"
+msgstr "Livrare și achitare"
+
+msgid "Публичная оферта"
+msgstr "Ofertă publică"
+
+msgid "Обмен и возврат товара"
+msgstr "Schimbul și returnarea mărfii"
+
+msgid "Политика конфиденциальности"
+msgstr "Politica de confidențialitate"
+
+msgid "О компании"
+msgstr "Despre companie"
+
+msgid "О нас"
+msgstr "Despre noi"
+
+msgid "Статьи"
+msgstr "Articole"
+
+msgid "Сертификаты"
+msgstr "Certificate"
+
+msgid "Контакты"
+msgstr "Contacte"
+
+msgid "Как нас найти"
+msgstr "Cum ne găsiți"
+
+msgid "Все права защищены."
+msgstr "Toate drepturile rezervate."
+
+msgid "Наверх страницы"
+msgstr "Sus"
