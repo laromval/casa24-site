@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
- * Ссылки футера — по ID страниц/разделов (RU-оригиналы), а не по слагам:
+ * Ссылки футера — по ID страниц (RU-оригиналы), а не по слагам:
  * слаги вида /o-nas/, /contacte/, /obmen-i-vozvrat/ на сайте не существуют
  * (404 на проде 27.10.2026, отчёт qa), а RO-версии у страниц свои адреса.
  * wpml_object_id подставляет перевод на текущем языке. ID одинаковые на
@@ -23,11 +23,13 @@ $ip_footer_page = static function ( $page_id ) {
 	return $url ? $url : home_url( '/' );
 };
 
-$ip_footer_cat = static function ( $term_id ) {
-	$url = get_term_link( (int) apply_filters( 'wpml_object_id', $term_id, 'product_cat', true ), 'product_cat' );
-
-	return is_wp_error( $url ) ? home_url( '/' ) : $url;
-};
+/*
+ * «Сертификаты» (28.10.2026) — страница создана скриптом
+ * tools/certificates/certificates-page.php, ID на проде и staging разные —
+ * ищем RU-оригинал по слагу. Нет страницы — пункт не выводится.
+ */
+$ip_cert_page           = get_page_by_path( 'sertifikaty' );
+$ip_footer_certificates = $ip_cert_page ? get_permalink( apply_filters( 'wpml_object_id', $ip_cert_page->ID, 'page', true ) ) : '';
 
 /* Соцсети и карта: пустая строка — пункт не выводится (адресов пока нет, ссылки "#" вели в никуда). */
 $ip_footer_social = array(
@@ -107,17 +109,6 @@ $ip_footer_map_url = '';
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1085732 ) ); ?>"><?php esc_html_e( 'Публичная оферта', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1085726 ) ); ?>"><?php esc_html_e( 'Обмен и возврат товара', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1080727 ) ); ?>"><?php esc_html_e( 'Политика конфиденциальности', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( $ip_footer_page( 1000804 ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
-					</ul>
-				</div>
-
-				<div class="ip-footer__col">
-					<h3><?php esc_html_e( 'Каталог', 'glozin-child' ); ?></h3>
-					<ul>
-						<li><a href="<?php echo esc_url( $ip_footer_cat( 813 ) ); ?>"><?php esc_html_e( 'Двери', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( $ip_footer_cat( 886 ) ); ?>"><?php esc_html_e( 'Электроинструмент', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( $ip_footer_cat( 815 ) ); ?>"><?php esc_html_e( 'Сад и огород', 'glozin-child' ); ?></a></li>
-						<li><a href="<?php echo esc_url( $ip_footer_cat( 841 ) ); ?>"><?php esc_html_e( 'Хозтовары', 'glozin-child' ); ?></a></li>
 					</ul>
 				</div>
 
@@ -126,6 +117,9 @@ $ip_footer_map_url = '';
 					<ul>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1000810 ) ); ?>"><?php esc_html_e( 'О нас', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1000799 ) ); ?>"><?php esc_html_e( 'Статьи', 'glozin-child' ); ?></a></li>
+						<?php if ( $ip_footer_certificates ) : ?>
+							<li><a href="<?php echo esc_url( $ip_footer_certificates ); ?>"><?php esc_html_e( 'Сертификаты', 'glozin-child' ); ?></a></li>
+						<?php endif; ?>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1000804 ) ); ?>"><?php esc_html_e( 'Контакты', 'glozin-child' ); ?></a></li>
 					</ul>
 				</div>

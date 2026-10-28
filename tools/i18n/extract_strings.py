@@ -6,6 +6,8 @@ out = sys.argv[2]
 files = [
     root + "/wp-content/themes/glozin-child/template-homepage-industrial-pro.php",
     root + "/wp-content/themes/glozin-child/inc/industrial-pro.php",
+    root + "/wp-content/themes/glozin-child/template-parts/industrial-pro/header.php",
+    root + "/wp-content/themes/glozin-child/template-parts/industrial-pro/footer.php",
 ]
 pat = re.compile(r"(?:__|_e|esc_html__|esc_html_e|esc_attr__|esc_attr_e)\(\s*'((?:[^'\\]|\\.)*)'\s*,\s*'glozin-child'\s*\)")
 strings = []
