@@ -374,7 +374,18 @@ get_header();
 			);
 
 			$ip_categories = array();
-			if ( taxonomy_exists( 'product_cat' ) ) {
+			if ( function_exists( 'casa24_catalog_is_ready' ) && casa24_catalog_is_ready() ) {
+				// Новый каталог (28.10.2026): все разделы с теми же значками, что в меню «Каталог».
+				$ip_section_icons = glozin_child_catalog_section_icons();
+				foreach ( casa24_catalog_menu_tree() as $ip_section ) {
+					$ip_categories[] = array(
+						'name'  => $ip_section['name'],
+						'url'   => $ip_section['url'],
+						'icon'  => $ip_section_icons[ $ip_section['key'] ] ?? '<circle cx="12" cy="12" r="8"/>',
+						'count' => (int) $ip_section['count'],
+					);
+				}
+			} elseif ( taxonomy_exists( 'product_cat' ) ) {
 				foreach ( $ip_main_categories as $ip_cat_id => $ip_cat_icon ) {
 					// На RO-версии WPML подставляет румынскую категорию.
 					$ip_cat = get_term( (int) apply_filters( 'wpml_object_id', $ip_cat_id, 'product_cat', true ), 'product_cat' );
@@ -385,7 +396,8 @@ get_header();
 						$ip_count = get_term_meta( $ip_cat->term_id, 'product_count_product_cat', true );
 
 						$ip_categories[] = array(
-							'term'  => $ip_cat,
+							'name'  => $ip_cat->name,
+							'url'   => glozin_child_category_url( $ip_cat_id ),
 							'icon'  => $ip_cat_icon,
 							'count' => '' !== $ip_count ? (int) $ip_count : (int) $ip_cat->count,
 						);
@@ -398,12 +410,12 @@ get_header();
 				<ul class="ip-categories-grid">
 					<?php foreach ( $ip_categories as $ip_item ) : ?>
 						<li class="ip-category-card">
-							<a class="ip-category-card__link" href="<?php echo esc_url( get_term_link( $ip_item['term'] ) ); ?>">
+							<a class="ip-category-card__link" href="<?php echo esc_url( $ip_item['url'] ); ?>">
 								<span class="ip-category-card__badge" aria-hidden="true">
 									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><?php echo $ip_item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput -- статичная разметка иконки из массива выше. ?></svg>
 								</span>
 								<span class="ip-category-card__text">
-									<h3 class="ip-category-card__name"><?php echo esc_html( $ip_item['term']->name ); ?></h3>
+									<h3 class="ip-category-card__name"><?php echo esc_html( $ip_item['name'] ); ?></h3>
 									<?php if ( $ip_item['count'] > 0 ) : ?>
 										<span class="ip-category-card__desc">
 											<?php

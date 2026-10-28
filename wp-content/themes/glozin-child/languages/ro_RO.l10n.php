@@ -39,6 +39,8 @@ return array(
 		'Сейчас нет товаров со скидкой — блок появится, как только в WooCommerce будет хотя бы один товар с указанной акционной ценой.' => 'Acum nu sunt mărfuri la reducere — blocul va apărea imediat ce în WooCommerce va exista cel puțin o marfă cu preț promoțional.',
 		'WooCommerce не активен — блоки "Топ продаж" и "Товары на скидках" появятся после активации плагина.' => 'WooCommerce nu este activ — blocurile „Top vânzări” și „Mărfuri la reducere” vor apărea după activarea modulului.',
 		'Главное меню (шапка)' => 'Meniul principal (antet)',
+		'Все товары раздела' => 'Toate mărfurile din secțiune',
+		'Весь каталог' => 'Tot catalogul',
 		'Добавить «%s» в корзину' => 'Adaugă „%s” în coș',
 		'Выбрать «%s»' => 'Alege „%s”',
 		'Мы используем cookie' => 'Folosim cookie-uri',

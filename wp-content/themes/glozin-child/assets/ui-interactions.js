@@ -55,7 +55,71 @@
 				toggle.focus();
 			}
 		} );
+
+		initMegaMenu( catalog );
 	} );
+
+	/*
+	 * Мега-меню каталога (28.10.2026). На компьютере раздел слева становится
+	 * активным при наведении — справа его группы. Небольшая задержка, чтобы
+	 * при движении курсора наискосок к панели не переключались соседние
+	 * разделы. На планшете и телефоне нажатие на раздел раскрывает его группы
+	 * под ним (переход в раздел — ссылкой «Все товары раздела»).
+	 */
+	function initMegaMenu( catalog ) {
+		var mega = catalog.querySelector( '[data-ip-mega]' );
+		if ( ! mega ) {
+			return;
+		}
+
+		var desktop  = window.matchMedia( '(min-width: 992px)' );
+		var sections = mega.querySelectorAll( '[data-ip-mega-section]' );
+		var timer    = null;
+
+		function activate( section ) {
+			window.clearTimeout( timer );
+			Array.prototype.forEach.call( sections, function ( item ) {
+				item.classList.toggle( 'is-active', item === section );
+			} );
+		}
+
+		Array.prototype.forEach.call( sections, function ( section ) {
+			var link = section.querySelector( '.ip-mega__section-link' );
+
+			section.addEventListener( 'mouseenter', function () {
+				if ( ! desktop.matches || section.classList.contains( 'is-active' ) ) {
+					return;
+				}
+				window.clearTimeout( timer );
+				timer = window.setTimeout( function () {
+					activate( section );
+				}, 120 );
+			} );
+
+			section.addEventListener( 'mouseleave', function () {
+				window.clearTimeout( timer );
+			} );
+
+			link.addEventListener( 'focus', function () {
+				if ( desktop.matches ) {
+					activate( section );
+				}
+			} );
+
+			link.addEventListener( 'click', function ( event ) {
+				if ( desktop.matches ) {
+					return;
+				}
+				event.preventDefault();
+				var open = ! section.classList.contains( 'is-open' );
+				Array.prototype.forEach.call( sections, function ( item ) {
+					item.classList.remove( 'is-open' );
+				} );
+				section.classList.toggle( 'is-open', open );
+				link.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+			} );
+		} );
+	}
 
 	/*
 	 * Подсказка «Быстрый просмотр» — как у «Добавить в список желаний»

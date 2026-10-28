@@ -603,6 +603,248 @@ button:where(.ip-scroll-top)::after{
   }
 }
 
+/* ---------------------------------------------------------------------
+   Мега-меню «Каталог» (новое дерево каталога, 28.10.2026, по образцу
+   владельца): слева разделы, справа группы и подгруппы колонками.
+   Панель раздела — внутри его пункта (glozin_child_catalog_mega_menu()).
+   --------------------------------------------------------------------- */
+.ip-catalog__menu--mega{
+  width: min(1240px, calc(100vw - 40px));
+  max-height: none;
+  overflow: visible;
+}
+
+.ip-mega{
+  --ip-mega-side: 290px;
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+  width: var(--ip-mega-side);
+  min-height: min(560px, calc(100vh - 200px));
+  border-right: 1px solid var(--border);
+}
+
+.ip-mega__section-link{
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--text);
+  font-family: "Work Sans", sans-serif;
+  line-height: 1.3;
+}
+
+.ip-catalog__menu .ip-mega__section-link{
+  /* сбрасываем общий стиль ссылок старого списка (.ip-catalog__menu a); строки
+     плотные — 21 раздел (второй этап, 28.10.2026) должен влезать в экран */
+  justify-content: flex-start;
+  align-items: center;
+  padding: 5px 16px 5px 18px;
+  font-size: 14.5px;
+  border-radius: 0;
+}
+
+.ip-mega__icon{
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+}
+
+.ip-mega__icon svg{
+  width: 100%;
+  height: 100%;
+}
+
+.ip-mega__section-name{
+  flex-grow: 1;
+}
+
+.ip-mega__chevron{
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform .2s;
+}
+
+.ip-mega__section.is-active > .ip-mega__section-link{
+  background: var(--bg-light);
+  color: var(--accent-dark);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* Панель раздела: на компьютере — справа от колонки разделов на всю высоту меню. */
+.ip-mega__panel{
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--ip-mega-side);
+  width: calc(min(1240px, 100vw - 40px) - var(--ip-mega-side));
+  padding: 24px 32px 28px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+}
+
+.ip-mega__section.is-active > .ip-mega__panel{
+  display: block;
+}
+
+.ip-catalog__menu .ip-mega__title{
+  display: block;
+  padding: 0;
+  margin-bottom: 18px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.ip-catalog__menu .ip-mega__title:hover{
+  background: none;
+}
+
+/* «Все товары раздела» — только на телефоне (на компьютере есть заголовок-ссылка). */
+.ip-mega__all{
+  display: none;
+}
+
+.ip-mega__groups{
+  column-count: 3;
+  column-gap: 32px;
+}
+
+.ip-mega__group{
+  break-inside: avoid;
+  margin-bottom: 20px;
+}
+
+.ip-catalog__menu .ip-mega__group-title{
+  display: block;
+  padding: 0 0 8px;
+  font-family: "Work Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ip-mega__links{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ip-catalog__menu .ip-mega__links a{
+  display: block;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.ip-catalog__menu .ip-mega__group-title:hover,
+.ip-catalog__menu .ip-mega__links a:hover{
+  background: none;
+  color: var(--accent-dark);
+}
+
+.ip-mega__catalog-all{
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.ip-catalog__menu .ip-mega__catalog-all a{
+  padding: 12px 18px;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent-dark);
+}
+
+/* Тёмная тема: --accent-dark (#b33c00) на тёмном фоне не читается. */
+:root[data-ip-theme="dark"] .ip-mega__section.is-active > .ip-mega__section-link,
+:root[data-ip-theme="dark"] .ip-mega__section.is-open > .ip-mega__section-link,
+:root[data-ip-theme="dark"] .ip-catalog__menu .ip-mega__group-title:hover,
+:root[data-ip-theme="dark"] .ip-catalog__menu .ip-mega__links a:hover,
+:root[data-ip-theme="dark"] .ip-catalog__menu .ip-mega__catalog-all a,
+:root[data-ip-theme="dark"] .ip-catalog__menu .ip-mega__all{
+  color: var(--accent);
+}
+
+@media (max-width: 1199px){
+  .ip-mega__groups{
+    column-count: 2;
+  }
+}
+
+/* Планшет и телефон: раскрывающийся список, группы — под разделом. */
+@media (max-width: 991px){
+  .ip-catalog__menu--mega{
+    width: calc(100vw - 32px);
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .ip-mega{
+    width: auto;
+    min-height: 0;
+    border-right: none;
+  }
+
+  /* На телефоне строки снова крупные — под палец. */
+  .ip-catalog__menu .ip-mega__section-link{
+    padding: 10px 16px;
+  }
+
+  .ip-mega__section.is-active > .ip-mega__section-link{
+    box-shadow: none;
+    background: none;
+    color: var(--text);
+  }
+
+  .ip-mega__section.is-open > .ip-mega__section-link{
+    background: var(--bg-light);
+    color: var(--accent-dark);
+  }
+
+  .ip-mega__section.is-open .ip-mega__chevron{
+    transform: rotate(90deg);
+  }
+
+  .ip-mega__panel,
+  .ip-mega__section.is-active > .ip-mega__panel{
+    display: none;
+    position: static;
+    width: auto;
+    padding: 6px 18px 14px 56px;
+    overflow: visible;
+  }
+
+  .ip-mega__section.is-open > .ip-mega__panel{
+    display: block;
+  }
+
+  .ip-catalog__menu .ip-mega__title{
+    display: none;
+  }
+
+  .ip-catalog__menu .ip-mega__all{
+    display: block;
+    padding: 6px 0 12px;
+    font-weight: 600;
+    color: var(--accent-dark);
+  }
+
+  .ip-mega__groups{
+    column-count: 1;
+  }
+
+  .ip-mega__group{
+    margin-bottom: 12px;
+  }
+}
+
 .ip-search{
   flex-grow: 1;
   max-width: 520px;
