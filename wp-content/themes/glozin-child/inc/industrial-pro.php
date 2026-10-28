@@ -339,6 +339,16 @@ add_filter( 'body_class', 'glozin_child_industrial_pro_body_class' );
  * @return string URL категории или '#', если категория не найдена.
  */
 function glozin_child_category_url( $term_id ) {
+	// Старая группа 1С → сразу её категория в новом каталоге, без 301 (28.10.2026).
+	if ( function_exists( 'casa24_catalog_redirect_key' ) && casa24_catalog_is_ready() ) {
+		$term = get_term( (int) $term_id, 'product_cat' );
+		$key  = $term instanceof WP_Term ? casa24_catalog_redirect_key( $term ) : null;
+		$ids  = casa24_catalog_term_ids( (string) apply_filters( 'wpml_current_language', casa24_catalog_default_lang() ) );
+		if ( $key && ! empty( $ids[ $key ] ) ) {
+			$term_id = (int) $ids[ $key ];
+		}
+	}
+
 	$term_id = (int) apply_filters( 'wpml_object_id', $term_id, 'product_cat', true );
 	$link    = get_term_link( $term_id, 'product_cat' );
 
