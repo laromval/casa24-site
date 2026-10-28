@@ -127,25 +127,8 @@ function glozin_child_edit_address_default_country( $value, $key, $load_address 
 	return $value;
 }
 
-/**
- * Auto-check "I have read and agree to the terms" checkbox on checkout page.
- */
-add_action('wp_footer', 'glozin_child_checkout_terms_default');
-function glozin_child_checkout_terms_default() {
-    if (!is_checkout()) {
-        return;
-    }
-    ?>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var termsCheckbox = document.getElementById('terms');
-        if (termsCheckbox) {
-            termsCheckbox.checked = true;
-        }
-    });
-    </script>
-    <?php
-}
+// Скрипт подрядчика, ставивший галочку «Принимаю условия» на чекауте сам,
+// убран 27.10.2026: согласие — только осознанное (№27, inc/privacy-consent.php).
 
 add_filter( 'woocommerce_account_menu_items', 'remove_downloads_my_account', 999 );
 
@@ -339,3 +322,4 @@ require get_stylesheet_directory() . '/inc/plugins/top-categories-carousel.php';
 require get_stylesheet_directory() . '/inc/hide-flag.php';
 require get_stylesheet_directory() . '/inc/telsender-wpml-fix.php';
 require get_stylesheet_directory() . '/inc/industrial-pro.php';
+require get_stylesheet_directory() . '/inc/privacy-consent.php';
