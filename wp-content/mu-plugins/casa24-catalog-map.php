@@ -299,6 +299,23 @@ function casa24_catalog_upsert_term_in_lang( $key, $lang, $name, $slug, $parent,
  */
 function casa24_catalog_classify( $name, $rules ) {
 	$n   = mb_strtolower( $name );
+
+	// Наборы правил из catalog_tree.py (NAME_RULES): первое совпадение побеждает,
+	// «^» в начале подстроки — название с неё начинается.
+	$map = casa24_catalog_map();
+	if ( isset( $map['rules'][ $rules ] ) ) {
+		$trimmed = trim( $n );
+		foreach ( $map['rules'][ $rules ] as $rule ) {
+			foreach ( $rule[1] as $needle ) {
+				$found = '^' === $needle[0] ? 0 === mb_strpos( $trimmed, mb_substr( $needle, 1 ) ) : false !== mb_strpos( $n, $needle );
+				if ( $found ) {
+					return $rule[0];
+				}
+			}
+		}
+		return null;
+	}
+
 	$has = static function ( ...$needles ) use ( $n ) {
 		foreach ( $needles as $needle ) {
 			if ( false !== mb_strpos( $n, $needle ) ) {
@@ -792,6 +809,9 @@ function casa24_catalog_redirect_key( $term ) {
 		return $map['groups'][ $ru_id ];
 	}
 	if ( isset( $map['sort'][ $ru_id ] ) ) {
+		if ( $map['sort'][ $ru_id ][1] ) {
+			return $map['sort'][ $ru_id ][1];
+		}
 		return 'clean' === $map['sort'][ $ru_id ][0] ? $map['names']['Уборка и бытовая химия'] : $map['names']['Краски и лаки'];
 	}
 
@@ -829,6 +849,40 @@ function casa24_catalog_redirect_old_categories() {
 	}
 }
 add_action( 'template_redirect', 'casa24_catalog_redirect_old_categories', 5 );
+
+/**
+ * 301 с адресов категорий первой версии нового дерева, которых больше нет
+ * (второй этап 28.10.2026: «Инструмент», «Товары для дома» и т. п.).
+ * Такие адреса отдают 404 — по последнему сегменту ищем замену в map['legacy'].
+ */
+function casa24_catalog_redirect_legacy() {
+	if ( ! is_404() || ! casa24_catalog_is_ready() ) {
+		return;
+	}
+
+	$path = (string) wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '', PHP_URL_PATH ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- только сравнение со словарём.
+	if ( ! preg_match( '~/product-category/(?:.+/)?([a-z0-9-]+)/?$~', $path, $m ) ) {
+		return;
+	}
+
+	$map = casa24_catalog_map();
+	if ( empty( $map['legacy'][ $m[1] ] ) ) {
+		return;
+	}
+
+	$ids = casa24_catalog_term_ids( (string) apply_filters( 'wpml_current_language', casa24_catalog_default_lang() ) );
+	$key = $map['legacy'][ $m[1] ];
+	if ( empty( $ids[ $key ] ) ) {
+		return;
+	}
+
+	$link = get_term_link( $ids[ $key ], 'product_cat' );
+	if ( ! is_wp_error( $link ) ) {
+		wp_safe_redirect( $link, 301, 'Casa24 catalog' );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'casa24_catalog_redirect_legacy', 6 );
 
 /**
  * Картинки (thumbnail_id) для категорий нового дерева — их показывает Glozin

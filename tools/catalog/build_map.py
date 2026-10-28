@@ -9,7 +9,7 @@ import sys
 import unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from catalog_tree import TREE, SORT, UNSORTED, PRODUCT_OVERRIDES, REDIRECTS  # noqa: E402
+from catalog_tree import TREE, SORT, UNSORTED, PRODUCT_OVERRIDES, REDIRECTS, NAME_RULES, LEGACY  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, 'wp-content', 'mu-plugins', 'casa24-catalog', 'map.php')
@@ -31,6 +31,11 @@ for tid in (1273, 1274, 1275):
     SORT_GROUPS[tid] = ('clean', 'Мыло')
 # Товары, лежащие прямо в группе «Электроинструмент» (не в подгруппе).
 SORT_GROUPS[886] = ('power', 'Прочий электроинструмент')
+# Большие группы-«мешки» 1С (второй этап, 28.10.2026): правила — в NAME_RULES.
+for _rules, (_tids, _default, _) in NAME_RULES.items():
+    for _tid in _tids:
+        assert _tid not in SORT_GROUPS, ('группа в двух наборах правил', _tid)
+        SORT_GROUPS[_tid] = (_rules, _default)
 
 RU_LAT = dict(zip('абвгдеёжзийклмнопрстуфхцчшщъыьэюя',
                   ['a', 'b', 'v', 'g', 'd', 'e', 'e', 'zh', 'z', 'i', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't',
@@ -87,6 +92,10 @@ unsorted = add(UNSORTED[0], UNSORTED[1], '', 99)
 for tid in SORT_GROUPS:
     assert tid not in groups, ('группа и в разборе, и в переносе', tid)
 
+for rules, (_, default, items) in NAME_RULES.items():
+    for target in [default] + [t for t, _ in items]:
+        assert target in by_name, ('правило ведёт в несуществующую категорию', rules, target)
+
 ro_slugs = [slug_ro(n[3]) for n in nodes]
 assert len(set(ro_slugs)) == len(ro_slugs), 'повтор RO-слага'
 
@@ -126,6 +135,16 @@ lines += ['\t),', "\t'sort'     => array("]
 for tid in sorted(SORT_GROUPS):
     rules, default = SORT_GROUPS[tid]
     lines.append(f"\t\t{tid} => array( {php(rules)}, {php(by_name[default] if default else None)} ),")
+lines += ['\t),', "\t'rules'    => array("]
+for rules, (_, _, items) in NAME_RULES.items():
+    lines.append(f'\t\t{php(rules)} => array(')
+    for target, needles in items:
+        lines.append(f"\t\t\tarray( {php(target)}, array( {', '.join(php(n) for n in needles)} ) ),")
+    lines.append('\t\t),')
+lines += ['\t),', "\t'legacy'   => array("]
+for slug in sorted(LEGACY):
+    assert slug not in by_name.values(), ('старый ключ ещё в дереве', slug)
+    lines.append(f'\t\t{php(slug)} => {php(by_name[LEGACY[slug]])},')
 lines += ['\t),', "\t'redirects' => array("]
 for tid in sorted(REDIRECTS):
     lines.append(f'\t\t{tid} => {php(by_name[REDIRECTS[tid]])},')
