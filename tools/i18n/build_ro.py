@@ -66,6 +66,7 @@ RO = {
     "О компании": "Despre companie",
     "О нас": "Despre noi",
     "Статьи": "Articole",
+    "Сертификаты": "Certificate",
     "Как нас найти": "Cum ne găsiți",
     "Все права защищены.": "Toate drepturile rezervate.",
     "Наверх страницы": "Sus",

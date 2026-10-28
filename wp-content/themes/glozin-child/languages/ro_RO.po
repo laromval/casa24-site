@@ -229,21 +229,6 @@ msgstr "Schimbul și returnarea mărfii"
 msgid "Настройки cookie"
 msgstr "Setări cookie"
 
-msgid "Контакты"
-msgstr "Contacte"
-
-msgid "Двери"
-msgstr "Uși"
-
-msgid "Электроинструмент"
-msgstr "Instrumente electrice"
-
-msgid "Сад и огород"
-msgstr "Grădină"
-
-msgid "Хозтовары"
-msgstr "Mărfuri de uz casnic"
-
 msgid "О компании"
 msgstr "Despre companie"
 
@@ -252,6 +237,12 @@ msgstr "Despre noi"
 
 msgid "Статьи"
 msgstr "Articole"
+
+msgid "Сертификаты"
+msgstr "Certificate"
+
+msgid "Контакты"
+msgstr "Contacte"
 
 msgid "Как нас найти"
 msgstr "Cum ne găsiți"
