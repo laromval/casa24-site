@@ -126,7 +126,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php esc_html_e( 'Каталог', 'glozin-child' ); ?>
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
 				</button>
-				<nav class="ip-catalog__menu" id="ip-catalog-menu" aria-label="<?php esc_attr_e( 'Категории каталога', 'glozin-child' ); ?>">
+				<nav class="ip-catalog__menu<?php echo function_exists( 'casa24_catalog_is_ready' ) && casa24_catalog_is_ready() ? ' ip-catalog__menu--mega' : ''; ?>" id="ip-catalog-menu" aria-label="<?php esc_attr_e( 'Категории каталога', 'glozin-child' ); ?>">
 					<?php glozin_child_catalog_menu(); ?>
 				</nav>
 			</div>

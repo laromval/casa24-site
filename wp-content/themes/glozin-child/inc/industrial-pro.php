@@ -97,6 +97,12 @@ function glozin_child_catalog_menu() {
 		return;
 	}
 
+	// Новое дерево каталога (mu-plugin casa24-catalog-map) — мега-меню.
+	if ( function_exists( 'casa24_catalog_is_ready' ) && casa24_catalog_is_ready() ) {
+		glozin_child_catalog_mega_menu();
+		return;
+	}
+
 	$terms = get_terms(
 		array(
 			'taxonomy'   => 'product_cat',
@@ -142,6 +148,95 @@ function glozin_child_catalog_menu() {
 		);
 	}
 
+	echo '</ul>';
+}
+
+/**
+ * Иконки разделов каталога (контурные 24×24, как у блока «Категории» на главной).
+ *
+ * Ключ — ключ раздела в tools/catalog/catalog_tree.py (транслит RU-названия).
+ *
+ * @return string[]
+ */
+function glozin_child_catalog_section_icons() {
+	return array(
+		'stroymaterialy'            => '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.7h18M9 4v5.3M15 9.3v5.4M9 14.7V20"/>',
+		'kraski-i-laki'             => '<rect x="3" y="3" width="15" height="6" rx="1"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',
+		'otdelochnye-materialy'     => '<path d="M4 4h12a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2z"/><path d="M18 8h2v12H8v-2"/><path d="M8 8h6M8 12h6"/>',
+		'dveri-i-furnitura'         => '<path d="M6 21V3h12v18"/><path d="M3 21h18"/><path d="M14.5 12h.01"/>',
+		'instrument'                => '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+		'krepezh'                   => '<path d="M8 3h8l1 4H7z"/><path d="M10 7v11l2 3 2-3V7"/><path d="M10 11l4-1.5M10 15l4-1.5"/>',
+		'elektrika-i-osveschenie'   => '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
+		'santehnika-i-vannaya'      => '<path d="M12 2.7l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+		'sad-i-ogorod'              => '<path d="M12 21V11"/><path d="M12 11C12 7 9 4 4 4c0 4 3 7 8 7z"/><path d="M12 14c0-3.5 2.5-6 7-6 0 3.5-2.5 6-7 6z"/><path d="M7 21h10"/>',
+		'tovary-dlya-doma'          => '<path d="M3 11l9-8 9 8"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+		'detyam-otdyh-kantstovary'  => '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3.5 3.5 3.5 9.3 0 12.8M18.4 5.6c-3.5 3.5-3.5 9.3 0 12.8"/>',
+	);
+}
+
+/**
+ * Мега-меню «Каталог» (обратная связь 28.10.2026, по образцу владельца):
+ * слева разделы-«оглавление», при наведении справа — группы жирным и
+ * подгруппы под ними, колонками. На телефоне — раскрывающийся список:
+ * нажатие на раздел открывает его группы (assets/ui-interactions.js).
+ *
+ * Панель раздела лежит внутри его пункта списка: на компьютере она
+ * позиционируется справа от колонки разделов, на телефоне — под пунктом.
+ */
+function glozin_child_catalog_mega_menu() {
+	$sections = casa24_catalog_menu_tree();
+	$icons    = glozin_child_catalog_section_icons();
+	$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' );
+	$chevron  = '<svg class="ip-mega__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg>';
+
+	echo '<ul class="ip-mega" data-ip-mega>';
+
+	foreach ( $sections as $i => $section ) {
+		$panel_id = 'ip-mega-' . $section['key'];
+		$icon     = $icons[ $section['key'] ] ?? '<circle cx="12" cy="12" r="8"/>';
+
+		printf(
+			'<li class="ip-mega__section%1$s" data-ip-mega-section><a class="ip-mega__section-link" href="%2$s" aria-controls="%3$s"><span class="ip-mega__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">%4$s</svg></span><span class="ip-mega__section-name">%5$s</span>%6$s</a>',
+			0 === $i ? ' is-active' : '',
+			esc_url( $section['url'] ),
+			esc_attr( $panel_id ),
+			$icon, // phpcs:ignore WordPress.Security.EscapeOutput -- статичная разметка иконки из массива выше.
+			esc_html( $section['name'] ),
+			$chevron // phpcs:ignore WordPress.Security.EscapeOutput -- статичная разметка.
+		);
+
+		printf( '<div class="ip-mega__panel" id="%s">', esc_attr( $panel_id ) );
+		printf(
+			'<a class="ip-mega__title" href="%1$s">%2$s</a><a class="ip-mega__all" href="%1$s">%3$s</a>',
+			esc_url( $section['url'] ),
+			esc_html( $section['name'] ),
+			esc_html__( 'Все товары раздела', 'glozin-child' )
+		);
+		echo '<div class="ip-mega__groups">';
+
+		foreach ( $section['children'] as $group ) {
+			echo '<div class="ip-mega__group">';
+			printf( '<a class="ip-mega__group-title" href="%s">%s</a>', esc_url( $group['url'] ), esc_html( $group['name'] ) );
+
+			if ( $group['children'] ) {
+				echo '<ul class="ip-mega__links">';
+				foreach ( $group['children'] as $item ) {
+					printf( '<li><a href="%s">%s</a></li>', esc_url( $item['url'] ), esc_html( $item['name'] ) );
+				}
+				echo '</ul>';
+			}
+
+			echo '</div>';
+		}
+
+		echo '</div></div></li>';
+	}
+
+	printf(
+		'<li class="ip-mega__catalog-all"><a href="%s">%s</a></li>',
+		esc_url( $shop_url ),
+		esc_html__( 'Весь каталог', 'glozin-child' )
+	);
 	echo '</ul>';
 }
 

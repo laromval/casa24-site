@@ -115,6 +115,12 @@ msgstr "WooCommerce nu este activ — blocurile „Top vânzări” și „Mărf
 msgid "Главное меню (шапка)"
 msgstr "Meniul principal (antet)"
 
+msgid "Все товары раздела"
+msgstr "Toate mărfurile din secțiune"
+
+msgid "Весь каталог"
+msgstr "Tot catalogul"
+
 msgid "Добавить «%s» в корзину"
 msgstr "Adaugă „%s” în coș"
 

@@ -42,6 +42,8 @@ RO = {
     "Поддержка в один клик.": "Suport dintr-un clic.",
     "Категории": "Categorii",
     "Все категории": "Toate categoriile",
+    "Все товары раздела": "Toate mărfurile din secțiune",
+    "Весь каталог": "Tot catalogul",
     "Товаров: %s": "Mărfuri: %s",
     "Категории товаров появятся здесь после подключения каталога WooCommerce.": "Categoriile de mărfuri vor apărea aici după conectarea catalogului WooCommerce.",
     "Топ продаж": "Top vânzări",
