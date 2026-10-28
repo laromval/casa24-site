@@ -696,6 +696,39 @@ function casa24_catalog_storefront_terms_args( $args, $taxonomies ) {
 add_filter( 'get_terms_args', 'casa24_catalog_storefront_terms_args', 20, 2 );
 
 /**
+ * Карта сайта Rank Math: в product_cat-sitemap — только новое дерево (без
+ * групп 1С, которые отдают 301, и без «Не разобрано»). 28.10.2026.
+ *
+ * Обе выборки Rank Math для карты (индекс и страницы) идут через get_terms()
+ * с условием по rank_math_robots — по нему их и узнаём.
+ *
+ * @param array    $args       Аргументы get_terms().
+ * @param string[] $taxonomies Таксономии.
+ * @return array
+ */
+function casa24_catalog_sitemap_terms_args( $args, $taxonomies ) {
+	if ( ! in_array( 'product_cat', (array) $taxonomies, true ) || '' === (string) get_query_var( 'sitemap' ) || empty( $args['meta_query'] ) || ! casa24_catalog_is_ready() ) {
+		return $args;
+	}
+	if ( false === strpos( wp_json_encode( $args['meta_query'] ), 'rank_math_robots' ) ) {
+		return $args;
+	}
+
+	$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+		'relation' => 'AND',
+		$args['meta_query'],
+		array(
+			'key'     => CASA24_CATALOG_META,
+			'value'   => casa24_catalog_map()['unsorted'],
+			'compare' => '!=',
+		),
+	);
+
+	return $args;
+}
+add_filter( 'get_terms_args', 'casa24_catalog_sitemap_terms_args', 20, 2 );
+
+/**
  * Витрина: категории товара («Категория:» в карточке, хлебные крошки) —
  * только новые, если товар уже разложен.
  *
