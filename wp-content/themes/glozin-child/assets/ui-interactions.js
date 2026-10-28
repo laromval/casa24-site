@@ -303,7 +303,13 @@
 			wrap.style.animationDuration = fallDuration + 's, ' + swayDuration + 's';
 			wrap.style.animationDelay = fallDelay + 's, ' + swayDelay + 's';
 
-			wrap.innerHTML = '<svg viewBox="0 0 24 24" fill="' + LEAF_COLORS[ colorIndex % LEAF_COLORS.length ] + '"><path d="' + LEAF_PATH + '"></path></svg>';
+			// Цвет задаём прямо на <path> — и атрибутом, и inline-стилем: в
+			// старых браузерах (Windows 7) fill с <svg> не доходил до листа,
+			// и он рисовался чёрным (обратная связь 28.10.2026). Inline-стиль
+			// перебивает любые общие правила темы вида "svg path { fill }".
+			var color = LEAF_COLORS[ colorIndex % LEAF_COLORS.length ];
+			wrap.style.color = color;
+			wrap.innerHTML = '<svg viewBox="0 0 24 24" fill="' + color + '" style="fill:' + color + '"><path d="' + LEAF_PATH + '" fill="' + color + '" style="fill:' + color + '"></path></svg>';
 			return wrap;
 		}
 
