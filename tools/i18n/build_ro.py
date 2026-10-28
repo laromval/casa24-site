@@ -73,6 +73,25 @@ RO = {
     "Главное меню (шапка)": "Meniul principal (antet)",
     "Добавить «%s» в корзину": "Adaugă „%s” în coș",
     "Выбрать «%s»": "Alege „%s”",
+    # Cookie-баннер и согласия (inc/privacy-consent.php, 27.10.2026)
+    "Мы используем cookie": "Folosim cookie-uri",
+    "Необходимые cookie нужны, чтобы работали корзина, вход и выбор языка. Аналитику и маркетинг включаем только с вашего согласия — выбор можно изменить в любой момент по ссылке «Настройки cookie» внизу сайта.": "Cookie-urile necesare asigură funcționarea coșului, a autentificării și a alegerii limbii. Analitica și marketingul le activăm doar cu acordul dvs. — alegerea poate fi schimbată oricând prin linkul „Setări cookie” din partea de jos a site-ului.",
+    "Необходимые": "Necesare",
+    "Корзина, вход в кабинет, язык, защита сайта. Без них магазин не работает, поэтому они включены всегда.": "Coșul, intrarea în cabinet, limba, protecția site-ului. Fără ele magazinul nu funcționează, de aceea sunt mereu activate.",
+    "Аналитика": "Analitică",
+    "Google Analytics и источник перехода в заказе: какие страницы смотрят и откуда приходят. Помогает улучшать сайт.": "Google Analytics și sursa vizitei în comandă: ce pagini sunt vizitate și de unde vin vizitatorii. Ne ajută să îmbunătățim site-ul.",
+    "Маркетинг": "Marketing",
+    "Персональная реклама в Google и соцсетях. Сейчас не используется — включится только с вашего согласия.": "Publicitate personalizată în Google și rețelele sociale. Acum nu este folosită — se va activa doar cu acordul dvs.",
+    "Только необходимые": "Doar cele necesare",
+    "Настроить": "Configurează",
+    "Сохранить выбор": "Salvează alegerea",
+    "Принять все": "Acceptă toate",
+    "Настройки cookie": "Setări cookie",
+    "Публичной оферты": "Ofertei publice",
+    "Я прочитал(а) и принимаю условия %s": "Am citit și accept condițiile %s",
+    "Политике конфиденциальности": "Politica de confidențialitate",
+    "Данные аккаунта используются для входа, истории заказов и сохранения адресов. Подробнее — в %s.": "Datele contului sunt folosite pentru autentificare, istoricul comenzilor și păstrarea adreselor. Detalii — în %s.",
+    "Ваши данные используются для оформления, оплаты и доставки заказа. Подробнее — в %s.": "Datele dvs. sunt folosite pentru perfectarea, achitarea și livrarea comenzii. Detalii — în %s.",
 }
 
 strings = open(sys.argv[2], encoding="utf-8").read().splitlines()

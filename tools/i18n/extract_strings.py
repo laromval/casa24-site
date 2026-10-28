@@ -6,6 +6,7 @@ out = sys.argv[2]
 files = [
     root + "/wp-content/themes/glozin-child/template-homepage-industrial-pro.php",
     root + "/wp-content/themes/glozin-child/inc/industrial-pro.php",
+    root + "/wp-content/themes/glozin-child/inc/privacy-consent.php",
     root + "/wp-content/themes/glozin-child/template-parts/industrial-pro/header.php",
     root + "/wp-content/themes/glozin-child/template-parts/industrial-pro/footer.php",
 ]
