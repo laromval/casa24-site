@@ -665,7 +665,9 @@ function casa24_catalog_is_storefront() {
  * Витрина: списки категорий (фильтры, виджеты, карта сайта) — только новое
  * дерево, без групп 1С и без «Не разобрано».
  *
- * Явные выборки по ID (include) не трогаем.
+ * Явные выборки по ID (include) не трогаем. Служебные выборки тоже: WP
+ * пересобирает опцию product_cat_children через get_terms( get=all,
+ * fields=id=>parent ) — урезанная иерархия осталась бы в базе.
  *
  * @param array    $args       Аргументы get_terms().
  * @param string[] $taxonomies Таксономии.
@@ -673,6 +675,9 @@ function casa24_catalog_is_storefront() {
  */
 function casa24_catalog_storefront_terms_args( $args, $taxonomies ) {
 	if ( ! in_array( 'product_cat', (array) $taxonomies, true ) || ! empty( $args['include'] ) || ! empty( $args['object_ids'] ) || ! casa24_catalog_is_storefront() ) {
+		return $args;
+	}
+	if ( ( isset( $args['get'] ) && 'all' === $args['get'] ) || ( isset( $args['fields'] ) && in_array( $args['fields'], array( 'id=>parent', 'ids', 'tt_ids', 'count' ), true ) ) ) {
 		return $args;
 	}
 
@@ -701,6 +706,10 @@ add_filter( 'get_terms_args', 'casa24_catalog_storefront_terms_args', 20, 2 );
  */
 function casa24_catalog_storefront_object_terms( $terms, $object_ids, $taxonomies ) {
 	if ( ! is_array( $terms ) || ! $terms || ! in_array( 'product_cat', (array) $taxonomies, true ) || ! casa24_catalog_is_storefront() ) {
+		return $terms;
+	}
+	// Корзина и оформление считают купоны/доставку по категориям — там группы 1С нужны целиком.
+	if ( wp_doing_ajax() || ! empty( $_GET['wc-ajax'] ) || ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return $terms;
 	}
 
@@ -760,7 +769,7 @@ function casa24_catalog_redirect_key( $term ) {
  * 301 со страницы старой категории на новую (на том же языке).
  */
 function casa24_catalog_redirect_old_categories() {
-	if ( ! is_product_category() || ! casa24_catalog_is_ready() ) {
+	if ( ! function_exists( 'is_product_category' ) || ! is_product_category() || ! casa24_catalog_is_ready() ) {
 		return;
 	}
 
