@@ -175,6 +175,161 @@ body.ip-site .catalog-top-categories :is(h2, h3, h6, .catalog-top-categories__ti
   letter-spacing: 0.02em;
 }
 
+/* Каталог «папками» (inc/catalog-folders.php): раздел с подкатегориями —
+   слева их список, справа плитки и «Хиты продаж». */
+body.casa24-folders-page #primary{
+  width: 100%;
+  max-width: 100%;
+  flex: 1 1 100%;
+}
+
+.casa24-folders{
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.casa24-folders__nav{
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.casa24-folders__nav-title{
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.casa24-folders__nav-list{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.casa24-folders__nav-list li{
+  margin: 0 0 5px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.casa24-folders__nav-list a{
+  color: var(--text-muted);
+}
+
+.casa24-folders__nav-title:hover,
+.casa24-folders__nav-list a:hover{
+  color: var(--accent-dark);
+}
+
+.casa24-folders__nav-list .is-extra{
+  display: none;
+}
+
+.casa24-folders__nav-group.is-open .is-extra{
+  display: list-item;
+}
+
+.casa24-folders__nav-more{
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.casa24-folders__grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 20px;
+  margin: 0 0 48px;
+  padding: 0;
+  list-style: none;
+}
+
+.casa24-folders__tile a{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding: 16px 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: center;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.casa24-folders__tile a:hover{
+  border-color: var(--accent);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+  color: var(--text);
+}
+
+.casa24-folders__tile-image{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 12px;
+}
+
+.casa24-folders__tile-image img{
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.casa24-folders__tile-name{
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.casa24-folders__hits-title{
+  margin: 0 0 24px;
+  font-size: 24px;
+}
+
+@media (max-width: 1024px){
+  /* На планшете и телефоне список слева не нужен — те же ссылки в плитках. */
+  .casa24-folders{
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .casa24-folders__nav{
+    display: none;
+  }
+}
+
+@media (max-width: 575px){
+  .casa24-folders__grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .casa24-folders__tile a{
+    padding: 12px 8px;
+  }
+
+  .casa24-folders__tile-name{
+    font-size: 13px;
+  }
+
+  .casa24-folders__hits-title{
+    font-size: 20px;
+  }
+}
+
 /* Боковая панель фильтров. */
 body.ip-site .catalog-filters-sidebar :is(.widget-title, .products-filter__filter-name, h2, h3){
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
