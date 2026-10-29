@@ -221,6 +221,75 @@ function glozin_child_folders_hit_ids( $term_id, $limit = 8 ) {
 }
 
 /**
+ * Картинка категории (thumbnail_id) по узлу дерева.
+ *
+ * @param array $node Узел casa24_catalog_menu_tree().
+ * @param int[] $ids  Ключ → term_id.
+ * @return int
+ */
+function glozin_child_folders_thumb( $node, $ids ) {
+	return empty( $ids[ $node['key'] ] ) ? 0 : (int) get_term_meta( $ids[ $node['key'] ], 'thumbnail_id', true );
+}
+
+/**
+ * Плитка подкатегории.
+ *
+ * Если у неё есть свои подгруппы — коллаж 2×2 из картинок самых больших
+ * подгрупп (обратная связь владельца 29.10.2026: по фото должно быть понятно,
+ * что внутри). Одинаковые картинки отбрасываются (у группы 1С картинка часто
+ * взята у первой подгруппы). Меньше двух разных — одна картинка, как раньше.
+ *
+ * @param array $child Узел дерева.
+ * @param int[] $ids   Ключ → term_id.
+ * @return string
+ */
+function glozin_child_folders_tile( $child, $ids ) {
+	$thumbs = array();
+
+	if ( $child['children'] ) {
+		$subs = $child['children'];
+		usort(
+			$subs,
+			function ( $a, $b ) {
+				return $b['count'] - $a['count'];
+			}
+		);
+		foreach ( $subs as $sub ) {
+			$thumb = glozin_child_folders_thumb( $sub, $ids );
+			if ( $thumb && ! in_array( $thumb, $thumbs, true ) ) {
+				$thumbs[] = $thumb;
+			}
+			if ( count( $thumbs ) >= 4 ) {
+				break;
+			}
+		}
+	}
+
+	$image = '';
+	if ( count( $thumbs ) >= 2 ) {
+		// Три фото — первое крупно слева, два справа друг над другом.
+		$image = '<span class="casa24-folders__collage casa24-folders__collage--' . count( $thumbs ) . '">';
+		foreach ( $thumbs as $thumb ) {
+			$image .= '<span class="casa24-folders__collage-cell">' . wp_get_attachment_image( $thumb, 'medium', false, array( 'alt' => '' ) ) . '</span>';
+		}
+		$image .= '</span>';
+	} else {
+		$thumb = glozin_child_folders_thumb( $child, $ids );
+		$image = $thumb ? wp_get_attachment_image( $thumb, 'medium', false, array( 'alt' => $child['name'] ) ) : '';
+	}
+	if ( ! $image ) {
+		$image = wc_placeholder_img( 'medium' );
+	}
+
+	return sprintf(
+		'<li class="casa24-folders__tile"><a href="%s"><span class="casa24-folders__tile-image">%s</span><span class="casa24-folders__tile-name">%s</span></a></li>',
+		esc_url( $child['url'] ),
+		$image,
+		esc_html( $child['name'] )
+	);
+}
+
+/**
  * Вывод «папки»: слева список подкатегорий, справа плитки и хиты продаж.
  */
 function glozin_child_folders_render() {
@@ -266,18 +335,7 @@ function glozin_child_folders_render() {
 	// Плитки подкатегорий.
 	echo '<ul class="casa24-folders__grid">';
 	foreach ( $node['children'] as $child ) {
-		$thumb = empty( $ids[ $child['key'] ] ) ? 0 : (int) get_term_meta( $ids[ $child['key'] ], 'thumbnail_id', true );
-		$image = $thumb ? wp_get_attachment_image( $thumb, 'medium', false, array( 'alt' => $child['name'] ) ) : '';
-		if ( ! $image ) {
-			$image = wc_placeholder_img( 'medium' );
-		}
-
-		printf(
-			'<li class="casa24-folders__tile"><a href="%s"><span class="casa24-folders__tile-image">%s</span><span class="casa24-folders__tile-name">%s</span></a></li>',
-			esc_url( $child['url'] ),
-			$image, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовый <img> от WordPress.
-			esc_html( $child['name'] )
-		);
+		echo glozin_child_folders_tile( $child, $ids ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- экранировано внутри.
 	}
 	echo '</ul>';
 
