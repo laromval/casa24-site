@@ -232,12 +232,28 @@ function glozin_child_folders_thumb( $node, $ids ) {
 }
 
 /**
+ * Отобранные фото товаров категории для коллажа (мета _casa24_collage_imgs,
+ * ставит tools/category-collages/collage-picks-apply.php).
+ *
+ * @param array $node Узел casa24_catalog_menu_tree().
+ * @param int[] $ids  Ключ → term_id.
+ * @return int[]
+ */
+function glozin_child_folders_picks( $node, $ids ) {
+	$meta = empty( $ids[ $node['key'] ] ) ? '' : (string) get_term_meta( $ids[ $node['key'] ], '_casa24_collage_imgs', true );
+
+	return array_values( array_filter( array_map( 'intval', explode( ',', $meta ) ) ) );
+}
+
+/**
  * Плитка подкатегории.
  *
- * Если у неё есть свои подгруппы — коллаж 2×2 из картинок самых больших
+ * Если у неё есть свои подгруппы — коллаж 2×2 из фото товаров самых больших
  * подгрупп (обратная связь владельца 29.10.2026: по фото должно быть понятно,
- * что внутри). Одинаковые картинки отбрасываются (у группы 1С картинка часто
- * взята у первой подгруппы). Меньше двух разных — одна картинка, как раньше.
+ * что внутри; только хорошие фото на белом фоне, товар без упаковки — их
+ * отбирали вручную, см. collage-picks-apply.php). Сначала по одному фото из
+ * каждой подгруппы, если подгрупп с фото меньше четырёх — вторые фото тех же.
+ * Меньше двух фото — одна картинка.
  *
  * @param array $child Узел дерева.
  * @param int[] $ids   Ключ → term_id.
@@ -254,19 +270,31 @@ function glozin_child_folders_tile( $child, $ids ) {
 				return $b['count'] - $a['count'];
 			}
 		);
-		foreach ( $subs as $sub ) {
-			$thumb = glozin_child_folders_thumb( $sub, $ids );
-			if ( $thumb && ! in_array( $thumb, $thumbs, true ) ) {
-				$thumbs[] = $thumb;
-			}
-			if ( count( $thumbs ) >= 4 ) {
-				break;
+		$picks = array_filter(
+			array_map(
+				function ( $sub ) use ( $ids ) {
+					return glozin_child_folders_picks( $sub, $ids );
+				},
+				$subs
+			)
+		);
+		for ( $round = 0; $round < 3 && count( $thumbs ) < 4; $round++ ) {
+			foreach ( $picks as $list ) {
+				if ( isset( $list[ $round ] ) && ! in_array( $list[ $round ], $thumbs, true ) ) {
+					$thumbs[] = $list[ $round ];
+				}
+				if ( count( $thumbs ) >= 4 ) {
+					break;
+				}
 			}
 		}
 	}
+	if ( count( $thumbs ) < 2 ) {
+		$thumbs = array_values( array_unique( array_merge( $thumbs, glozin_child_folders_picks( $child, $ids ) ) ) );
+	}
 
 	$image = '';
-	if ( count( $thumbs ) >= 2 ) {
+	if ( count( $thumbs ) >= 2 && $child['children'] ) {
 		// Три фото — первое крупно слева, два справа друг над другом.
 		$image = '<span class="casa24-folders__collage casa24-folders__collage--' . count( $thumbs ) . '">';
 		foreach ( $thumbs as $thumb ) {
@@ -274,7 +302,7 @@ function glozin_child_folders_tile( $child, $ids ) {
 		}
 		$image .= '</span>';
 	} else {
-		$thumb = glozin_child_folders_thumb( $child, $ids );
+		$thumb = $thumbs ? $thumbs[0] : glozin_child_folders_thumb( $child, $ids );
 		$image = $thumb ? wp_get_attachment_image( $thumb, 'medium', false, array( 'alt' => $child['name'] ) ) : '';
 	}
 	if ( ! $image ) {

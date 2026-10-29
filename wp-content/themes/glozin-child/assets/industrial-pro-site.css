@@ -279,6 +279,8 @@ body.casa24-folders-page #primary{
   justify-content: center;
   width: 100%;
   aspect-ratio: 1;
+  min-height: 0;
+  overflow: hidden;
   margin-bottom: 12px;
 }
 
@@ -291,15 +293,15 @@ body.casa24-folders-page #primary{
 /* Коллаж из фото подгрупп: 2×2, при трёх — первое на всю высоту слева. */
 .casa24-folders__collage{
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 4px;
   width: 100%;
   height: 100%;
 }
 
 .casa24-folders__collage--2{
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .casa24-folders__collage--3 .casa24-folders__collage-cell:first-child{
