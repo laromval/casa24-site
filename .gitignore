@@ -37,3 +37,10 @@ _deploy/
 # Выгрузки сверки цен (tools/price-sync) — промежуточные данные
 tools/price-sync/*.json
 tools/price-sync/*.csv
+
+# Аудит фото товаров — выгрузки и миниатюры
+tools/media/*.json
+tools/media/*.xlsx
+tools/media/thumbs/
+tools/media/.venv/
+tools/media/pilot/
