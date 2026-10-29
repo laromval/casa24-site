@@ -88,6 +88,12 @@ msgstr "Categorii"
 msgid "Все категории"
 msgstr "Toate categoriile"
 
+msgid "Назад"
+msgstr "Înapoi"
+
+msgid "Вперёд"
+msgstr "Înainte"
+
 msgid "Товаров: %s"
 msgstr "Mărfuri: %s"
 

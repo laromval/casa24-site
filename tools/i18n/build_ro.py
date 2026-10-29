@@ -31,6 +31,8 @@ RO = {
     "Акции и предложения": "Promoții și oferte",
     "Строительные материалы, инструмент и хозтовары в Кишинёве": "Materiale de construcții, instrumente și mărfuri de uz casnic în Chișinău",
     "Выбор слайда": "Alege slide-ul",
+    "Назад": "Înapoi",
+    "Вперёд": "Înainte",
     "Слайд %d": "Slide-ul %d",
     "Бесплатная доставка": "Livrare gratuită",
     "При заказе от 1000 лей.": "La comanda de la 1000 lei.",

@@ -30,6 +30,8 @@ return array(
 		'Поддержка в один клик.' => 'Suport dintr-un clic.',
 		'Категории' => 'Categorii',
 		'Все категории' => 'Toate categoriile',
+		'Назад' => 'Înapoi',
+		'Вперёд' => 'Înainte',
 		'Товаров: %s' => 'Mărfuri: %s',
 		'Категории товаров появятся здесь после подключения каталога WooCommerce.' => 'Categoriile de mărfuri vor apărea aici după conectarea catalogului WooCommerce.',
 		'Топ продаж' => 'Top vânzări',

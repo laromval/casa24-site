@@ -345,13 +345,24 @@ get_header();
 	<!-- =================================================================
 	     5. Категории
 	     ================================================================= -->
-	<section class="ip-section">
+	<section class="ip-section" data-ip-cat-slider>
 		<div class="container">
 			<div class="ip-section__head">
 				<h2><?php esc_html_e( 'Категории', 'glozin-child' ); ?></h2>
-				<a class="ip-section__link" href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' ) ); ?>">
-					<?php esc_html_e( 'Все категории', 'glozin-child' ); ?>
-				</a>
+				<div class="ip-section__actions">
+					<a class="ip-section__link" href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' ) ); ?>">
+						<?php esc_html_e( 'Все категории', 'glozin-child' ); ?>
+					</a>
+					<?php // Стрелки прокрутки ленты категорий (обратная связь 29.10.2026); прячутся, если всё помещается. ?>
+					<div class="ip-slider-nav" data-ip-cat-nav hidden>
+						<button type="button" class="ip-slider-nav__btn" data-ip-cat-prev aria-label="<?php esc_attr_e( 'Назад', 'glozin-child' ); ?>">
+							<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+						</button>
+						<button type="button" class="ip-slider-nav__btn" data-ip-cat-next aria-label="<?php esc_attr_e( 'Вперёд', 'glozin-child' ); ?>">
+							<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+						</button>
+					</div>
+				</div>
 			</div>
 
 			<?php
@@ -407,7 +418,7 @@ get_header();
 
 			if ( ! empty( $ip_categories ) ) :
 				?>
-				<ul class="ip-categories-grid">
+				<ul class="ip-categories-grid" data-ip-cat-track>
 					<?php foreach ( $ip_categories as $ip_item ) : ?>
 						<li class="ip-category-card">
 							<a class="ip-category-card__link" href="<?php echo esc_url( $ip_item['url'] ); ?>">
