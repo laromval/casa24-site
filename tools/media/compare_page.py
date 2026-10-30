@@ -1,4 +1,4 @@
-"""Страница проверки партии глазами: оригинал, выбранный вариант и запасной, галочка «заливать на сайт».
+"""Редактор фото товаров casa24.md (страница проверки партии): оригинал, выбранный вариант и запасной, галочка «заливать на сайт».
 
 Запуск: `python compare_page.py <папка партии>` — в папке ждёт pick.json, src/ и out/ (с report.json);
 пишет index.html рядом. На сайт уходят только фото с галочкой, у остальных остаётся старое фото.
@@ -19,8 +19,10 @@
 Кнопки ⟲ ⟳ поворачивают новое фото на 90° (rotate в решении, поворот делает upload_batch.py).
 Товары без фото (no_photo в report.json, make_batch.py ставит их первыми): слева и справа заглушка «нет фото»,
 «Найти в Google» ищет по названию в Картинках, утвердить можно только после того, как добавлено своё фото.
-Кнопка с фотоаппаратом — сфотографировать товар: на телефоне сразу открывается камера (capture), снимок уходит
-на сервер как своё фото (POST /upload): первый — новым главным, следующие — в доп. фото; на компьютере — выбор файла.
+Кнопка с фотоаппаратом — своя камера страницы (getUserMedia, нужен https — туннель): видоискатель с квадратной рамкой,
+«снять» → «Переснять» / «Готово»; квадратный кадр уходит на сервер как своё фото (POST /upload): первый — новым главным,
+следующие — в доп. фото. Родная камера телефона (input capture) — запасной пункт «Родная камера» в меню «⋯»
+и сама включается, если браузер не даёт камеру странице.
 Страница работает и с телефона через туннель (review_server.py с ключом, см. docs/setup-shop-pc-photo-phone.md):
 там «Найти в Google» открывается соседней вкладкой телефона, а не в Chrome на компьютере.
 Товары, уже залитые по journal.jsonl любой партии, на странице не показываются.
@@ -63,8 +65,8 @@ NOPHOTO = ("data:image/svg+xml," + urllib.parse.quote(
 CAMERA = ('<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
           'stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>'
           '<circle cx="12" cy="13" r="4"/></svg>')
-SHOT = (f'<label class="shb" title="Сфотографировать товар (на телефоне откроется камера)" aria-label="Сфотографировать">{CAMERA}'
-        '<input type="file" accept="image/*" capture="environment" hidden></label>')
+SHOT = f'<button type="button" class="shb" title="Сфотографировать товар — квадратный кадр" aria-label="Сфотографировать">{CAMERA}</button>'
+CAMN = '<label class="camn">Родная камера<input type="file" accept="image/*" capture="environment" hidden></label>'
 order = sorted((k for k in report if k not in uploaded), key=lambda k: (not report[k]["flags"], report[k]["choice"], k))
 
 
@@ -108,7 +110,7 @@ for pid in order:
     tools = (f'<div class="tools"><div class="menu"><button type="button" class="mbtn" title="скачать / загрузить фото">⋯</button>'
              f'<div class="mlist" hidden><button type="button" class="dl" data-what="old">Скачать оригинал</button>'
              f'<button type="button" class="dl" data-what="new">Скачать новое</button>'
-             f'<label class="up">Загрузить фото<input type="file" accept="image/*" hidden></label></div></div>'
+             f'<label class="up">Загрузить фото<input type="file" accept="image/*" hidden></label>{CAMN}</div></div>'
              f'<button type="button" class="cropb">Кадрировать</button>'
              f'<button type="button" class="cutb" title="вырезать товар и поставить на белый; можно нажать на нескольких — пойдут по очереди">Удалить фон</button>{find}'
              f'<div class="rot"><button type="button" data-r="-90" title="повернуть против часовой">⟲</button><button type="button" data-r="90" title="повернуть по часовой">⟳</button></div></div>')
@@ -153,7 +155,7 @@ for pid, e in sorted(here.items()):
 <figcaption class="cap">{"изменённое главное фото — ещё НЕ на сайте" if has_re else "главное фото на сайте"}{f" · доп. фото на сайте: {n_site}" if n_site else ""}</figcaption></figure></div>
 <div class="row"><div class="lft"><div class="menu"><button type="button" class="mbtn" title="действия с главным фото">⋯</button>
 <div class="mlist" hidden><button type="button" class="dl1">Скачать главное</button>
-<label class="reup">Загрузить фото<input type="file" accept="image/*" hidden></label><button type="button" class="recrop">Кадрировать</button></div></div>
+<label class="reup">Загрузить фото<input type="file" accept="image/*" hidden></label>{CAMN}<button type="button" class="recrop">Кадрировать</button></div></div>
 <span class="find"><a class="gbtn" href="https://lens.google.com/uploadbyurl?url={lens}&q={q}" target="_blank" title="поиск по фото и названию товара">Найти в Google</a>{SHOT}</span></div>
 <div class="rot"><button type="button" class="rer" data-r="-90" title="повернуть против часовой">⟲</button><button type="button" class="rer" data-r="90" title="повернуть по часовой">⟳</button></div></div>
 <div class="url"><input type="url" placeholder="Ссылка на фото — или перетащите картинку прямо на карточку"><button type="button" class="ubtn">Взять</button></div>
@@ -169,9 +171,10 @@ for pid, e in sorted(here.items()):
 <label class="ok gok"><input type="checkbox"> Добавить новые доп. фото на сайт</label></div>''')
 
 page = f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Проверка: белый фон</title><style>
+<title>Редактор фото — Casa24</title><style>
 body{{font:14px system-ui,sans-serif;margin:16px;background:#eceff1;color:#222}}
 h1{{font-size:20px}} .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}}
+.help{{margin:0 0 12px}} .help summary{{display:inline-block;padding:6px 14px;border:1px solid #b0bec5;border-radius:6px;background:#fff;font-weight:600;cursor:pointer;list-style:none}} .help summary::-webkit-details-marker{{display:none}} .help[open] summary{{background:#263238;color:#fff}}
 .card{{background:#fff;border-radius:8px;padding:8px;border:3px solid transparent}}
 .card.on{{border-color:#2e7d32;background:#f1f8e9}}
 .pair{{display:grid;grid-template-columns:1fr 1fr;gap:6px}} .pair.one{{grid-template-columns:1fr}} .pair.one img{{max-height:260px}}
@@ -202,6 +205,15 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 .gto{{display:flex;align-items:center;gap:4px;color:#555}} .card.on:not(.dcard) .gal .gto{{display:none}}
 .card.drop{{outline:3px dashed #1a73e8;outline-offset:-6px}} .card.target{{box-shadow:0 0 0 2px #f28c28}} .card.on:not(.dcard) .url{{display:none}}
 .shb{{display:inline-flex;align-items:center;justify-content:center;padding:3px 8px!important;border:1px solid #b0bec5;border-radius:4px;background:#fff;color:#455a64;cursor:pointer}}
+#cam{{position:fixed;inset:0;background:#000;z-index:30}} #cam[hidden]{{display:none}}
+#cam video{{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}} #cam .cprev{{position:absolute;object-fit:cover}}
+#cam .cfr{{position:absolute;border:2px solid #fff;box-shadow:0 0 0 100vmax rgba(0,0,0,.6);pointer-events:none}}
+#cam .cmsg{{position:absolute;top:12px;left:12px;right:12px;color:#fff;text-align:center;font-size:15px}}
+#cam .cbar{{position:absolute;left:0;right:0;bottom:0;padding:16px 16px calc(20px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}}
+#cam .cx,#cam .cre{{grid-column:1;justify-self:start}} #cam .csnap{{grid-column:2}} #cam .cok{{grid-column:3;justify-self:end}}
+#cam .csnap{{width:76px;height:76px;border-radius:50%;border:6px solid #fff;background:#e65100;padding:0}} #cam .csnap:active{{transform:scale(.92)}}
+#cam .cx,#cam .cre,#cam .cok{{font-size:17px;padding:12px 18px;border-radius:8px;border:0}} #cam .cx{{background:rgba(255,255,255,.25);color:#fff}}
+#cam .cre{{background:#fff;color:#222}} #cam .cok{{background:#2e7d32;color:#fff;font-weight:600}} #cam [hidden]{{display:none}}
 .shb:hover{{border-color:#f28c28;color:#e65100}} .shb.busy{{opacity:.5;pointer-events:none}}
 @media (max-width:700px){{body{{margin:8px}} h1{{font-size:17px}} .grid{{grid-template-columns:1fr}} .card>p,body>p{{font-size:13px}}
   .tools button,.up,.gbtn,.fbtn,.url button{{font-size:14px!important;padding:8px 12px!important}} .shb{{padding:8px 14px!important;background:#e65100;color:#fff;border-color:#e65100}}
@@ -226,17 +238,21 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 .bar{{position:sticky;bottom:0;background:#263238;color:#fff;padding:10px;margin-top:16px;border-radius:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}}
 button{{font:inherit;padding:6px 12px;cursor:pointer}} .save{{background:#f28c28;color:#fff;border:0;border-radius:4px;font-weight:600}}
 </style></head><body>
-<h1>Проверка: замена фона на белый — {len(order)} фото{f" (уже на сайте: {len(uploaded)})" if uploaded else ""}</h1>
+<h1>Редактор фото — {len(order)} товаров{f" (уже на сайте: {len(uploaded)})" if uploaded else ""}</h1>
+<details class="help"><summary>Инструкция</summary>
 <p>Слева — как на сайте сейчас, справа — новое фото. <b>Галочка «Утвердить»</b> — это фото будет залито на сайт.
 <b>«Найти в Google»</b> — откроет поиск Google по нашему фото и названию товара сразу: кликните нужную картинку, чтобы она открылась крупно, и <b>перетащите её мышью на карточку</b> (или в Google правой кнопкой «Копировать картинку», вернитесь сюда, кликните карточку и нажмите <b>Ctrl+V</b>; или вставьте адрес картинки в поле «Ссылка на фото» → «Взять»). Она станет новым фото на белом квадрате. «Поручить Claude» — поищу сам и покажу отдельной страницей. <b>Фотоаппарат</b> — сфотографировать товар: на телефоне сразу откроется камера, снимок станет новым фото (следующие — доп. фото). Товары <b>без фото</b> идут первыми: на сайте они сейчас скрыты и появятся сами, как только фото будет залито. Без галочки у товара останется старое фото — напишите в поле под галочкой, что не так, чтобы это учесть в доработке. <b>cut</b> — товар вырезан, <b>full</b> — кадр целиком на белом;
 клик по фото — открыть в оригинальном размере (повторный клик — закрыть); ★ на миниатюре доп. фото — сделать его главным; клик по маленькой картинке справа — выбрать её вместо основной; ⟲ ⟳ — повернуть новое фото.
-<b>«Кадрировать»</b> — потянуть углы рамки к углам товара: фото выровняется, как в Photoshop. <b>«Загрузить фото»</b> — загрузить файл, найденный самостоятельно: он станет новым фото (вариант <b>own</b>), поставлю его на белый квадрат. <b>«Удалить фон»</b> — вырезать товар и поставить на белый (около минуты), только там, где вы решите. «Скачать» — сохранить новое фото или оригинал к себе. Когда закончите — «Сохранить решения» и пришлите файл (или скажите, что сохранили).</p>
+<b>«Кадрировать»</b> — потянуть углы рамки к углам товара: фото выровняется, как в Photoshop. <b>«Загрузить фото»</b> — загрузить файл, найденный самостоятельно: он станет новым фото (вариант <b>own</b>), поставлю его на белый квадрат. <b>«Удалить фон»</b> — вырезать товар и поставить на белый (около минуты), только там, где вы решите. «Скачать» — сохранить новое фото или оригинал к себе. Когда закончите — «Сохранить решения» и пришлите файл (или скажите, что сохранили).</p></details>
 <div class="grid">{"".join(cards)}</div>
 {f'''<h2>Уже на сайте — добавить фото ({len(done_cards)})</h2>
 <p>Фото в интерьере, в другом ракурсе, детали. Добавьте их в карточку (файлы, ссылка, перетаскивание из Google или Ctrl+V — всё идёт в доп. фото),
 поставьте галочку «Добавить новые фото на сайт» и сохраните решения — дозалью их после уже стоящих фото, главное фото не трогаю.</p>
 <details{" open" if not cards else ""}><summary>Показать товары ({len(done_cards)})</summary><div class="grid">{"".join(done_cards)}</div></details>''' if done_cards else ""}
 <div id="zoom" hidden><div></div><img alt=""></div>
+<div id="cam" hidden><video playsinline muted autoplay></video><img class="cprev" alt="" hidden><div class="cfr"></div><div class="cmsg"></div>
+<div class="cbar"><button type="button" class="cx" aria-label="Закрыть">✕</button><button type="button" class="csnap" aria-label="Снять"></button>
+<button type="button" class="cre" hidden>Переснять</button><button type="button" class="cok" hidden>Готово</button></div></div>
 <div id="cropm" hidden><div class="cbox">
 <div class="ctop"><b>Кадрирование</b> <button type="button" data-f="src">Оригинал</button><button type="button" data-f="new">Новое фото</button> <span id="cinfo"></span></div>
 <div id="cscroll"><div class="cwrap"><img id="cimg" alt=""><svg id="cquad"><polygon></polygon>{'<g class="hd"><circle r="13"></circle><path class="xo" d="M-12 0H12M0-12V12"></path><path class="xi" d="M-12 0H12M0-12V12"></path></g>' * 4}</svg></div></div>
@@ -403,8 +419,35 @@ function cutShow(st){{cards.forEach(c=>{{const id=c.dataset.id,b=c.querySelector
   clearTimeout(cutTimer);if(cutWait.size)cutTimer=setTimeout(cutPoll,2000);}}
 function cutPoll(){{fetch('/cut-status').then(x=>x.json()).then(cutShow).catch(()=>{{cutTimer=setTimeout(cutPoll,5000);}});}}
 cutPoll();   // после перезагрузки страницы — показать, что ещё в очереди
-document.addEventListener('change',async e=>{{const fi=e.target.closest('.shb input');if(!fi||!fi.files.length)return;
-  const c=fi.closest('.card'),lb=fi.parentNode;lb.classList.add('busy');
+// камера страницы: видоискатель с квадратной рамкой — снимок сразу квадратный (центр кадра камеры)
+const cam=document.getElementById('cam'),cvid=cam.querySelector('video'),cfr=cam.querySelector('.cfr'),cpv=cam.querySelector('.cprev'),cmsg=cam.querySelector('.cmsg');
+let camCard=null,camStream=null,camBlob=null;
+function camFrame(){{const W=cam.clientWidth,H=cam.clientHeight,vw=cvid.videoWidth,vh=cvid.videoHeight;if(!vw)return;
+  const k=Math.min(W/vw,H/vh),sz=Math.min(vw,vh)*k,st={{width:sz+'px',height:sz+'px',left:(W-sz)/2+'px',top:(H-sz)/2+'px'}};
+  Object.assign(cfr.style,st);Object.assign(cpv.style,st);}}
+cvid.addEventListener('loadedmetadata',camFrame);window.addEventListener('resize',()=>{{if(!cam.hidden)camFrame();}});
+function camMode(shot){{cpv.hidden=!shot;cam.querySelector('.cx').hidden=shot;cam.querySelector('.csnap').hidden=shot;cam.querySelector('.cre').hidden=!shot;cam.querySelector('.cok').hidden=!shot;}}
+async function camOpen(c){{camCard=c;
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){{c.querySelector('.camn input').click();return;}}   // нет камеры для страницы — родная
+  cam.hidden=false;camMode(false);cmsg.textContent='включаю камеру…';
+  try{{camStream=await navigator.mediaDevices.getUserMedia({{video:{{facingMode:{{ideal:'environment'}},width:{{ideal:1920}},height:{{ideal:1920}}}},audio:false}});
+    cvid.srcObject=camStream;await cvid.play();cmsg.textContent='';camFrame();}}
+  catch(e){{cmsg.textContent='Камера недоступна ('+(e.name||e)+'). Разрешите доступ к камере для этого сайта или выберите в меню «⋯» → «Родная камера».';}}}}
+function camClose(){{cam.hidden=true;if(camStream)camStream.getTracks().forEach(t=>t.stop());camStream=null;cvid.srcObject=null;
+  if(cpv.src.startsWith('blob:'))URL.revokeObjectURL(cpv.src);cpv.removeAttribute('src');}}
+cam.querySelector('.csnap').addEventListener('click',()=>{{const vw=cvid.videoWidth,vh=cvid.videoHeight;if(!vw)return;
+  const sz=Math.min(vw,vh),k=document.createElement('canvas');k.width=k.height=sz;
+  k.getContext('2d').drawImage(cvid,(vw-sz)/2,(vh-sz)/2,sz,sz,0,0,sz,sz);
+  k.toBlob(b=>{{camBlob=b;cpv.src=URL.createObjectURL(b);camMode(true);cmsg.textContent=sz+'×'+sz+' px';}},'image/jpeg',0.92);}});
+cam.querySelector('.cre').addEventListener('click',()=>{{camMode(false);cmsg.textContent='';}});
+cam.querySelector('.cx').addEventListener('click',camClose);
+cam.querySelector('.cok').addEventListener('click',()=>{{const c=camCard,b=camBlob;camClose();
+  putFile(c,new File([b],'camera.jpg',{{type:'image/jpeg'}}),c.classList.contains('dcard')||c.dataset.choice==='own');}});
+document.addEventListener('click',e=>{{const b=e.target.closest('.shb');if(b)camOpen(b.closest('.card'));}});
+document.addEventListener('keydown',e=>{{if(e.key==='Escape'&&!cam.hidden)camClose();}});
+// родная камера телефона (меню «⋯»): снимок как есть, тем же порядком — главное, потом доп. фото
+document.addEventListener('change',async e=>{{const fi=e.target.closest('.camn input');if(!fi||!fi.files.length)return;
+  const c=fi.closest('.card'),lb=c.querySelector('.shb');lb.classList.add('busy');
   for(const f of fi.files)await putFile(c,f,c.classList.contains('dcard')||c.dataset.choice==='own');
   lb.classList.remove('busy');fi.value='';c.scrollIntoView({{block:'nearest'}});}});
 function setAll(v){{cards.forEach(c=>{{if(v&&c.dataset.choice==='none')return;c.querySelector('.ok input').checked=v;c.classList.toggle('on',v);rec(c);}});}}

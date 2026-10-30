@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cloudflared tunnel:*)",
+      "Bash(\"/c/Program Files (x86)/cloudflared/cloudflared.exe\" tunnel:*)",
+      "PowerShell(cloudflared tunnel:*)",
+      "PowerShell(& \"C:\\Program Files (x86)\\cloudflared\\cloudflared.exe\" tunnel:*)"
+    ]
+  }
+}
