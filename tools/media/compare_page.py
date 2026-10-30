@@ -128,7 +128,7 @@ for pid in order:
 <div class="row">{tools}</div>
 {url}
 {gallery}
-<textarea class="note" rows="1" enterkeyhint="done" placeholder="Почему не утверждено? (например: обрезана ручка, лучше кадр целиком, нужен другой ракурс)"></textarea>
+<textarea class="note" rows="3" enterkeyhint="done" placeholder="Примечание для Claude: что не так или что сделать (например: обрезана ручка, нужен другой ракурс)"></textarea>
 <div class="meta">{alt_img}<a href="{html.escape(p.get("url", ""))}" target="_blank">{html.escape(p.get("name", pid))}</a>
 <div class="cat">{html.escape((p.get("cat") or "").split(", ")[0])} · ID {pid} · вариант <b class="ch">{main}</b></div>{fl}</div>
 <label class="ok"><input type="checkbox"> Утвердить — заливать на сайт</label></div>''')
