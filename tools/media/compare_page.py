@@ -223,8 +223,9 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 @media (max-width:700px){{body{{margin:6px}} .grid{{grid-template-columns:1fr;gap:8px}} .help p{{font-size:13px}}
   html{{scroll-snap-type:y proximity}} .top{{scroll-snap-align:start}} .card{{scroll-snap-align:start;scroll-margin-top:4px;display:flex;flex-direction:column;padding:6px}}
   .card .meta{{order:-1;margin-bottom:4px}} .card .meta a{{font-weight:600;font-size:15px}} .card .cat{{font-size:11px}} .fl{{margin-top:2px}}
-  .lg,.gto,.gal .gl,figcaption,.tools .cropb,.tools .cutb{{display:none}} .card .mlist .mo{{display:block}} body{{overflow-x:hidden}} .card{{min-width:0}} .sm{{display:inline}} .pair img{{max-height:34vh}}
-  .row{{margin-top:6px}} .tools{{flex-wrap:nowrap;gap:5px;width:100%}} .tools .find{{gap:5px}}
+  .lg,.gto,.gal .gl,figcaption{{display:none}} body{{overflow-x:hidden}} .card{{min-width:0}}
+  .tools .cropb,.tools .cutb{{order:5;flex:1;font-size:14px!important;padding:8px 10px!important}} .sm{{display:inline}} .pair img{{max-height:34vh}}
+  .row{{margin-top:6px}} .tools{{flex-wrap:wrap;gap:5px;width:100%}} .tools .find{{gap:5px}}
   .tools button,.tools .gbtn,.tools .fbtn{{font-size:14px!important;padding:8px 10px!important;white-space:nowrap}}
   .tools .shb{{padding:6px 12px!important;background:#e65100;color:#fff;border-color:#e65100}} .shb svg{{width:24px;height:24px}}
   .tools .rot button{{padding:6px 9px!important;font-size:17px!important}} .url{{margin-top:5px}} .url input{{font-size:14px;padding:7px}} .url button{{padding:7px 10px}}
