@@ -28,6 +28,8 @@
 «⋯» → «Скрыть навсегда» — товар не нужен на сайте: action "hide", hide_forever.py ставит метку casa24_hidden,
 товар скрыт с витрины и больше не попадает в партии (повторное нажатие — «Не скрывать»).
 Товары, уже залитые по journal.jsonl любой партии, на странице не показываются.
+Строка «Найти товар» вверху — поиск на сайте по названию, артикулу или ID (GET /search); «Добавить» кладёт товар
+с его текущим фото в партию (POST /add), страница перезагружается, и он стоит первым.
 Отметки держатся в localStorage браузера, чтобы не потерять их при перезагрузке страницы.
 """
 import glob
@@ -69,7 +71,9 @@ CAMERA = ('<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="c
           '<circle cx="12" cy="13" r="4"/></svg>')
 SHOT = f'<button type="button" class="shb" title="Сфотографировать товар — квадратный кадр" aria-label="Сфотографировать">{CAMERA}</button>'
 CAMN = '<label class="camn">Родная камера<input type="file" accept="image/*" capture="environment" hidden></label>'
-order = sorted((k for k in report if k not in uploaded), key=lambda k: (not report[k]["flags"], report[k]["choice"], k))
+# товар, добавленный поиском («added»), показывается, даже если его фото уже меняли из другой партии; первыми — последние добавленные
+order = sorted((k for k in report if k not in here and (k not in uploaded or report[k].get("added"))),
+               key=lambda k: (-report[k].get("added", 0), not report[k]["flags"], report[k]["choice"], k))
 
 
 
@@ -178,7 +182,13 @@ page = f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name
 <title>Редактор фото — Casa24</title><style>
 body{{font:14px system-ui,sans-serif;margin:16px;background:#eceff1;color:#222}}
 h1{{font-size:20px}} .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}}
-.top{{display:flex;align-items:center;gap:12px;margin:0 0 10px}} .top b{{font-size:16px}} .helpb{{padding:6px 14px;border:1px solid #b0bec5;border-radius:6px;background:#fff;font-weight:600}} .helpb.act{{background:#263238;color:#fff}}
+.top{{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 10px}}
+.srch{{position:relative;display:flex;gap:6px;flex:1;min-width:240px;max-width:520px}} .srch input{{flex:1;min-width:0;font:inherit;font-size:14px;padding:6px 8px;border:1px solid #b0bec5;border-radius:6px}}
+.srch>button{{border:0;border-radius:6px;background:#263238;color:#fff;font-weight:600}}
+#sres{{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:8;background:#fff;border:1px solid #cfd8dc;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.22);max-height:70vh;overflow:auto}} #sres[hidden]{{display:none}}
+#sres .sr{{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #eceff1}} #sres img{{width:48px;height:48px;object-fit:contain;flex:none;background:#fafafa;border:1px solid #eee}}
+#sres .si{{flex:1;min-width:0;font-size:13px}} #sres .si small{{display:block;color:#777;font-size:11px}} #sres .sn{{padding:10px;color:#555;font-size:13px}}
+#sres .sr button{{flex:none;border:0;border-radius:4px;background:#2e7d32;color:#fff;font-weight:600;font-size:13px;padding:7px 10px}} #sres .sr button:disabled{{background:#b0bec5}} .top b{{font-size:16px}} .helpb{{padding:6px 14px;border:1px solid #b0bec5;border-radius:6px;background:#fff;font-weight:600}} .helpb.act{{background:#263238;color:#fff}}
 .card{{background:#fff;border-radius:8px;padding:8px;border:3px solid transparent}}
 .card.on{{border-color:#2e7d32;background:#f1f8e9}}
 .pair{{display:grid;grid-template-columns:1fr 1fr;gap:6px}} .pair.one{{grid-template-columns:1fr}} .pair.one img{{max-height:260px}}
@@ -257,7 +267,9 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 button{{font:inherit;padding:6px 12px;cursor:pointer}} .save{{background:#f28c28;color:#fff;border:0;border-radius:4px;font-weight:600}}
 </style></head><body>
 <div class="top"><button type="button" class="helpb" onclick="this.classList.toggle('act');help.hidden=!help.hidden">Инструкция</button>
-<b>Загружено {len(order)} {"товар" if len(order) % 10 == 1 and len(order) % 100 != 11 else "товара" if 2 <= len(order) % 10 <= 4 and not 12 <= len(order) % 100 <= 14 else "товаров"}</b></div>
+<b>Загружено {len(order)} {"товар" if len(order) % 10 == 1 and len(order) % 100 != 11 else "товара" if 2 <= len(order) % 10 <= 4 and not 12 <= len(order) % 100 <= 14 else "товаров"}</b>
+<form class="srch" onsubmit="event.preventDefault();findProd()"><input id="sq" type="search" enterkeyhint="search" placeholder="Найти товар: название, артикул или ID">
+<button type="submit">Найти</button><div id="sres" hidden></div></form></div>
 <div id="help" class="help" hidden>
 <p>Слева — как на сайте сейчас, справа — новое фото. <b>Галочка «Утвердить»</b> — это фото будет залито на сайт.
 <b>«Найти в Google»</b> — откроет поиск Google по нашему фото и названию товара сразу: кликните нужную картинку, чтобы она открылась крупно, и <b>перетащите её мышью на карточку</b> (или в Google правой кнопкой «Копировать картинку», вернитесь сюда, кликните карточку и нажмите <b>Ctrl+V</b>; или вставьте адрес картинки в поле «Ссылка на фото» → «Взять»). Она станет новым фото на белом квадрате. «Поручить Claude» — поищу сам и покажу отдельной страницей. <b>Фотоаппарат</b> — сфотографировать товар: на телефоне сразу откроется камера, снимок станет новым фото (следующие — доп. фото). Товары <b>без фото</b> идут первыми: на сайте они сейчас скрыты и появятся сами, как только фото будет залито. Без галочки у товара останется старое фото — напишите в поле под галочкой, что не так, чтобы это учесть в доработке. <b>cut</b> — товар вырезан, <b>full</b> — кадр целиком на белом;
@@ -281,6 +293,23 @@ button{{font:inherit;padding:6px 12px;cursor:pointer}} .save{{background:#f28c28
 <button class="all" onclick="setAll(true)">Утвердить все</button><button class="all" onclick="setAll(false)">Снять все</button>
 <button class="save" onclick="save()">Сохранить решения</button> <span id="msg"></span></div>
 <script>
+// поиск товара на сайте и добавление его в партию (review_server.py: /search, /add)
+const esc=s=>String(s).replace(/[&<>"]/g,ch=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}})[ch]);
+async function findProd(){{const q=sq.value.trim();sq.blur();sres.hidden=false;
+  if(q.length<2){{sres.innerHTML='<div class="sn">Введите хотя бы 2 буквы или цифры</div>';return;}}
+  sres.innerHTML='<div class="sn">Ищу на сайте…</div>';
+  try{{const r=await fetch('search?q='+encodeURIComponent(q)),d=await r.json();
+    if(!r.ok)throw new Error(d.error||r.status);
+    sres.innerHTML=d.length?d.map(p=>'<div class="sr"><img src="'+(p.thumb?esc(p.thumb):'data:,')+'" alt=""><div class="si">'+esc(p.name)
+      +'<small>'+esc(p.cat)+(p.sku?' · арт. '+esc(p.sku):'')+' · ID '+p.id+(p.instock?'':' · нет в наличии')+(p.thumb?'':' · без фото')+'</small></div>'
+      +'<button type="button" data-id="'+p.id+'"'+(p.in_batch?' disabled>Уже в списке':'>Добавить')+'</button></div>').join('')
+      :'<div class="sn">Ничего не нашёл. Попробуйте другое слово или артикул.</div>';
+  }}catch(e){{sres.innerHTML='<div class="sn">Поиск не удался: '+esc(e.message)+'</div>';}}}}
+sres.addEventListener('click',async e=>{{const b=e.target.closest('button');if(!b||b.disabled)return;b.disabled=true;b.textContent='Добавляю…';
+  try{{const r=await fetch('add',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{id:+b.dataset.id}})}}),d=await r.json();
+    if(!r.ok)throw new Error(d.error||r.status);history.scrollRestoration='manual';scrollTo(0,0);location.reload();   // новый товар — первая карточка
+  }}catch(err){{b.textContent='Ошибка';b.title=err.message;b.disabled=false;}}}});
+document.addEventListener('click',e=>{{if(!e.target.closest('.srch'))sres.hidden=true;}});
 const KEY='casa24-photo-review-{batch}';
 let st={{}};try{{st=JSON.parse(localStorage.getItem(KEY)||'{{}}')}}catch(e){{}}
 function persist(){{try{{localStorage.setItem(KEY,JSON.stringify(st))}}catch(e){{}}}}

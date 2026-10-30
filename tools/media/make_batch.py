@@ -96,7 +96,8 @@ def main():
         report[pid] = {"src": "", "choice": "none", "flags": ["нет фото"], "has_cut": False, "no_photo": True}
     print(f"без фото: {len(pick)}")
 
-    audit = json.load(open(os.path.join(HERE, "audit.json"), encoding="utf-8"))
+    ap = os.path.join(HERE, "audit.json")       # на новом компьютере его нет, пока не запущен photo_bg_audit.py
+    audit = json.load(open(ap, encoding="utf-8")) if len(pick) < count and os.path.exists(ap) else []
     cand = [x for x in audit if x["verdict"] == "не белый" and x["in_stock"] and x.get("src")
             and str(x["id"]) not in done and str(x["id"]) not in taken and str(x["id"]) not in hidden]
     cand.sort(key=lambda x: sum(x.get("sides") or [1, 1, 1, 1]))      # меньше белого по краям — хуже

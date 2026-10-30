@@ -13,12 +13,16 @@ POST /re-edit {id, url, deg} — рабочая копия главного фо
 POST /cut-bg {id, from} — кнопка «Удалить фон»: в очередь на вырезку моделью (cut_bg.py в .venv, по одному фото)
 → out/<id>.own.webp; GET /cut-status — состояние очереди.
 POST /crop — кадрирование оригинала или варианта рамкой со страницы, результат туда же (вариант «own»).
+GET /search?q=<название, артикул или ID> — поиск RU-товаров на сайте (WooCommerce REST, доступ из .env, как upload_batch.py);
+POST /add {id} — добавить найденный товар в партию: его главное фото с сайта в src/ и out/<id>.full.webp
+(без фото — карточка «нет фото»), запись в pick.json и report.json ("added" — время, такие карточки идут первыми).
 
 С телефона: `python review_server.py <партия> <порт> --key <секрет>` и туннель `cloudflared tunnel --url http://localhost:<порт>`.
 Запрос не с localhost (Host — адрес туннеля) пускается только с ?key=<секрет> (ставит cookie на 30 дней) или с этой cookie;
 открыть Chrome на компьютере (/open-chrome) с телефона нельзя. Без --key страница, как раньше, только для этого компьютера.
 """
 import hmac
+import html
 import io
 import json
 import os
@@ -27,11 +31,12 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.error
 import urllib.request
 from collections import deque
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 
 import numpy as np
 from PIL import Image, ImageOps
@@ -42,6 +47,21 @@ KEY = sys.argv[sys.argv.index("--key") + 1] if "--key" in sys.argv else ""
 SIZE, PAD = 1000, 0.05
 MAX_UPLOAD = 30 * 1024 * 1024
 VARIANTS = ("cut", "full", "ai", "web", "own")
+FIELDS = "_fields=id,name,sku,permalink,images,categories,stock_status,status"
+BATCH_LOCK = threading.Lock()        # pick.json / report.json пишет /add — по одному
+
+
+def wc(path):
+    """GET к WooCommerce REST сайта с паролем приложения из .env (тот же доступ, что у upload_batch.py)."""
+    from upload_batch import call      # читает .env при импорте — только когда нужен поиск
+    return call("GET", path)
+
+
+def short(p, in_batch):
+    imgs = p.get("images") or []
+    return {"id": p["id"], "name": html.unescape(p["name"]), "sku": p.get("sku", ""),
+            "cat": html.unescape((p.get("categories") or [{}])[0].get("name", "")), "thumb": imgs[0]["src"] if imgs else "",
+            "instock": p.get("stock_status") == "instock", "in_batch": str(p["id"]) in in_batch}
 
 
 def to_square(im):
@@ -186,6 +206,8 @@ class Handler(SimpleHTTPRequestHandler):
         if urlparse(self.path).path == "/cut-status":
             with CUT_CV:
                 return self.reply(200, cut_status())
+        if urlparse(self.path).path == "/search":
+            return self.search()
         # страница пересобирается при каждом открытии: загруженные фото, галерея и кадры видны после F5
         if urlparse(self.path).path in ("/", "/index.html"):
             subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "compare_page.py"), ROOT],
@@ -199,6 +221,73 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def search(self):
+        """?q= — до 20 опубликованных RU-товаров по названию; число — ещё и точное совпадение артикула или ID."""
+        q = (parse_qs(urlparse(self.path).query).get("q") or [""])[0].strip()
+        if len(q) < 2:
+            return self.reply(400, {"error": "введите хотя бы 2 буквы или цифры"})
+        try:
+            found = []
+            if q.isdigit():
+                found += wc(f"/wp-json/wc/v3/products?sku={q}&lang=ru&{FIELDS}")
+                try:
+                    found.append(wc(f"/wp-json/wc/v3/products/{q}?{FIELDS}"))
+                except urllib.error.HTTPError:
+                    pass                    # такого ID нет
+            found += wc(f"/wp-json/wc/v3/products?search={quote(q)}&status=publish&lang=ru&per_page=20&{FIELDS}")
+        except Exception as e:  # noqa: BLE001
+            return self.reply(502, {"error": f"сайт не ответил: {e}"})
+        in_batch = set(json.load(open(os.path.join(ROOT, "out", "report.json"), encoding="utf-8")))
+        seen, out = set(), []
+        for p in found:
+            if p["id"] not in seen and p.get("status", "publish") == "publish":
+                seen.add(p["id"])
+                out.append(short(p, in_batch))
+        self.reply(200, out)
+
+    def add(self):
+        """{id} — найденный товар в партию: главное фото с сайта → src/<id>.<ext> и белый квадрат out/<id>.full.webp."""
+        try:
+            pid = str(json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)))["id"])
+            assert re.fullmatch(r"\d{1,10}", pid)
+        except Exception:  # noqa: BLE001
+            return self.reply(400, {"error": "нужен ID товара"})
+        rpath, ppath = os.path.join(ROOT, "out", "report.json"), os.path.join(ROOT, "pick.json")
+        if pid in json.load(open(rpath, encoding="utf-8")):
+            return self.reply(200, {"ok": True, "already": True})
+        try:
+            p = wc(f"/wp-json/wc/v3/products/{pid}")
+        except Exception as e:  # noqa: BLE001
+            return self.reply(502, {"error": f"не нашёл товар на сайте: {e}"})
+        cats = ", ".join(html.unescape(c["name"]) for c in p.get("categories", []))
+        entry = {"id": p["id"], "sku": p.get("sku", ""), "name": p["name"], "url": p.get("permalink", ""),
+                 "in_stock": p.get("stock_status") == "instock", "cat": cats, "img_id": 0, "src": "", "thumb": ""}
+        rep = {"src": "", "choice": "none", "flags": ["нет фото"], "has_cut": False, "no_photo": True}
+        if p.get("images"):
+            img = p["images"][0]
+            try:
+                raw = urllib.request.urlopen(urllib.request.Request(img["src"], headers={"User-Agent": "Mozilla/5.0"}), timeout=30).read()
+                im = Image.open(io.BytesIO(raw))
+                im.load()
+            except Exception as e:  # noqa: BLE001
+                return self.reply(502, {"error": f"не скачалось фото с сайта: {e}"})
+            ext = (im.format or "jpg").lower().replace("jpeg", "jpg")
+            with open(os.path.join(ROOT, "src", f"{pid}.{ext}"), "wb") as f:
+                f.write(raw)
+            to_square(im).save(os.path.join(ROOT, "out", f"{pid}.full.webp"), quality=88, method=6)
+            entry.update(img_id=img["id"], src=img["src"], thumb=img["src"])
+            rep = {"src": f"{pid}.{ext}", "choice": "full", "flags": [], "has_cut": False}
+        else:
+            entry.update(verdict="нет фото", no_photo=True)
+        rep["added"] = int(time.time())
+        with BATCH_LOCK:
+            report, pick = json.load(open(rpath, encoding="utf-8")), json.load(open(ppath, encoding="utf-8"))
+            report[pid] = rep
+            pick = [x for x in pick if str(x["id"]) != pid] + [entry]
+            json.dump(pick, open(ppath, "w", encoding="utf-8"), ensure_ascii=False)
+            json.dump(report, open(rpath, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        self.reply(200, {"ok": True, "name": html.unescape(p["name"])})
 
     def fetch(self):
         """{id, url} — картинка по ссылке (перетащена из Google или вставлена) → как своё фото."""
@@ -397,6 +486,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self.open_chrome()
         if self.path == "/cut-bg":
             return self.cut_bg()
+        if self.path == "/add":
+            return self.add()
         if self.path != "/save":
             self.send_error(404)
             return
