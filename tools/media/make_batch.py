@@ -1,6 +1,6 @@
 """Быстрая партия плохих фото — без вырезки фона моделью: отобрать, скачать, показать на странице проверки.
 
-Запуск: `python make_batch.py <имя партии> [сколько=100]` — СНАЧАЛА товары в наличии вообще без фото (список прямо
+Запуск: `python make_batch.py <имя партии> [сколько=30]` — СНАЧАЛА товары в наличии вообще без фото (список прямо
 с сайта по SSH; на витрине они скрыты mu-plugin'ом casa24-hide-no-photo.php, пока фото не появится) — у них нет src/ и full,
 только карточка с пометкой «нет фото»; затем из audit.json товары в наличии с небелым фоном,
 которые ещё не залиты ни из одной партии (journal.jsonl в tools/media/*/), сначала самые «небелые»;
@@ -66,7 +66,7 @@ def to_square(im):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     name = sys.argv[1]
-    count = int(sys.argv[2]) if len(sys.argv) > 2 else 100
+    count = int(sys.argv[2]) if len(sys.argv) > 2 else 30
     d = os.path.join(HERE, name)
     for sub in ("src", "out"):
         os.makedirs(os.path.join(d, sub), exist_ok=True)

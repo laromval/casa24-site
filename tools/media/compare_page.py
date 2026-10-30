@@ -81,7 +81,7 @@ def gallery_html(pid, done=False):
           '<label class="gto" title="ссылка, перетаскивание и Ctrl+V пойдут в галерею, а не в новое фото">'
           '<input type="checkbox"> ссылку / перетаскивание — в галерею</label>')
     return (f'<div class="gal"><span class="gl">{"Новые доп. фото:" if done else "Галерея (доп. фото):"}</span><span class="gis">{imgs}</span>'
-            f'<label class="up gup">+ добавить в галерею<input type="file" accept="image/*" multiple hidden></label>{to}</div>')
+            f'<label class="up gup">+ <span class="lg">добавить в галерею</span><span class="sm">доп. фото</span><input type="file" accept="image/*" multiple hidden></label>{to}</div>')
 
 
 cards = []
@@ -102,8 +102,8 @@ for pid in order:
     # у товара без фото искать можно только по названию — в Google Картинках
     gurl = f"https://www.google.com/search?tbm=isch&q={q}" if nophoto else f"https://lens.google.com/uploadbyurl?url={lens}&q={q}"
     gtitle = "поиск картинок по названию товара" if nophoto else "поиск по нашему фото и названию товара сразу"
-    find = (f'<span class="find"><a class="gbtn" href="{gurl}" target="_blank" title="{gtitle}">Найти в Google</a>'
-            f'<button type="button" class="fbtn" title="я сам поищу и покажу найденное отдельной страницей">Поручить Claude</button>'
+    find = (f'<span class="find"><a class="gbtn" href="{gurl}" target="_blank" title="{gtitle}"><span class="lg">Найти в </span>Google</a>'
+            f'<button type="button" class="fbtn" title="я сам поищу и покажу найденное отдельной страницей"><span class="lg">Поручить </span>Claude</button>'
             f'{SHOT}</span>')
     url = (f'<div class="url"><input type="url" placeholder="Ссылка на фото — или перетащите картинку из Google прямо на карточку">'
             f'<button type="button" class="ubtn">Взять</button></div>')
@@ -124,7 +124,7 @@ for pid in order:
 <div class="row">{tools}</div>
 {url}
 {gallery}
-<textarea class="note" rows="2" placeholder="Почему не утверждено? (например: обрезана ручка, лучше кадр целиком, нужен другой ракурс)"></textarea>
+<textarea class="note" rows="1" placeholder="Почему не утверждено? (например: обрезана ручка, лучше кадр целиком, нужен другой ракурс)"></textarea>
 <div class="meta">{alt_img}<a href="{html.escape(p.get("url", ""))}" target="_blank">{html.escape(p.get("name", pid))}</a>
 <div class="cat">{html.escape((p.get("cat") or "").split(", ")[0])} · ID {pid} · вариант <b class="ch">{main}</b></div>{fl}</div>
 <label class="ok"><input type="checkbox"> Утвердить — заливать на сайт</label></div>''')
@@ -174,7 +174,7 @@ page = f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name
 <title>Редактор фото — Casa24</title><style>
 body{{font:14px system-ui,sans-serif;margin:16px;background:#eceff1;color:#222}}
 h1{{font-size:20px}} .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}}
-.help{{margin:0 0 12px}} .help summary{{display:inline-block;padding:6px 14px;border:1px solid #b0bec5;border-radius:6px;background:#fff;font-weight:600;cursor:pointer;list-style:none}} .help summary::-webkit-details-marker{{display:none}} .help[open] summary{{background:#263238;color:#fff}}
+.top{{display:flex;align-items:center;gap:12px;margin:0 0 10px}} .top b{{font-size:16px}} .helpb{{padding:6px 14px;border:1px solid #b0bec5;border-radius:6px;background:#fff;font-weight:600}} .helpb.act{{background:#263238;color:#fff}}
 .card{{background:#fff;border-radius:8px;padding:8px;border:3px solid transparent}}
 .card.on{{border-color:#2e7d32;background:#f1f8e9}}
 .pair{{display:grid;grid-template-columns:1fr 1fr;gap:6px}} .pair.one{{grid-template-columns:1fr}} .pair.one img{{max-height:260px}}
@@ -215,10 +215,17 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 #cam .cx,#cam .cre,#cam .cok{{font-size:17px;padding:12px 18px;border-radius:8px;border:0}} #cam .cx{{background:rgba(255,255,255,.25);color:#fff}}
 #cam .cre{{background:#fff;color:#222}} #cam .cok{{background:#2e7d32;color:#fff;font-weight:600}} #cam [hidden]{{display:none}}
 .shb:hover{{border-color:#f28c28;color:#e65100}} .shb.busy{{opacity:.5;pointer-events:none}}
-@media (max-width:700px){{body{{margin:8px}} h1{{font-size:17px}} .grid{{grid-template-columns:1fr}} .card>p,body>p{{font-size:13px}}
-  .tools button,.up,.gbtn,.fbtn,.url button{{font-size:14px!important;padding:8px 12px!important}} .shb{{padding:8px 14px!important;background:#e65100;color:#fff;border-color:#e65100}}
-  .shb svg{{width:26px;height:26px}} .rot button{{padding:6px 14px;font-size:20px}} .url input{{font-size:14px;padding:8px}}
-  .bar{{gap:6px;padding:8px}} .bar button{{padding:8px 10px}} .ok{{padding:12px}}}}
+.sm{{display:none}}
+@media (max-width:700px){{body{{margin:6px}} .grid{{grid-template-columns:1fr;gap:8px}} .help p{{font-size:13px}}
+  html{{scroll-snap-type:y proximity}} .top{{scroll-snap-align:start}} .card{{scroll-snap-align:start;scroll-margin-top:4px;display:flex;flex-direction:column;padding:6px}}
+  .card .meta{{order:-1;margin-bottom:4px}} .card .meta a{{font-weight:600;font-size:15px}} .card .cat{{font-size:11px}} .fl{{margin-top:2px}}
+  .lg,.gto,.gal .gl,figcaption{{display:none}} .sm{{display:inline}} .pair img{{max-height:34vh}}
+  .row{{margin-top:6px}} .tools{{flex-wrap:nowrap;gap:5px;width:100%}} .tools .find{{gap:5px}}
+  .tools button,.tools .gbtn,.tools .fbtn{{font-size:14px!important;padding:8px 10px!important;white-space:nowrap}}
+  .tools .shb{{padding:6px 12px!important;background:#e65100;color:#fff;border-color:#e65100}} .shb svg{{width:24px;height:24px}}
+  .tools .rot button{{padding:6px 9px!important;font-size:17px!important}} .url{{margin-top:5px}} .url input{{font-size:14px;padding:7px}} .url button{{padding:7px 10px}}
+  .gal{{margin-top:5px}} .gal .up{{font-size:13px;padding:6px 10px}} .note{{margin:5px 0 0;font-size:13px;padding:6px}} .ok{{margin:6px 0 0;padding:9px}}
+  .bar{{gap:8px;padding:8px;margin-top:8px;font-size:14px}} .bar .all{{display:none}} .bar .save{{padding:9px 14px;margin-left:auto}} #msg{{flex-basis:100%;font-size:12px}} #msg:empty{{display:none}}}}
 .card.nophoto .cutb,.card.nophoto[data-choice="none"] .cropb{{display:none}}
 .card.search{{border-color:#1565c0;background:#e3f2fd}} .card.search .fbtn{{background:#1565c0;color:#fff;border:0;border-radius:4px}} .card.on:not(.dcard) .find{{display:none}}
 .rmode{{font-size:12px;margin:4px 2px 0;color:#555}} .rmode[hidden]{{display:none}} .rmode select{{font:inherit;font-size:12px}}
@@ -238,12 +245,13 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 .bar{{position:sticky;bottom:0;background:#263238;color:#fff;padding:10px;margin-top:16px;border-radius:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}}
 button{{font:inherit;padding:6px 12px;cursor:pointer}} .save{{background:#f28c28;color:#fff;border:0;border-radius:4px;font-weight:600}}
 </style></head><body>
-<h1>Редактор фото — {len(order)} товаров{f" (уже на сайте: {len(uploaded)})" if uploaded else ""}</h1>
-<details class="help"><summary>Инструкция</summary>
+<div class="top"><button type="button" class="helpb" onclick="this.classList.toggle('act');help.hidden=!help.hidden">Инструкция</button>
+<b>Загружено {len(order)} {"товар" if len(order) % 10 == 1 and len(order) % 100 != 11 else "товара" if 2 <= len(order) % 10 <= 4 and not 12 <= len(order) % 100 <= 14 else "товаров"}</b></div>
+<div id="help" class="help" hidden>
 <p>Слева — как на сайте сейчас, справа — новое фото. <b>Галочка «Утвердить»</b> — это фото будет залито на сайт.
 <b>«Найти в Google»</b> — откроет поиск Google по нашему фото и названию товара сразу: кликните нужную картинку, чтобы она открылась крупно, и <b>перетащите её мышью на карточку</b> (или в Google правой кнопкой «Копировать картинку», вернитесь сюда, кликните карточку и нажмите <b>Ctrl+V</b>; или вставьте адрес картинки в поле «Ссылка на фото» → «Взять»). Она станет новым фото на белом квадрате. «Поручить Claude» — поищу сам и покажу отдельной страницей. <b>Фотоаппарат</b> — сфотографировать товар: на телефоне сразу откроется камера, снимок станет новым фото (следующие — доп. фото). Товары <b>без фото</b> идут первыми: на сайте они сейчас скрыты и появятся сами, как только фото будет залито. Без галочки у товара останется старое фото — напишите в поле под галочкой, что не так, чтобы это учесть в доработке. <b>cut</b> — товар вырезан, <b>full</b> — кадр целиком на белом;
 клик по фото — открыть в оригинальном размере (повторный клик — закрыть); ★ на миниатюре доп. фото — сделать его главным; клик по маленькой картинке справа — выбрать её вместо основной; ⟲ ⟳ — повернуть новое фото.
-<b>«Кадрировать»</b> — потянуть углы рамки к углам товара: фото выровняется, как в Photoshop. <b>«Загрузить фото»</b> — загрузить файл, найденный самостоятельно: он станет новым фото (вариант <b>own</b>), поставлю его на белый квадрат. <b>«Удалить фон»</b> — вырезать товар и поставить на белый (около минуты), только там, где вы решите. «Скачать» — сохранить новое фото или оригинал к себе. Когда закончите — «Сохранить решения» и пришлите файл (или скажите, что сохранили).</p></details>
+<b>«Кадрировать»</b> — потянуть углы рамки к углам товара: фото выровняется, как в Photoshop. <b>«Загрузить фото»</b> — загрузить файл, найденный самостоятельно: он станет новым фото (вариант <b>own</b>), поставлю его на белый квадрат. <b>«Удалить фон»</b> — вырезать товар и поставить на белый (около минуты), только там, где вы решите. «Скачать» — сохранить новое фото или оригинал к себе. Когда закончите — «Сохранить решения» и пришлите файл (или скажите, что сохранили).</p></div>
 <div class="grid">{"".join(cards)}</div>
 {f'''<h2>Уже на сайте — добавить фото ({len(done_cards)})</h2>
 <p>Фото в интерьере, в другом ракурсе, детали. Добавьте их в карточку (файлы, ссылка, перетаскивание из Google или Ctrl+V — всё идёт в доп. фото),
@@ -258,8 +266,8 @@ button{{font:inherit;padding:6px 12px;cursor:pointer}} .save{{background:#f28c28
 <div id="cscroll"><div class="cwrap"><img id="cimg" alt=""><svg id="cquad"><polygon></polygon>{'<g class="hd"><circle r="13"></circle><path class="xo" d="M-12 0H12M0-12V12"></path><path class="xi" d="M-12 0H12M0-12V12"></path></g>' * 4}</svg></div></div>
 <div class="cbot"><button type="button" id="capply" class="save">Готово</button><button type="button" id="ccancel">Отмена</button> <span style="color:#777">Потяните углы рамки к углам товара (как Perspective Crop в Photoshop). «Готово» — фото выровняется в ровный прямоугольник и встанет на белый квадрат.</span><button type="button" id="creset">Сбросить рамку</button></div>
 </div></div>
-<div class="bar">Утверждено: <b id="n">0</b> из {len(order)}
-<button onclick="setAll(true)">Утвердить все</button><button onclick="setAll(false)">Снять все</button>
+<div class="bar"><span>Утверждено: <b id="n">0</b> из {len(order)}</span>
+<button class="all" onclick="setAll(true)">Утвердить все</button><button class="all" onclick="setAll(false)">Снять все</button>
 <button class="save" onclick="save()">Сохранить решения</button> <span id="msg"></span></div>
 <script>
 const KEY='casa24-photo-review-{batch}';
