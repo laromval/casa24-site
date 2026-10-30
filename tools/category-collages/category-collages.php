@@ -7,7 +7,8 @@
  *   wp eval-file category-collages.php apply      — собрать коллажи и поставить картинками разделов
  *   wp eval-file category-collages.php rollback   — вернуть прежние картинки
  *   wp eval-file category-collages.php report 813 — все кандидаты раздела с оценкой фото
- *   wp eval-file category-collages.php apply 813 961 — пересобрать только эти разделы
+ *   wp eval-file category-collages.php apply 813 961 — пересобрать только эти разделы (можно и группы
+ *     второго уровня: коллаж — по одному фото из разных подкатегорий)
  *
  * Разделы — верхнего уровня (RU). Товары: опубликованы, видимы в каталоге, в
  * наличии, с фото не меньше 300px. Продаж на сайте нет (счётчики 0), поэтому
@@ -232,17 +233,14 @@ function casa24_collage_pick( $groups, $overrides = array() ) {
 		}
 	}
 
-	// Фото с телефона на сером/цветном фоне (белого по краю < 55%) — только
-	// если без них не набирается хотя бы 2 фото.
-	$clean = array();
+	// Фото с телефона на сером/цветном фоне (белого по краю < 55%) — внутри
+	// подраздела только если в нём нет фото на белом. Подраздел целиком не
+	// выкидываем: коллаж должен показывать разные подразделы (30.10.2026).
 	foreach ( $groups as $gid => $items ) {
 		$ok = array_values( array_filter( $items, function ( $i ) { return $i['white'] >= 0.55; } ) );
 		if ( $ok ) {
-			$clean[ $gid ] = $ok;
+			$groups[ $gid ] = $ok;
 		}
-	}
-	if ( array_sum( array_map( 'count', $clean ) ) + count( $picked ) >= 2 ) {
-		$groups = $clean;
 	}
 
 	uasort(
@@ -424,13 +422,18 @@ function casa24_collage_assign( $term_id, $attachment_id ) {
 
 do_action( 'wpml_switch_language', 'ru' );
 
-$tops = get_terms(
-	array(
-		'taxonomy'   => 'product_cat',
-		'parent'     => 0,
-		'hide_empty' => true,
-		'exclude'    => array( (int) get_option( 'default_product_cat', 0 ) ),
-	)
+// ID в аргументах — любые разделы (и группы второго уровня с подкатегориями),
+// без ID — все разделы верхнего уровня.
+$casa24_ids = array_map( 'intval', array_slice( $args, 1 ) );
+$tops       = get_terms(
+	$casa24_ids && 'rollback' !== $casa24_mode
+		? array( 'taxonomy' => 'product_cat', 'include' => $casa24_ids, 'hide_empty' => false )
+		: array(
+			'taxonomy'   => 'product_cat',
+			'parent'     => 0,
+			'hide_empty' => true,
+			'exclude'    => array( (int) get_option( 'default_product_cat', 0 ) ),
+		)
 );
 
 if ( 'rollback' === $casa24_mode ) {
@@ -468,8 +471,13 @@ foreach ( $tops as $top ) {
 	$opt    = isset( $overrides[ $top->term_id ] ) ? $overrides[ $top->term_id ] : array();
 	$min_px = isset( $opt['min'] ) ? $opt['min'] : 300;
 	$groups = casa24_collage_candidates( $top, ! empty( $opt['any_stock'] ), $min_px );
-	if ( array_sum( array_map( 'count', $groups ) ) < 2 ) {
-		$groups = casa24_collage_candidates( $top, true, min( $min_px, 250 ) );
+	// Подкатегории без подходящих товаров в наличии — добрать из остальных её
+	// товаров (в т. ч. не в наличии, фото от 140px — у многих групп 1С фото мелкие),
+	// чтобы коллаж показывал все подкатегории, а не одну.
+	foreach ( casa24_collage_candidates( $top, true, 140 ) as $gid => $items ) {
+		if ( empty( $groups[ $gid ] ) ) {
+			$groups[ $gid ] = $items;
+		}
 	}
 
 	if ( 'report' === $casa24_mode ) {

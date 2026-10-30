@@ -388,6 +388,10 @@ body.ip-site :is(.onsale, .woocommerce-badge, .gz-badge, .product-badge){
   font-weight: 700;
   text-transform: uppercase;
 }
+/* «Хиты продаж» добираются новыми товарами, пока продаж мало — «Новинка» под заголовком «Хиты» нелогична (30.10.2026). */
+.casa24-folders__hits .woocommerce-badge.new{
+  display: none;
+}
 
 /* Пагинация. */
 body.ip-site .woocommerce-pagination :is(a, span).page-numbers{

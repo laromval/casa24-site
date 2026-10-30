@@ -9,6 +9,16 @@
 		<custom-field action="copy">glozin_product_attribute_number</custom-field>
 	</custom-fields>
 
+	<!-- Производитель и размеры из названий товаров (mu-plugin casa24-catalog-attrs.php):
+	     значения одинаковы для RU и RO (0,5 L, 25 kg, Total), поэтому не переводятся. -->
+	<taxonomies>
+		<taxonomy translate="0">pa_proizvoditel</taxonomy>
+		<taxonomy translate="0">pa_obem</taxonomy>
+		<taxonomy translate="0">pa_ves</taxonomy>
+		<taxonomy translate="0">pa_moshchnost</taxonomy>
+		<taxonomy translate="0">pa_razmer</taxonomy>
+	</taxonomies>
+
 	<admin-texts>
 		<key name="theme_mods_glozin">
 			<key name="logo_text" />
