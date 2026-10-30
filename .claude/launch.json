@@ -4,8 +4,67 @@
     {
       "name": "preview-static",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4173", "--directory", ".preview-temp"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4173",
+        "--directory",
+        ".preview-temp"
+      ],
       "port": 4173
+    },
+    {
+      "name": "preview-static-alt",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4176",
+        "--directory",
+        ".preview-temp"
+      ],
+      "port": 4176,
+      "autoPort": false
+    },
+    {
+      "name": "media-edited",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "tools/media/review_server.py",
+        "tools/media/edited",
+        "4174"
+      ],
+      "port": 4174
+    },
+    {
+      "name": "media-batch-1",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "tools/media/review_server.py",
+        "tools/media/batch-1",
+        "4175"
+      ],
+      "port": 4175
+    },
+    {
+      "name": "media-batch-2",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "tools/media/review_server.py",
+        "tools/media/batch-2",
+        "4177"
+      ],
+      "port": 4177
+    },
+    {
+      "name": "media-batch-3",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "tools/media/review_server.py",
+        "tools/media/batch-3",
+        "4178"
+      ],
+      "port": 4178
     }
   ]
 }

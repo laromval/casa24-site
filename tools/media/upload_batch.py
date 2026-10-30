@@ -1,7 +1,7 @@
 """Заливка утверждённых фото партии на casa24.md (WP REST + WooCommerce REST, доступ из .env).
 
 Запуск: `python upload_batch.py <папка партии> [--only ID ...]` — берёт <партия>/decisions.json
-(action "cut" | "full" — заливать вариант out/<id>.<action>.webp, "keep" — пропустить), загружает фото
+(action "cut" | "full" | "ai" | "web" | "own" — заливать вариант out/<id>.<action>.webp, gallery — доп. фото после главного, повёрнутый на rotate°; "keep" и "search" — пропустить), загружает фото
 в медиатеку (alt = название товара), ставит главным фото у RU-товара и его RO-перевода (WPML)
 и метку casa24_photo_lock = 1 — обмен с 1С больше не меняет фото этих товаров
 (wp-content/mu-plugins/casa24-photo-lock.php). Галерея сохраняется.
@@ -12,10 +12,13 @@
   залитых товаров (только если фото больше не стоит ни у одного товара партии). Удаление
   безвозвратное; оригиналы остаются локально в <партия>/src/.
 Откат: `python upload_batch.py <папка партии> --rollback [--only ID ...]` — вернуть прежние фото
-и снять метку (до --purge-old).
+и снять метку (до --purge-old); у дозаливок галереи (action "gallery") — убрать добавленные доп. фото;
+у замены главного (action "replace", рабочая копия out/<id>.re.webp; mode "swap" — прежнее главное
+вторым в доп. фото, "drop" — убрать с сайта) — вернуть прежнее.
 """
 import base64
 import html
+import io
 import json
 import os
 import re
@@ -23,6 +26,8 @@ import sys
 import time
 import urllib.error
 import urllib.request
+
+from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TR = dict(zip("абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
@@ -72,9 +77,9 @@ def images_of(pid):
     return [i["id"] for i in call("GET", f"/wp-json/wc/v3/products/{pid}")["images"]]
 
 
-def set_main(pid, media_id, lock, old):
-    """Поставить media_id главным фото (галерею old[1:] сохранить) и метку замка."""
-    new = [media_id] + [i for i in old[1:] if i != media_id]
+def set_main(pid, media_id, lock, old, gallery=()):
+    """Поставить media_id главным фото, за ним новые фото галереи, затем прежняя галерея old[1:]; метка замка."""
+    new = [media_id] + list(gallery) + [i for i in old[1:] if i != media_id and i not in gallery]
     call("PUT", f"/wp-json/wc/v3/products/{pid}", {
         "images": [{"id": i} for i in new],
         "meta_data": [{"key": LOCK, "value": "1" if lock else ""}],
@@ -96,6 +101,13 @@ def rollback(jpath, only):
         if e.get("rolled_back") or e.get("purged") or (only and e["id"] not in only):
             continue
         for pid, old in e["old"].items():
+            if e.get("kind") == "replace":          # вернуть прежнее главное фото, замок оставить
+                call("PUT", f"/wp-json/wc/v3/products/{pid}", {"images": [{"id": i} for i in old]})
+                continue
+            if e.get("kind") == "gallery_add":      # убрать только добавленные доп. фото, замок оставить
+                cur = images_of(pid)
+                call("PUT", f"/wp-json/wc/v3/products/{pid}", {"images": [{"id": i} for i in cur if i not in e["gallery"]]})
+                continue
             call("PUT", f"/wp-json/wc/v3/products/{pid}", {
                 "images": [{"id": i} for i in old], "meta_data": [{"key": LOCK, "value": ""}]})
         e["rolled_back"] = True
@@ -105,10 +117,16 @@ def rollback(jpath, only):
 
 def purge_old(jpath):
     journal = read_journal(jpath)
-    live = [e for e in journal if not e.get("rolled_back")]
-    in_use = {e["media_id"] for e in live}
+    live = [e for e in journal if not e.get("rolled_back") and e.get("kind") != "gallery_add"]
+    latest = {}
+    for e in live:                       # по порядку: последняя заливка/замена — текущее главное фото
+        latest[e["id"]] = e["media_id"]
+    in_use = set(latest.values())
     for e in live:
         if e.get("purged"):
+            continue
+        if e.get("mode") == "swap":          # прежнее главное оставлено в доп. фото — не удалять
+            e["purged"] = True
             continue
         olds = {o[0] for o in e["old"].values() if o}
         for mid in olds - in_use:
@@ -136,28 +154,111 @@ def main():
     journal = read_journal(jpath)
     decisions = json.load(open(os.path.join(d, "decisions.json"), encoding="utf-8"))
     pick = {str(x["id"]): x for x in json.load(open(os.path.join(d, "pick.json"), encoding="utf-8"))}
-    done = {e["id"] for e in journal if not e.get("rolled_back")}
-    todo = [(k, v["action"]) for k, v in decisions.items()
-            if v["action"] != "keep" and k not in done and (not only or k in only)]
+    done = {e["id"] for e in journal if not e.get("rolled_back") and e.get("kind") != "gallery_add"}
+    todo = [(k, v["action"], v.get("rotate", 0)) for k, v in decisions.items()
+            if v["action"] not in ("keep", "search", "gallery", "replace") and k not in done and (not only or k in only)]
     print(f"к заливке: {len(todo)}")
-    for n, (pid, variant) in enumerate(todo, 1):
+    for n, (pid, variant, rotate) in enumerate(todo, 1):
         p = call("GET", f"/wp-json/wc/v3/products/{pid}")
         name = html.unescape(pick[pid]["name"])
         ids = {pid} | {str(v) for v in (p.get("translations") or {}).values()}
         fname = f"{slug(name)}-{pid}.webp"
-        data = open(os.path.join(d, "out", f"{pid}.{variant}.webp"), "rb").read()
+        src = os.path.join(d, "out", f"{pid}.{variant}.webp")
+        if rotate:
+            # rotate на странице — по часовой стрелке, PIL поворачивает против
+            buf = io.BytesIO()
+            Image.open(src).rotate(-rotate, expand=True, fillcolor="white").save(buf, "WEBP", quality=88, method=6)
+            data = buf.getvalue()
+        else:
+            data = open(src, "rb").read()
         media = call("POST", "/wp-json/wp/v2/media", data, {
             "Content-Type": "image/webp", "Content-Disposition": f'attachment; filename="{fname}"'})
         call("POST", f"/wp-json/wp/v2/media/{media['id']}", {"alt_text": name})
+        gallery, gfiles = upload_gallery(d, pid, name, decisions[pid].get("gallery", []), set(), 2)
         # прежние фото — у всех версий до замены: WPML копирует новое фото RU в RO сразу при сохранении
         old = {t: images_of(t) for t in sorted(ids)}
         for t in sorted(ids):
-            set_main(t, media["id"], True, old[t])
-        e = {"id": pid, "variant": variant, "media_id": media["id"], "url": media["source_url"], "old": old,
+            set_main(t, media["id"], True, old[t], gallery)
+        e = {"id": pid, "variant": variant, "rotate": rotate, "media_id": media["id"], "gallery": gallery, "gallery_files": gfiles,
+             "url": media["source_url"], "old": old,
              "at": time.strftime("%Y-%m-%d %H:%M:%S")}
         with open(jpath, "a", encoding="utf-8") as f:
             f.write(json.dumps(e, ensure_ascii=False) + "\n")
-        print(f"{n}/{len(todo)} {pid} → {media['id']} {fname}  товары: {', '.join(sorted(ids))}", flush=True)
+        print(f"{n}/{len(todo)} {pid} → {media['id']} {fname}" + (f" + галерея {gallery}" if gallery else "")
+              + f"  товары: {', '.join(sorted(ids))}", flush=True)
+
+    replace_main(d, jpath, decisions, pick, only)
+    add_gallery(d, jpath, decisions, pick, only)
+
+
+def replace_main(d, jpath, decisions, pick, only):
+    """action "replace": у уже залитого товара заменить главное фото рабочей копией out/<id>.re.webp (RU + RO).
+    Доп. фото остаются; после заливки рабочая копия переименовывается в re-<время>.webp."""
+    for pid, v in decisions.items():
+        src = os.path.join(d, "out", f"{pid}.re.webp")
+        if v["action"] != "replace" or not os.path.exists(src) or (only and pid not in only):
+            continue
+        p = call("GET", f"/wp-json/wc/v3/products/{pid}")
+        name = html.unescape(pick[pid]["name"])
+        ids = {pid} | {str(x) for x in (p.get("translations") or {}).values()}
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        media = call("POST", "/wp-json/wp/v2/media", open(src, "rb").read(), {
+            "Content-Type": "image/webp", "Content-Disposition": f'attachment; filename="{slug(name)}-{pid}-{stamp}.webp"'})
+        call("POST", f"/wp-json/wp/v2/media/{media['id']}", {"alt_text": name})
+        old = {t: images_of(t) for t in sorted(ids)}
+        mode = v.get("mode", "drop")          # прежнее главное: "swap" — вторым в доп. фото, "drop" — убрать с сайта
+        for t in sorted(ids):
+            set_main(t, media["id"], True, old[t], old[t][:1] if mode == "swap" else ())
+        e = {"id": pid, "kind": "replace", "mode": mode, "variant": "re", "media_id": media["id"], "url": media["source_url"],
+             "old": old, "at": time.strftime("%Y-%m-%d %H:%M:%S")}
+        with open(jpath, "a", encoding="utf-8") as f:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+        os.replace(src, os.path.join(d, "out", f"{pid}.re-{stamp}.webp"))
+        print(f"{pid}: главное фото заменено → {media['id']}"
+              + (" (прежнее — в доп. фото)" if mode == "swap" else " (прежнее убрано)") + f"  товары: {', '.join(sorted(ids))}", flush=True)
+
+
+def upload_gallery(d, pid, name, files, skip, start):
+    """Залить файлы out/<gN>.webp в медиатеку. Вернуть (id вложений, имена файлов)."""
+    ids, names = [], []
+    for k, g in enumerate([f for f in files if f not in skip], start):
+        gpath = os.path.join(d, "out", g)
+        if not os.path.exists(gpath):
+            continue
+        gm = call("POST", "/wp-json/wp/v2/media", open(gpath, "rb").read(), {
+            "Content-Type": "image/webp", "Content-Disposition": f'attachment; filename="{slug(name)}-{pid}-{k}.webp"'})
+        call("POST", f"/wp-json/wp/v2/media/{gm['id']}", {"alt_text": f"{name} — фото {k}"})
+        ids.append(gm["id"])
+        names.append(g)
+    return ids, names
+
+
+def add_gallery(d, jpath, decisions, pick, only):
+    """action "gallery": к уже залитому товару добавить новые доп. фото в конец галереи (RU + RO), главное не трогать."""
+    journal = read_journal(jpath)
+    live = [e for e in journal if not e.get("rolled_back")]
+    sent = {g for e in live for g in e.get("gallery_files", [])}
+    todo = [k for k, v in decisions.items() if v["action"] in ("gallery", "replace") and (not only or k in only)
+            and [g for g in v.get("gallery", []) if g not in sent]]
+    if not todo:
+        return
+    print(f"дозалить доп. фото: {len(todo)} товар.")
+    for pid in todo:
+        p = call("GET", f"/wp-json/wc/v3/products/{pid}")
+        name = html.unescape(pick[pid]["name"])
+        ids = {pid} | {str(v) for v in (p.get("translations") or {}).values()}
+        old = {t: images_of(t) for t in sorted(ids)}
+        gallery, gfiles = upload_gallery(d, pid, name, decisions[pid]["gallery"], sent, len(old[pid]) + 1)
+        for t in sorted(ids):
+            cur = old[t]
+            call("PUT", f"/wp-json/wc/v3/products/{t}", {
+                "images": [{"id": i} for i in cur + [g for g in gallery if g not in cur]],
+                "meta_data": [{"key": LOCK, "value": "1"}]})
+        e = {"id": pid, "kind": "gallery_add", "gallery": gallery, "gallery_files": gfiles, "old": old,
+             "at": time.strftime("%Y-%m-%d %H:%M:%S")}
+        with open(jpath, "a", encoding="utf-8") as f:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+        print(f"{pid}: + доп. фото {gallery}  товары: {', '.join(sorted(ids))}", flush=True)
 
 
 if __name__ == "__main__":

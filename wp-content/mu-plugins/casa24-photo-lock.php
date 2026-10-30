@@ -13,6 +13,7 @@
  *   wp casa24 photo-lock list               — товары с меткой
  *   wp casa24 photo-lock lock --ids=1,2     — поставить метку
  *   wp casa24 photo-lock unlock --ids=1,2   — снять (фото снова будет приходить из 1С)
+ *   wp casa24 photo-lock sync-gallery --ids=1,2 — доп. фото RU-товара скопировать в переводы (RO)
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,6 +75,59 @@ add_filter( 'update_post_metadata', 'casa24_photo_lock_guard', 10, 3 );
 add_filter( 'add_post_metadata', 'casa24_photo_lock_guard', 10, 3 );
 add_filter( 'delete_post_metadata', 'casa24_photo_lock_guard', 10, 3 );
 
+/**
+ * Галерея RU-товара → в его переводы (RO).
+ *
+ * WooCommerce Multilingual подставляет переводу галерею оригинала через фильтр get_post_metadata,
+ * поэтому update_post_meta у перевода видит «то же значение» и ничего не пишет, а витрина читает
+ * пустую настоящую запись — доп. фото у RO не видны. Пишем запись перевода напрямую: delete + add
+ * (add_post_meta с unique проверяет базу без фильтров).
+ *
+ * @param int $product_id ID RU-товара.
+ * @return array ID переводов, которым записана галерея.
+ */
+function casa24_sync_gallery_to_translations( $product_id ) {
+	global $wpdb;
+	$value = (string) $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_product_image_gallery'", $product_id ) );
+	$done  = array();
+	$trid  = apply_filters( 'wpml_element_trid', null, $product_id, 'post_product' );
+	foreach ( (array) apply_filters( 'wpml_get_element_translations', null, $trid, 'post_product' ) as $lang => $t ) {
+		$tid = (int) $t->element_id;
+		if ( $tid === (int) $product_id ) {
+			continue;
+		}
+		$raw = (string) $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_product_image_gallery'", $tid ) );
+		if ( $raw === $value ) {
+			continue;
+		}
+		delete_post_meta( $tid, '_product_image_gallery' );
+		if ( '' !== $value ) {
+			add_post_meta( $tid, '_product_image_gallery', $value, true );
+		}
+		clean_post_cache( $tid );
+		if ( function_exists( 'wc_delete_product_transients' ) ) {
+			wc_delete_product_transients( $tid );
+		}
+		do_action( 'litespeed_purge_post', $tid );
+		$done[] = $tid;
+	}
+	return $done;
+}
+
+/**
+ * После обновления товара через REST (скрипт заливки фото) — галерея в переводы.
+ *
+ * @param WC_Product $product Товар.
+ */
+function casa24_sync_gallery_after_rest( $product ) {
+	$id   = $product->get_id();
+	$lang = apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $id, 'element_type' => 'product' ) );
+	if ( 'ru' === $lang ) {
+		casa24_sync_gallery_to_translations( $id );
+	}
+}
+add_action( 'woocommerce_rest_insert_product_object', 'casa24_sync_gallery_after_rest', 20 );
+
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	/**
 	 * Метка «фото отредактировано на сайте» — обмен с 1С не меняет фото.
@@ -111,6 +165,23 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		public function lock( $args, $assoc_args ) {
 			foreach ( wp_parse_id_list( $assoc_args['ids'] ) as $id ) {
 				update_post_meta( $id, CASA24_PHOTO_LOCK_META, '1' );
+			}
+			WP_CLI::success( 'Готово.' );
+		}
+
+		/**
+		 * Скопировать галерею (доп. фото) RU-товаров в их переводы.
+		 *
+		 * ## OPTIONS
+		 *
+		 * --ids=<ids>
+		 * : ID RU-товаров через запятую.
+		 *
+		 * @subcommand sync-gallery
+		 */
+		public function sync_gallery( $args, $assoc_args ) {
+			foreach ( wp_parse_id_list( $assoc_args['ids'] ) as $id ) {
+				WP_CLI::log( $id . ' → ' . implode( ',', casa24_sync_gallery_to_translations( $id ) ) );
 			}
 			WP_CLI::success( 'Готово.' );
 		}

@@ -44,3 +44,6 @@ tools/media/*.xlsx
 tools/media/thumbs/
 tools/media/.venv/
 tools/media/pilot/
+tools/media/found-*/
+tools/media/edited/
+tools/media/batch-*/

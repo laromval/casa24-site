@@ -55,3 +55,4 @@
 - Техническая справка о сайте (стек, страницы, подрядчик): `docs/site-reference.md`
 - Git/деплой процесс: `docs/workflow-git.md`
 - Безопасность и доступы: `docs/security-notes.md`
+- Фото товаров с телефона, компьютер в магазине (настройка и работа): `docs/setup-shop-pc-photo-phone.md`
