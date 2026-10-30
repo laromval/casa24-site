@@ -113,6 +113,7 @@ for pid in order:
              f'<div class="mlist" hidden><button type="button" class="dl" data-what="old">Скачать оригинал</button>'
              f'<button type="button" class="dl" data-what="new">Скачать новое</button>'
              f'<label class="up">Загрузить фото<input type="file" accept="image/*" hidden></label>{CAMN}'
+             f'<button type="button" class="mo m-crop">Кадрировать</button><button type="button" class="mo m-cut">Удалить фон</button>'
              f'<button type="button" class="gonb">Скрыть навсегда</button></div></div>'
              f'<button type="button" class="cropb">Кадрировать</button>'
              f'<button type="button" class="cutb" title="вырезать товар и поставить на белый; можно нажать на нескольких — пойдут по очереди">Удалить фон</button>{find}'
@@ -127,7 +128,7 @@ for pid in order:
 <div class="row">{tools}</div>
 {url}
 {gallery}
-<textarea class="note" rows="1" placeholder="Почему не утверждено? (например: обрезана ручка, лучше кадр целиком, нужен другой ракурс)"></textarea>
+<textarea class="note" rows="1" enterkeyhint="done" placeholder="Почему не утверждено? (например: обрезана ручка, лучше кадр целиком, нужен другой ракурс)"></textarea>
 <div class="meta">{alt_img}<a href="{html.escape(p.get("url", ""))}" target="_blank">{html.escape(p.get("name", pid))}</a>
 <div class="cat">{html.escape((p.get("cat") or "").split(", ")[0])} · ID {pid} · вариант <b class="ch">{main}</b></div>{fl}</div>
 <label class="ok"><input type="checkbox"> Утвердить — заливать на сайт</label></div>''')
@@ -222,14 +223,14 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 @media (max-width:700px){{body{{margin:6px}} .grid{{grid-template-columns:1fr;gap:8px}} .help p{{font-size:13px}}
   html{{scroll-snap-type:y proximity}} .top{{scroll-snap-align:start}} .card{{scroll-snap-align:start;scroll-margin-top:4px;display:flex;flex-direction:column;padding:6px}}
   .card .meta{{order:-1;margin-bottom:4px}} .card .meta a{{font-weight:600;font-size:15px}} .card .cat{{font-size:11px}} .fl{{margin-top:2px}}
-  .lg,.gto,.gal .gl,figcaption{{display:none}} .sm{{display:inline}} .pair img{{max-height:34vh}}
+  .lg,.gto,.gal .gl,figcaption,.tools .cropb,.tools .cutb{{display:none}} .card .mlist .mo{{display:block}} body{{overflow-x:hidden}} .card{{min-width:0}} .sm{{display:inline}} .pair img{{max-height:34vh}}
   .row{{margin-top:6px}} .tools{{flex-wrap:nowrap;gap:5px;width:100%}} .tools .find{{gap:5px}}
   .tools button,.tools .gbtn,.tools .fbtn{{font-size:14px!important;padding:8px 10px!important;white-space:nowrap}}
   .tools .shb{{padding:6px 12px!important;background:#e65100;color:#fff;border-color:#e65100}} .shb svg{{width:24px;height:24px}}
   .tools .rot button{{padding:6px 9px!important;font-size:17px!important}} .url{{margin-top:5px}} .url input{{font-size:14px;padding:7px}} .url button{{padding:7px 10px}}
   .gal{{margin-top:5px}} .gal .up{{font-size:13px;padding:6px 10px}} .note{{margin:5px 0 0;font-size:13px;padding:6px}} .ok{{margin:6px 0 0;padding:9px}}
   .bar{{gap:8px;padding:8px;margin-top:8px;font-size:14px}} .bar .all{{display:none}} .bar .save{{padding:9px 14px;margin-left:auto}} #msg{{flex-basis:100%;font-size:12px}} #msg:empty{{display:none}}}}
-.card.nophoto .cutb,.card.nophoto[data-choice="none"] .cropb{{display:none}}
+.card[data-choice="none"] .cutb,.card[data-choice="none"] .cropb,.card[data-choice="none"] .mo{{display:none!important}} .mlist .mo{{display:none}}
 .card.gone{{border-color:#9e9e9e;background:#e0e0e0}} .card.gone .pair,.card.gone .url,.card.gone .gal,.card.gone .note,.card.gone .ok{{opacity:.35}}
 .card.gone::before{{content:"Будет скрыт навсегда — «⋯» → «Не скрывать», чтобы отменить";display:block;font-weight:600;color:#c62828;font-size:13px;margin-bottom:4px}}
 .mlist .gonb{{color:#c62828}}
@@ -405,7 +406,7 @@ cards.forEach(c=>{{
     document.querySelector('.ctop').querySelectorAll('button').forEach(b=>b.hidden=np&&b.dataset.f==='src');cropFrom(np?'new':'src');cropm.hidden=false;}});
   const ui=c.querySelector('.url input');
   c.querySelector('.ubtn').addEventListener('click',()=>{{if(ui.value.trim())takeUrl(c,ui.value.trim());}});
-  ui.addEventListener('keydown',e=>{{if(e.key==='Enter'&&ui.value.trim())takeUrl(c,ui.value.trim());}});
+  ui.addEventListener('keydown',e=>{{if(e.key==='Enter'){{ui.blur();if(ui.value.trim())takeUrl(c,ui.value.trim());}}}});
   c.addEventListener('dragover',e=>{{e.preventDefault();c.classList.add('drop');}});
   c.addEventListener('dragleave',e=>{{if(!c.contains(e.relatedTarget))c.classList.remove('drop');}});
   c.addEventListener('drop',e=>{{e.preventDefault();c.classList.remove('drop');const dt=e.dataTransfer;
@@ -462,6 +463,11 @@ cam.querySelector('.cok').addEventListener('click',()=>{{const c=camCard,b=camBl
 document.addEventListener('click',e=>{{const b=e.target.closest('.shb');if(b)camOpen(b.closest('.card'));}});
 document.addEventListener('keydown',e=>{{if(e.key==='Escape'&&!cam.hidden)camClose();}});
 // родная камера телефона (меню «⋯»): снимок как есть, тем же порядком — главное, потом доп. фото
+document.addEventListener('click',e=>{{const m=e.target.closest('.m-crop,.m-cut');if(!m)return;
+  m.closest('.card').querySelector(m.classList.contains('m-crop')?'.cropb':'.cutb').click();}});
+// клавиатура телефона: Enter в записке и касание мимо поля её закрывают
+document.addEventListener('keydown',e=>{{if(e.key==='Enter'&&!e.shiftKey&&e.target.matches('.note')){{e.preventDefault();e.target.blur();}}}});
+document.addEventListener('pointerdown',e=>{{const a=document.activeElement;if(a&&a.matches('input,textarea')&&!e.target.closest('input,textarea,button,label'))a.blur();}});
 document.addEventListener('change',async e=>{{const fi=e.target.closest('.camn input');if(!fi||!fi.files.length)return;
   const c=fi.closest('.card'),lb=c.querySelector('.shb');lb.classList.add('busy');
   for(const f of fi.files)await putFile(c,f,c.classList.contains('dcard')||c.dataset.choice==='own');
