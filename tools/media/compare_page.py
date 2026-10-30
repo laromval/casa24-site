@@ -235,6 +235,8 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 .card.gone{{border-color:#9e9e9e;background:#e0e0e0}} .card.gone .pair,.card.gone .url,.card.gone .gal,.card.gone .note,.card.gone .ok{{opacity:.35}}
 .card.gone::before{{content:"Будет скрыт навсегда — «⋯» → «Не скрывать», чтобы отменить";display:block;font-weight:600;color:#c62828;font-size:13px;margin-bottom:4px}}
 .mlist .gonb{{color:#c62828}}
+.pair figure{{position:relative}} .card.cutting .pair figure:last-child::after{{content:attr(data-cut);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;background:rgba(38,50,56,.65);color:#fff;font-weight:600;font-size:14px;animation:cutp 1.4s ease-in-out infinite}}
+@keyframes cutp{{50%{{background:rgba(38,50,56,.45)}}}}
 .card.search{{border-color:#1565c0;background:#e3f2fd}} .card.search .fbtn{{background:#1565c0;color:#fff;border:0;border-radius:4px}} .card.on:not(.dcard) .find{{display:none}}
 .rmode{{font-size:12px;margin:4px 2px 0;color:#555}} .rmode[hidden]{{display:none}} .rmode select{{font:inherit;font-size:12px}}
 .smenu{{position:absolute;left:0;top:100%;z-index:6;background:#fff;border:1px solid #cfd8dc;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.2);padding:4px;width:260px}}
@@ -431,8 +433,9 @@ cards.forEach(c=>{{
 // очередь «Удалить фон»: сервер режет по одному фото, страница раз в 2 с спрашивает состояние, готовое ставит новым фото
 const cutWait=new Set();let cutTimer=0;
 function cutShow(st){{cards.forEach(c=>{{const id=c.dataset.id,b=c.querySelector('.cutb'),s=st[id];
-    if(s&&(s.state==='queued'||s.state==='working')){{cutWait.add(id);b.disabled=true;b.textContent=s.state==='working'?'Удаляю фон…':'В очереди: '+s.pos;return;}}
-    if(!cutWait.has(id))return;cutWait.delete(id);b.disabled=false;b.textContent='Удалить фон';
+    if(s&&(s.state==='queued'||s.state==='working')){{cutWait.add(id);b.disabled=true;b.textContent=s.state==='working'?'Удаляю фон…':'В очереди: '+s.pos;
+      c.classList.add('cutting');c.querySelector('.pair figure:last-child').dataset.cut=s.state==='working'?'Удаляю фон… около минуты':'В очереди на удаление фона: '+s.pos;return;}}
+    if(!cutWait.has(id))return;cutWait.delete(id);b.disabled=false;b.textContent='Удалить фон';c.classList.remove('cutting');
     if(s&&s.state==='done')ownDone(c,s,'фон удалён');else msg.textContent='ID '+id+': '+((s&&s.error)||'не удалось удалить фон');}});
   clearTimeout(cutTimer);if(cutWait.size)cutTimer=setTimeout(cutPoll,2000);}}
 function cutPoll(){{fetch('/cut-status').then(x=>x.json()).then(cutShow).catch(()=>{{cutTimer=setTimeout(cutPoll,5000);}});}}
