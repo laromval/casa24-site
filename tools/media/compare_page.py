@@ -195,7 +195,8 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 #cropm{{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:10}} #cropm[hidden]{{display:none}}
 .cbox{{background:#fff;padding:12px;border-radius:8px;max-width:96vw}} .ctop,.cbot{{display:flex;flex-wrap:wrap;gap:8px;align-items:center}}
 .ctop button.act{{background:#263238;color:#fff}} .cwrap{{position:relative;display:inline-block;user-select:none;margin:8px 0;touch-action:none}}
-#cimg{{max-width:90vw;max-height:70vh;display:block;-webkit-user-drag:none}} #cquad{{position:absolute;inset:0;width:100%;height:100%;overflow:visible}} #cquad polygon{{fill:rgba(242,140,40,.12);stroke:#f28c28;stroke-width:2;stroke-dasharray:6 4}} #cquad .hd{{cursor:crosshair;touch-action:none}} #cquad .hd circle{{fill:transparent}} #cquad .xo{{stroke:#fff;stroke-width:5}} #cquad .xi{{stroke:#f28c28;stroke-width:2}} #cquad .hd:hover .xi{{stroke:#d32f2f}}
+#cimg{{max-width:90vw;max-height:70vh;display:block;-webkit-user-drag:none;-webkit-touch-callout:none;user-select:none;pointer-events:none}}
+.cwrap{{-webkit-touch-callout:none;cursor:crosshair}} #cquad .hd.on .xi{{stroke:#d32f2f;stroke-width:3}} #cquad .hd.on circle{{fill:rgba(211,47,47,.18)}} #cquad{{position:absolute;inset:0;width:100%;height:100%;overflow:visible}} #cquad polygon{{fill:rgba(242,140,40,.12);stroke:#f28c28;stroke-width:2;stroke-dasharray:6 4}} #cquad .hd{{cursor:crosshair;touch-action:none}} #cquad .hd circle{{fill:transparent}} #cquad .xo{{stroke:#fff;stroke-width:5}} #cquad .xi{{stroke:#f28c28;stroke-width:2}} #cquad .hd:hover .xi{{stroke:#d32f2f}}
 #cscroll{{max-width:calc(90vw + 28px);max-height:calc(70vh + 28px);overflow:auto;padding:14px;box-sizing:border-box}} #cscroll .cwrap{{margin:0}}
 .up:hover,.tools button:hover{{border-color:#f28c28}} .up.busy{{opacity:.5;pointer-events:none}}
 .find{{display:flex;gap:10px;align-items:center;margin:8px 0 0;font-size:12px}} .fbtn{{padding:3px 8px;font-size:12px}}
@@ -274,7 +275,7 @@ button{{font:inherit;padding:6px 12px;cursor:pointer}} .save{{background:#f28c28
 <div id="cropm" hidden><div class="cbox">
 <div class="ctop"><b>Кадрирование</b> <button type="button" data-f="src">Оригинал</button><button type="button" data-f="new">Новое фото</button> <span id="cinfo"></span></div>
 <div id="cscroll"><div class="cwrap"><img id="cimg" alt=""><svg id="cquad"><polygon></polygon>{'<g class="hd"><circle r="13"></circle><path class="xo" d="M-12 0H12M0-12V12"></path><path class="xi" d="M-12 0H12M0-12V12"></path></g>' * 4}</svg></div></div>
-<div class="cbot"><button type="button" id="capply" class="save">Готово</button><button type="button" id="ccancel">Отмена</button> <span style="color:#777">Потяните углы рамки к углам товара (как Perspective Crop в Photoshop). «Готово» — фото выровняется в ровный прямоугольник и встанет на белый квадрат.</span><button type="button" id="creset">Сбросить рамку</button></div>
+<div class="cbot"><button type="button" id="capply" class="save">Готово</button><button type="button" id="ccancel">Отмена</button> <span style="color:#777">Ведите пальцем (мышью): у угла — двигается угол, у стороны рамки — сторона сдвигается целиком; подведите углы к углам товара (как Perspective Crop в Photoshop). «Готово» — фото выровняется в ровный прямоугольник и встанет на белый квадрат.</span><button type="button" id="creset">Сбросить рамку</button></div>
 </div></div>
 <div class="bar"><span>Утверждено: <b id="n">0</b> из {len(order)}</span>
 <button class="all" onclick="setAll(true)">Утвердить все</button><button class="all" onclick="setAll(false)">Снять все</button>
@@ -311,10 +312,27 @@ cimg.addEventListener('load',()=>cropDraw());
 function cropFrom(f){{crop.from=f;crop.pts=[[0,0],[1,0],[1,1],[0,1]];crop.z=1;setZoom();
   cimg.src=f==='src'?crop.c.querySelector('.pair img').src:crop.c.querySelector('.main').src;
   document.querySelectorAll('.ctop button').forEach(b=>b.classList.toggle('act',b.dataset.f===f));cinfo.textContent='';}}
-handles.forEach((h,i)=>h.addEventListener('pointerdown',e=>{{e.preventDefault();crop.drag=i;h.setPointerCapture(e.pointerId);h.style.cursor='grabbing';}}));
-handles.forEach(h=>h.addEventListener('pointermove',e=>{{if(crop.drag<0)return;const r=cimg.getBoundingClientRect();
-  crop.pts[crop.drag]=[Math.min(Math.max((e.clientX-r.left)/r.width,0),1),Math.min(Math.max((e.clientY-r.top)/r.height,0),1)];cropDraw();}}));
-handles.forEach(h=>h.addEventListener('pointerup',()=>{{crop.drag=-1;h.style.cursor='';}}));
+// касание в любом месте фото: двигается ближайший угол рамки — на столько же, на сколько палец (угол не прячется под пальцем,
+// целиться в крестик не нужно); долгое нажатие не вызывает меню браузера «Сохранить / Открыть изображение»
+// касание у угла — двигается угол; касание у стороны рамки — вся сторона сдвигается параллельно (оба её угла)
+const cdrag={{x:0,y:0,idx:[],p:[]}},clamp=v=>Math.min(Math.max(v,0),1),CORNER_PX=36;
+function segDist(px,py,ax,ay,bx,by){{const dx=bx-ax,dy=by-ay,L=dx*dx+dy*dy,t=L?Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/L)):0;
+  return Math.hypot(px-ax-t*dx,py-ay-t*dy);}}
+cwrap.addEventListener('pointerdown',e=>{{if(!crop.pts||e.button>0)return;e.preventDefault();
+  const r=cimg.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,P=crop.pts.map(([x,y])=>[x*r.width,y*r.height]);
+  let ci=0,cd=Infinity;P.forEach(([x,y],i)=>{{const d=Math.hypot(x-px,y-py);if(d<cd){{cd=d;ci=i;}}}});
+  let ei=0,ed=Infinity;P.forEach((a,i)=>{{const b=P[(i+1)%4],d=segDist(px,py,a[0],a[1],b[0],b[1]);if(d<ed){{ed=d;ei=i;}}}});
+  cdrag.idx=(cd<=CORNER_PX||cd<=ed)?[ci]:[ei,(ei+1)%4];
+  crop.drag=1;cdrag.x=e.clientX;cdrag.y=e.clientY;cdrag.p=cdrag.idx.map(i=>crop.pts[i].slice());
+  try{{cwrap.setPointerCapture(e.pointerId);}}catch(_){{}}
+  handles.forEach((h,i)=>h.classList.toggle('on',cdrag.idx.includes(i)));}});
+cwrap.addEventListener('pointermove',e=>{{if(crop.drag<0)return;const r=cimg.getBoundingClientRect();let mx=e.clientX-cdrag.x,my=e.clientY-cdrag.y;
+  if(cdrag.idx.length===2){{   // сторона: только поперёк себя — остаётся параллельной
+    const [a,b]=cdrag.p,ex=(b[0]-a[0])*r.width,ey=(b[1]-a[1])*r.height,L=Math.hypot(ex,ey)||1,nx=-ey/L,ny=ex/L,k=mx*nx+my*ny;mx=k*nx;my=k*ny;}}
+  const dx=mx/r.width,dy=my/r.height;
+  cdrag.idx.forEach((i,k)=>{{crop.pts[i]=[clamp(cdrag.p[k][0]+dx),clamp(cdrag.p[k][1]+dy)];}});cropDraw();}});
+['pointerup','pointercancel'].forEach(t=>cwrap.addEventListener(t,()=>{{crop.drag=-1;handles.forEach(h=>h.classList.remove('on'));}}));
+cropm.addEventListener('contextmenu',e=>e.preventDefault());
 window.addEventListener('resize',()=>{{if(!cropm.hidden&&crop.pts)cropDraw();}});
 document.querySelectorAll('.ctop button').forEach(b=>b.addEventListener('click',()=>cropFrom(b.dataset.f)));
 creset.addEventListener('click',cropReset);
