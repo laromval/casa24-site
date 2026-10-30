@@ -11,6 +11,10 @@
  * WPML подставляет его из оригинала только при чтении через PHP.
  *
  * Товары «в наличии, но без фото» идут первыми в партии на поиск фото — tools/media/make_batch.py.
+ *
+ * «Скрыть навсегда» (кнопка редактора фото, tools/media/hide_forever.py): метка casa24_hidden = 1
+ * у RU-товара и переводов — товар скрыт так же, но и с фото, и в партии редактора больше не попадает.
+ * Вернуть: wp post meta delete <ID> casa24_hidden (у RU и RO), кэш сбросится сам.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,7 +53,7 @@ add_action(
 );
 
 /**
- * ID товаров без фото (RU и все их переводы) — одним запросом, в кэше на 10 минут; подзапрос
+ * ID товаров без фото или скрытых навсегда (RU и все их переводы) — одним запросом, в кэше на 10 минут; подзапрос
  * на каждую строку WP_Query замедлял главную на ~3,5 с. Смена главного фото сбрасывает кэш сразу.
  */
 function casa24_no_photo_ids() {
@@ -65,8 +69,9 @@ function casa24_no_photo_ids() {
 					JOIN {$wpdb->prefix}icl_translations t ON t.trid = ru.trid AND t.element_type = 'post_product'
 					JOIN {$wpdb->posts} p ON p.ID = ru.element_id AND p.post_type = 'product'
 					LEFT JOIN {$wpdb->postmeta} m ON m.post_id = ru.element_id AND m.meta_key = '_thumbnail_id'
+					LEFT JOIN {$wpdb->postmeta} h ON h.post_id = ru.element_id AND h.meta_key = 'casa24_hidden'
 					WHERE ru.element_type = 'post_product' AND ru.language_code = 'ru'
-					  AND ( m.meta_value IS NULL OR m.meta_value IN ( '', '0' ) )"
+					  AND ( m.meta_value IS NULL OR m.meta_value IN ( '', '0' ) OR h.meta_value = '1' )"
 				)
 			)
 		);
@@ -79,7 +84,7 @@ foreach ( array( 'added_post_meta', 'updated_post_meta', 'deleted_post_meta' ) a
 	add_action(
 		$casa24_hook,
 		function ( $mid, $post_id, $key ) {
-			if ( '_thumbnail_id' === $key ) {
+			if ( '_thumbnail_id' === $key || 'casa24_hidden' === $key ) {
 				delete_transient( 'casa24_no_photo_ids' );
 			}
 		},
@@ -106,6 +111,16 @@ add_filter(
 add_filter(
 	'woocommerce_related_products',
 	function ( $ids ) {
-		return casa24_hide_no_photo_context() ? array_values( array_filter( $ids, 'get_post_thumbnail_id' ) ) : $ids;
+		if ( ! casa24_hide_no_photo_context() ) {
+			return $ids;
+		}
+		return array_values(
+			array_filter(
+				$ids,
+				function ( $id ) {
+					return get_post_thumbnail_id( $id ) && '1' !== get_post_meta( $id, 'casa24_hidden', true );
+				}
+			)
+		);
 	}
 );

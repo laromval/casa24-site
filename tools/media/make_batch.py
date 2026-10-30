@@ -2,7 +2,7 @@
 
 Запуск: `python make_batch.py <имя партии> [сколько=30]` — СНАЧАЛА товары в наличии вообще без фото (список прямо
 с сайта по SSH; на витрине они скрыты mu-plugin'ом casa24-hide-no-photo.php, пока фото не появится) — у них нет src/ и full,
-только карточка с пометкой «нет фото»; затем из audit.json товары в наличии с небелым фоном,
+только карточка с пометкой «нет фото»; товары «Скрыть навсегда» (метка casa24_hidden на сайте) не берутся вовсе; затем из audit.json товары в наличии с небелым фоном,
 которые ещё не залиты ни из одной партии (journal.jsonl в tools/media/*/), сначала самые «небелые»;
 пишет <партия>/pick.json, src/<id>.<ext> (оригинал с сайта), out/<id>.full.webp (оригинал на белом квадрате)
 и out/report.json (вариант «full»). Замену фото пользователь ищет сам («Найти в Google», «Загрузить фото»).
@@ -29,8 +29,11 @@ $ids = $wpdb->get_col("SELECT p.ID FROM {$wpdb->posts} p
   JOIN {$wpdb->prefix}icl_translations t ON t.element_id = p.ID AND t.element_type = 'post_product' AND t.language_code = 'ru'
   JOIN {$wpdb->postmeta} s ON s.post_id = p.ID AND s.meta_key = '_stock_status' AND s.meta_value = 'instock'
   LEFT JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = '_thumbnail_id'
+  LEFT JOIN {$wpdb->postmeta} h ON h.post_id = p.ID AND h.meta_key = 'casa24_hidden'
   WHERE p.post_type = 'product' AND p.post_status = 'publish' AND (m.meta_value IS NULL OR m.meta_value IN ('', '0'))
+    AND h.meta_id IS NULL
   ORDER BY p.ID");
+$hidden = $wpdb->get_col("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'casa24_hidden' AND meta_value = '1'");
 $out = array();
 foreach ($ids as $id) {
   $cats = wp_get_post_terms($id, 'product_cat', array('fields' => 'names'));
@@ -38,16 +41,18 @@ foreach ($ids as $id) {
     'url' => get_permalink($id), 'in_stock' => true, 'cat' => implode(', ', is_array($cats) ? $cats : array()),
     'img_id' => 0, 'src' => '', 'thumb' => '', 'verdict' => 'нет фото', 'no_photo' => true);
 }
-echo wp_json_encode($out);
+echo wp_json_encode(array('no_photo' => $out, 'hidden' => array_map('intval', $hidden)));
 '''
 
 
 def no_photo_products():
+    """(товары в наличии без фото, ID «скрыто навсегда» — их в партии не брать)."""
     r = subprocess.run(SSH + ["cd ~/public_html && wp eval-file -"], input=NO_PHOTO_PHP, capture_output=True,
                        text=True, encoding="utf-8", timeout=300)
     if r.returncode:
         sys.exit("не получил список товаров без фото: " + r.stderr[:300])
-    return json.loads(r.stdout)
+    d = json.loads(r.stdout)
+    return d["no_photo"], {str(i) for i in d["hidden"]}
 
 
 def to_square(im):
@@ -80,7 +85,8 @@ def main():
             taken |= {str(x["id"]) for x in json.load(open(pj, encoding="utf-8"))}
 
     pick, report = [], {}
-    for x in no_photo_products():       # в первую очередь — в наличии, но без фото
+    no_photo, hidden = no_photo_products()
+    for x in no_photo:       # в первую очередь — в наличии, но без фото
         if len(pick) >= count:
             break
         pid = str(x["id"])
@@ -92,7 +98,7 @@ def main():
 
     audit = json.load(open(os.path.join(HERE, "audit.json"), encoding="utf-8"))
     cand = [x for x in audit if x["verdict"] == "не белый" and x["in_stock"] and x.get("src")
-            and str(x["id"]) not in done and str(x["id"]) not in taken]
+            and str(x["id"]) not in done and str(x["id"]) not in taken and str(x["id"]) not in hidden]
     cand.sort(key=lambda x: sum(x.get("sides") or [1, 1, 1, 1]))      # меньше белого по краям — хуже
     for x in cand:
         if len(pick) >= count:

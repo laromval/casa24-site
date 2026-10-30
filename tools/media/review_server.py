@@ -404,7 +404,7 @@ class Handler(SimpleHTTPRequestHandler):
         try:
             data = json.loads(body)
             assert isinstance(data, dict) and all(
-                isinstance(v, dict) and v.get("action") in VARIANTS + ("search", "keep", "gallery", "replace") and isinstance(v.get("comment", ""), str)
+                isinstance(v, dict) and v.get("action") in VARIANTS + ("search", "hide", "keep", "gallery", "replace") and isinstance(v.get("comment", ""), str)
                 and v.get("rotate", 0) in (0, 90, 180, 270)
                 and all(re.fullmatch(r"\d{1,10}\.g\d+\.webp", g) for g in v.get("gallery", []))
                 for v in data.values())

@@ -25,6 +25,8 @@
 и сама включается, если браузер не даёт камеру странице.
 Страница работает и с телефона через туннель (review_server.py с ключом, см. docs/setup-shop-pc-photo-phone.md):
 там «Найти в Google» открывается соседней вкладкой телефона, а не в Chrome на компьютере.
+«⋯» → «Скрыть навсегда» — товар не нужен на сайте: action "hide", hide_forever.py ставит метку casa24_hidden,
+товар скрыт с витрины и больше не попадает в партии (повторное нажатие — «Не скрывать»).
 Товары, уже залитые по journal.jsonl любой партии, на странице не показываются.
 Отметки держатся в localStorage браузера, чтобы не потерять их при перезагрузке страницы.
 """
@@ -110,7 +112,8 @@ for pid in order:
     tools = (f'<div class="tools"><div class="menu"><button type="button" class="mbtn" title="скачать / загрузить фото">⋯</button>'
              f'<div class="mlist" hidden><button type="button" class="dl" data-what="old">Скачать оригинал</button>'
              f'<button type="button" class="dl" data-what="new">Скачать новое</button>'
-             f'<label class="up">Загрузить фото<input type="file" accept="image/*" hidden></label>{CAMN}</div></div>'
+             f'<label class="up">Загрузить фото<input type="file" accept="image/*" hidden></label>{CAMN}'
+             f'<button type="button" class="gonb">Скрыть навсегда</button></div></div>'
              f'<button type="button" class="cropb">Кадрировать</button>'
              f'<button type="button" class="cutb" title="вырезать товар и поставить на белый; можно нажать на нескольких — пойдут по очереди">Удалить фон</button>{find}'
              f'<div class="rot"><button type="button" data-r="-90" title="повернуть против часовой">⟲</button><button type="button" data-r="90" title="повернуть по часовой">⟳</button></div></div>')
@@ -227,6 +230,9 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
   .gal{{margin-top:5px}} .gal .up{{font-size:13px;padding:6px 10px}} .note{{margin:5px 0 0;font-size:13px;padding:6px}} .ok{{margin:6px 0 0;padding:9px}}
   .bar{{gap:8px;padding:8px;margin-top:8px;font-size:14px}} .bar .all{{display:none}} .bar .save{{padding:9px 14px;margin-left:auto}} #msg{{flex-basis:100%;font-size:12px}} #msg:empty{{display:none}}}}
 .card.nophoto .cutb,.card.nophoto[data-choice="none"] .cropb{{display:none}}
+.card.gone{{border-color:#9e9e9e;background:#e0e0e0}} .card.gone .pair,.card.gone .url,.card.gone .gal,.card.gone .note,.card.gone .ok{{opacity:.35}}
+.card.gone::before{{content:"Будет скрыт навсегда — «⋯» → «Не скрывать», чтобы отменить";display:block;font-weight:600;color:#c62828;font-size:13px;margin-bottom:4px}}
+.mlist .gonb{{color:#c62828}}
 .card.search{{border-color:#1565c0;background:#e3f2fd}} .card.search .fbtn{{background:#1565c0;color:#fff;border:0;border-radius:4px}} .card.on:not(.dcard) .find{{display:none}}
 .rmode{{font-size:12px;margin:4px 2px 0;color:#555}} .rmode[hidden]{{display:none}} .rmode select{{font:inherit;font-size:12px}}
 .smenu{{position:absolute;left:0;top:100%;z-index:6;background:#fff;border:1px solid #cfd8dc;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.2);padding:4px;width:260px}}
@@ -374,15 +380,17 @@ document.addEventListener('keydown',e=>{{if(e.key!=='Escape')return;if(!zoom.hid
 function download(url,name){{const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}}
 function setRot(c,r){{c.dataset.rot=((r%360)+360)%360;c.querySelector('.main').style.transform='rotate('+c.dataset.rot+'deg)';}}
 function count(){{n.textContent=cards.filter(c=>c.classList.contains('on')).length;}}
-function rec(c){{if(c.classList.contains('dcard'))return;st[c.dataset.id]={{on:c.classList.contains('on'),choice:c.dataset.choice,note:c.querySelector('.note').value,rot:+(c.dataset.rot||0),search:c.classList.contains('search')}};persist();count();}}
+function rec(c){{if(c.classList.contains('dcard'))return;st[c.dataset.id]={{on:c.classList.contains('on'),choice:c.dataset.choice,note:c.querySelector('.note').value,rot:+(c.dataset.rot||0),search:c.classList.contains('search'),gone:c.classList.contains('gone')}};persist();count();}}
 cards.forEach(c=>{{
   const cb=c.querySelector('.ok input'),alt=c.querySelector('.alt'),note=c.querySelector('.note'),s=st[c.dataset.id];
-  if(s){{if(s.choice!==c.dataset.choice)swap(c);cb.checked=s.on;c.classList.toggle('on',s.on);note.value=s.note||'';setRot(c,s.rot||0);c.classList.toggle('search',!!s.search&&!s.on);}}
+  if(s){{if(s.choice!==c.dataset.choice)swap(c);cb.checked=s.on;c.classList.toggle('on',s.on);note.value=s.note||'';setRot(c,s.rot||0);c.classList.toggle('search',!!s.search&&!s.on);goneSet(c,!!s.gone&&!s.on);}}
   c.querySelector('.fbtn').addEventListener('click',()=>{{const v=!c.classList.contains('search');c.classList.toggle('search',v);
-    if(v){{cb.checked=false;c.classList.remove('on');}}rec(c);}});
+    if(v){{cb.checked=false;c.classList.remove('on');goneSet(c,false);}}rec(c);}});
+  c.querySelector('.gonb').addEventListener('click',()=>{{const v=!c.classList.contains('gone');goneSet(c,v);
+    if(v){{cb.checked=false;c.classList.remove('on','search');msg.textContent='ID '+c.dataset.id+' будет скрыт навсегда после «Сохранить решения»';}}rec(c);}});
   c.querySelectorAll('.rot button').forEach(b=>b.addEventListener('click',()=>{{setRot(c,+(c.dataset.rot||0)+(+b.dataset.r));rec(c);}}));
   cb.addEventListener('change',()=>{{if(cb.checked&&c.dataset.choice==='none'){{cb.checked=false;msg.textContent='ID '+c.dataset.id+': сначала добавьте фото — утверждать пока нечего';return;}}
-    c.classList.toggle('on',cb.checked);if(cb.checked)c.classList.remove('search');rec(c);}});
+    c.classList.toggle('on',cb.checked);if(cb.checked){{c.classList.remove('search');goneSet(c,false);}}rec(c);}});
   note.addEventListener('input',()=>rec(c));
   c.querySelectorAll('.dl').forEach(b=>b.addEventListener('click',()=>{{const id=c.dataset.id;
     if(b.dataset.what==='new')download(c.querySelector('.main').src.split('?')[0],id+'-'+c.dataset.choice+'.webp');
@@ -458,7 +466,8 @@ document.addEventListener('change',async e=>{{const fi=e.target.closest('.camn i
   const c=fi.closest('.card'),lb=c.querySelector('.shb');lb.classList.add('busy');
   for(const f of fi.files)await putFile(c,f,c.classList.contains('dcard')||c.dataset.choice==='own');
   lb.classList.remove('busy');fi.value='';c.scrollIntoView({{block:'nearest'}});}});
-function setAll(v){{cards.forEach(c=>{{if(v&&c.dataset.choice==='none')return;c.querySelector('.ok input').checked=v;c.classList.toggle('on',v);rec(c);}});}}
+function goneSet(c,v){{c.classList.toggle('gone',v);c.querySelector('.gonb').textContent=v?'Не скрывать':'Скрыть навсегда';}}
+function setAll(v){{cards.forEach(c=>{{if(v&&(c.dataset.choice==='none'||c.classList.contains('gone')))return;c.querySelector('.ok input').checked=v;c.classList.toggle('on',v);rec(c);}});}}
 // «Уже на сайте»: только доп. фото — файлы, ссылка, перетаскивание, Ctrl+V; галочка = дозалить их на сайт
 document.addEventListener('click',e=>{{const b=e.target.closest('.mbtn'),open=b&&b.nextElementSibling.hidden;
   // пункт меню (в т. ч. «Загрузить фото» — выбор файла) успевает сработать, меню закрывается следом
@@ -502,13 +511,13 @@ dcards.forEach(c=>{{c.querySelectorAll('.rok input,.gok input').forEach(x=>x.add
     if(!u)u=(dt.getData('text/plain')||'').trim();if(u)takeUrl(c,u);}});
 }});
 function save(){{const r={{}};cards.forEach(c=>{{const on=c.classList.contains('on');
-    r[c.dataset.id]={{action:on?c.dataset.choice:(c.classList.contains('search')?'search':'keep'),variant:c.dataset.choice,comment:on?'':c.querySelector('.note').value.trim(),rotate:+(c.dataset.rot||0),gallery:[...c.querySelectorAll('.gi')].map(g=>g.dataset.name)}};}});
+    r[c.dataset.id]={{action:on?c.dataset.choice:(c.classList.contains('gone')?'hide':c.classList.contains('search')?'search':'keep'),variant:c.dataset.choice,comment:on?'':c.querySelector('.note').value.trim(),rotate:+(c.dataset.rot||0),gallery:[...c.querySelectorAll('.gi')].map(g=>g.dataset.name)}};}});
   let ga=0;dcards.forEach(c=>{{const g=c.querySelector('.gok input').checked?[...c.querySelectorAll('.gi')].map(x=>x.dataset.name):[];
     const rep=c.querySelector('.rok input').checked&&!c.querySelector('.rok').hidden;
     if(rep||g.length){{r[c.dataset.id]={{action:rep?'replace':'gallery',mode:c.querySelector('.rmode select').value,gallery:g,comment:'',rotate:0}};ga++;}}}});
-  const on=Object.values(r).filter(v=>!['keep','search','gallery'].includes(v.action)).length, se=Object.values(r).filter(v=>v.action==='search').length;
+  const on=Object.values(r).filter(v=>!['keep','search','hide','gallery'].includes(v.action)).length, se=Object.values(r).filter(v=>v.action==='search').length, hd=Object.values(r).filter(v=>v.action==='hide').length;
   fetch('/save',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(r)}})
-   .then(x=>{{if(!x.ok)throw 0;msg.textContent='✓ сохранено: заливать '+on+', искать в Google '+se+', оставить старое '+(cards.length-on-se)+(ga?', изменить уже залитые: '+ga+' товар.':'')+' — Claude приступает';}})
+   .then(x=>{{if(!x.ok)throw 0;msg.textContent='✓ сохранено: заливать '+on+', искать в Google '+se+', скрыть навсегда '+hd+', оставить старое '+(cards.length-on-se-hd)+(ga?', изменить уже залитые: '+ga+' товар.':'')+' — Claude приступает';}})
    .catch(()=>{{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(r,null,1)],{{type:'application/json'}}));
      a.download='decisions-{batch}.json';a.click();msg.textContent='сервер не ответил — файл скачан: заливать '+on;}});}}
 </script></body></html>'''

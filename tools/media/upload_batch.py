@@ -1,7 +1,7 @@
 """Заливка утверждённых фото партии на casa24.md (WP REST + WooCommerce REST, доступ из .env).
 
 Запуск: `python upload_batch.py <папка партии> [--only ID ...]` — берёт <партия>/decisions.json
-(action "cut" | "full" | "ai" | "web" | "own" — заливать вариант out/<id>.<action>.webp, gallery — доп. фото после главного, повёрнутый на rotate°; "keep" и "search" — пропустить), загружает фото
+(action "cut" | "full" | "ai" | "web" | "own" — заливать вариант out/<id>.<action>.webp, gallery — доп. фото после главного, повёрнутый на rotate°; "keep", "search" и "hide" (скрыть навсегда — hide_forever.py) — пропустить), загружает фото
 в медиатеку (alt = название товара), ставит главным фото у RU-товара и его RO-перевода (WPML)
 и метку casa24_photo_lock = 1 — обмен с 1С больше не меняет фото этих товаров
 (wp-content/mu-plugins/casa24-photo-lock.php). Галерея сохраняется.
@@ -156,7 +156,7 @@ def main():
     pick = {str(x["id"]): x for x in json.load(open(os.path.join(d, "pick.json"), encoding="utf-8"))}
     done = {e["id"] for e in journal if not e.get("rolled_back") and e.get("kind") != "gallery_add"}
     todo = [(k, v["action"], v.get("rotate", 0)) for k, v in decisions.items()
-            if v["action"] not in ("keep", "search", "gallery", "replace") and k not in done and (not only or k in only)]
+            if v["action"] not in ("keep", "search", "hide", "gallery", "replace") and k not in done and (not only or k in only)]
     print(f"к заливке: {len(todo)}")
     for n, (pid, variant, rotate) in enumerate(todo, 1):
         p = call("GET", f"/wp-json/wc/v3/products/{pid}")
