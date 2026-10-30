@@ -42,7 +42,11 @@ add_action(
 	'pre_get_posts',
 	function ( $q ) {
 		$type = (array) $q->get( 'post_type' );
-		if ( array( 'product' ) !== $type && ! ( $q->is_search() && ( ! $q->get( 'post_type' ) || in_array( 'product', $type, true ) ) ) ) {
+		// в архиве категории/метки/атрибута post_type пуст — товарный запрос узнаём по таксономии или метке WooCommerce
+		$product_archive = 'product_query' === $q->get( 'wc_query' )
+			|| ( ! $q->get( 'post_type' ) && $q->is_tax( get_object_taxonomies( 'product' ) ) );
+		if ( array( 'product' ) !== $type && ! $product_archive
+			&& ! ( $q->is_search() && ( ! $q->get( 'post_type' ) || in_array( 'product', $type, true ) ) ) ) {
 			return;
 		}
 		if ( $q->is_singular() || ! casa24_hide_no_photo_context() ) {
