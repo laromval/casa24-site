@@ -83,6 +83,8 @@ return array(
 		'Будьте на связи' => 'Rămâneți în legătură',
 		'Интернет-магазин' => 'Magazin online',
 		'Доставка и оплата' => 'Livrare și achitare',
+		'Доставка' => 'Livrare',
+		'Оплата' => 'Achitare',
 		'Публичная оферта' => 'Ofertă publică',
 		'Обмен и возврат товара' => 'Schimbul și returnarea mărfii',
 		'Настройки cookie' => 'Setări cookie',

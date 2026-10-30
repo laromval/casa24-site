@@ -247,6 +247,12 @@ msgstr "Magazin online"
 msgid "Доставка и оплата"
 msgstr "Livrare și achitare"
 
+msgid "Доставка"
+msgstr "Livrare"
+
+msgid "Оплата"
+msgstr "Achitare"
+
 msgid "Публичная оферта"
 msgstr "Ofertă publică"
 

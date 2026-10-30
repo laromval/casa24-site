@@ -1228,6 +1228,8 @@ html[lang^="ro"] .ip-season-promo__scrim{
   align-items: center;
   gap: 12px;
   min-width: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .ip-usp-item__icon{
@@ -1240,6 +1242,18 @@ html[lang^="ro"] .ip-season-promo__scrim{
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+  transition: color .2s, border-color .2s;
+}
+
+/* Пункт — ссылка на страницу из подвала: при наведении иконка и
+   заголовок окрашиваются в акцентный цвет. */
+.ip-usp-item:hover .ip-usp-item__icon{
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.ip-usp-item:hover .ip-usp-item__title{
+  color: var(--accent);
 }
 
 .ip-usp-item__body{

@@ -105,7 +105,8 @@ $ip_footer_map_url = '';
 				<div class="ip-footer__col">
 					<h3><?php esc_html_e( 'Интернет-магазин', 'glozin-child' ); ?></h3>
 					<ul>
-						<li><a href="<?php echo esc_url( $ip_footer_page( 1000696 ) ); ?>"><?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1000696 ) ); ?>"><?php esc_html_e( 'Доставка', 'glozin-child' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $ip_footer_page( 1097054 ) ); ?>"><?php esc_html_e( 'Оплата', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1085732 ) ); ?>"><?php esc_html_e( 'Публичная оферта', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1085726 ) ); ?>"><?php esc_html_e( 'Обмен и возврат товара', 'glozin-child' ); ?></a></li>
 						<li><a href="<?php echo esc_url( $ip_footer_page( 1080727 ) ); ?>"><?php esc_html_e( 'Политика конфиденциальности', 'glozin-child' ); ?></a></li>
@@ -140,7 +141,7 @@ $ip_footer_map_url = '';
 			<?php endif; ?>
 			<a class="ip-footer__bottom-link" href="<?php echo esc_url( $ip_footer_page( 1000696 ) ); ?>">
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="7" width="15" height="13" rx="1"></rect><path d="M16 10h4l3 3v4h-7z"></path><circle cx="6" cy="20" r="2"></circle><circle cx="18" cy="20" r="2"></circle></svg>
-				<?php esc_html_e( 'Доставка и оплата', 'glozin-child' ); ?>
+				<?php esc_html_e( 'Доставка', 'glozin-child' ); ?>
 			</a>
 			<span class="ip-footer__copy">
 				&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> Casa24. <?php esc_html_e( 'Все права защищены.', 'glozin-child' ); ?>
