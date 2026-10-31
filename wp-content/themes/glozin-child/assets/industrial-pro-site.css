@@ -994,3 +994,55 @@ body.ip-site article:has(.c24-info-hero) .wp-block-table tbody tr:nth-child(even
 		width: 80px;
 	}
 }
+
+/* Виджет «Рекомендуемые товары» в панели фильтров каталога: 2 колонки, крупное фото (3:4) и цена, без названия и звёзд */
+.glozin-products-list-widget__wrapper {
+	display: grid !important;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px 12px;
+}
+.glozin-products-list-widget__wrapper > li.gz-product-list-item {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+}
+.glozin-products-list-widget__wrapper .product-thumbnail {
+	max-width: none !important;
+	width: 100% !important;
+}
+.glozin-products-list-widget__wrapper .gz-ratio {
+	width: 100% !important;
+	height: auto !important;
+	aspect-ratio: 3 / 4;
+}
+.glozin-products-list-widget__wrapper .gz-ratio::before {
+	display: none;
+}
+.glozin-products-list-widget__wrapper .gz-ratio img {
+	inset: 0;
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: cover !important;
+}
+.glozin-products-list-widget__wrapper .product__title,
+.glozin-products-list-widget__wrapper .product__rating {
+	display: none !important;
+}
+.glozin-products-list-widget__wrapper .product__summary {
+	align-items: center;
+	text-align: center;
+}
+.glozin-products-list-widget__wrapper .product__summary .price {
+	margin: 0;
+}
+
+/* Окно поиска на компьютере — под полосой «Каталог», а не под ней скрытым (переменную ставит functions.php) */
+@media (min-width: 1200px) {
+	#search-modal.modal-to-form .modal__container {
+		padding-top: var(--c24-search-top, 0px);
+	}
+}

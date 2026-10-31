@@ -288,6 +288,34 @@ function glozin_child_translate_search_products_label( $translated, $text, $doma
     return 'ro' === $lang ? 'Produse recomandate' : 'Рекомендуемые товары';
 }
 
+// Окно поиска на компьютере начинается от верха окна и уходит под полосу «Каталог» (.ip-navrow) —
+// отступ сверху = низ полосы в момент открытия (переменная --c24-search-top, стиль в industrial-pro-site.css)
+add_action( 'wp_footer', 'glozin_child_search_modal_offset', 99 );
+function glozin_child_search_modal_offset() {
+    ?>
+<script>
+( function () {
+	function setTop() {
+		var bar = document.querySelector( '.ip-navrow' ), modal = document.getElementById( 'search-modal' );
+		if ( bar && modal ) {
+			modal.style.setProperty( '--c24-search-top', Math.max( 0, Math.round( bar.getBoundingClientRect().bottom ) ) + 'px' );
+		}
+	}
+	[ 'pointerdown', 'focusin' ].forEach( function ( ev ) {
+		document.addEventListener( ev, function ( e ) {
+			if ( e.target.closest && e.target.closest( '.ip-navrow, [data-target="search-modal"], .header-search' ) ) {
+				setTop();
+			}
+		}, true );
+	} );
+	window.addEventListener( 'scroll', setTop, { passive: true } );
+	window.addEventListener( 'resize', setTop );
+	setTop();
+} )();
+</script>
+    <?php
+}
+
 // Glozin передаёт тип featured_products без visibility=featured — WC тогда отдаёт просто новые товары
 add_filter( 'woocommerce_shortcode_products_query', 'glozin_child_featured_products_only', 10, 3 );
 function glozin_child_featured_products_only( $query_args, $attributes, $type ) {
