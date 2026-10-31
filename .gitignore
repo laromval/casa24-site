@@ -46,5 +46,7 @@ tools/media/.venv/
 tools/media/pilot/
 tools/media/found-*/
 tools/media/edited/
+tools/media/edited-archive-*/
+tools/media/fix-*/
 tools/media/batch-*/
 __pycache__/

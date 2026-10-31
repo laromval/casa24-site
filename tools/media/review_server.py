@@ -73,6 +73,10 @@ def to_square(im):
         bg = Image.new("RGBA", im.size, "white")
         im = Image.alpha_composite(bg, im)       # прозрачный фон → белый
     im = im.convert("RGB")
+    # свои белые поля картинки срезаем — у всех товаров одинаковый отступ PAD от края квадрата
+    ys, xs = np.nonzero(np.asarray(im).min(axis=2) < 245)
+    if len(xs):
+        im = im.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
     inner = round(SIZE * (1 - 2 * PAD))
     k = inner / max(im.size)
     im = im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.LANCZOS)
