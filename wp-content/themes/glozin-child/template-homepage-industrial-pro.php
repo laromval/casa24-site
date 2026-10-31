@@ -213,14 +213,17 @@ get_header();
 				<?php foreach ( $ip_promo_banners as $ip_banner ) : ?>
 					<?php if ( ! empty( $ip_banner['overlay'] ) ) : ?>
 						<div class="ip-season-promo__slide ip-season-promo__slide--overlay">
-							<img
-								class="ip-season-promo__banner"
-								src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . $ip_banner['file'] ); ?>"
-								alt="<?php echo esc_attr( $ip_banner['overlay']['title'] ); ?>"
-								width="<?php echo esc_attr( $ip_banner['w'] ); ?>"
-								height="<?php echo esc_attr( $ip_banner['h'] ); ?>"
-								loading="lazy"
-							>
+							<picture>
+								<source media="(min-width: 768px)" srcset="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . str_replace( '.webp', '-wide.webp', $ip_banner['file'] ) ); ?>">
+								<img
+									class="ip-season-promo__banner"
+									src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . $ip_banner['file'] ); ?>"
+									alt="<?php echo esc_attr( $ip_banner['overlay']['title'] ); ?>"
+									width="<?php echo esc_attr( $ip_banner['w'] ); ?>"
+									height="<?php echo esc_attr( $ip_banner['h'] ); ?>"
+									loading="lazy"
+								>
+							</picture>
 							<?php
 							/*
 							 * Затемнение — отдельный слой на всю картинку (не боксик под
@@ -251,14 +254,17 @@ get_header();
 						</div>
 					<?php else : ?>
 						<a class="ip-season-promo__slide" href="<?php echo esc_url( $ip_banner['href'] ); ?>">
-							<img
-								class="ip-season-promo__banner"
-								src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . $ip_banner['file'] ); ?>"
-								alt="<?php echo esc_attr( $ip_banner['alt'] ); ?>"
-								width="<?php echo esc_attr( $ip_banner['w'] ); ?>"
-								height="<?php echo esc_attr( $ip_banner['h'] ); ?>"
-								loading="lazy"
-							>
+							<picture>
+								<source media="(min-width: 768px)" srcset="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . str_replace( '.webp', '-wide.webp', $ip_banner['file'] ) ); ?>">
+								<img
+									class="ip-season-promo__banner"
+									src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/' . $ip_banner['file'] ); ?>"
+									alt="<?php echo esc_attr( $ip_banner['alt'] ); ?>"
+									width="<?php echo esc_attr( $ip_banner['w'] ); ?>"
+									height="<?php echo esc_attr( $ip_banner['h'] ); ?>"
+									loading="lazy"
+								>
+							</picture>
 							<?php if ( ! empty( $ip_banner['leaves'] ) ) : ?>
 								<div class="ip-season-promo__leaves" data-ip-falling-leaves aria-hidden="true"></div>
 							<?php endif; ?>

@@ -926,9 +926,17 @@ button:where(.ip-scroll-top)::after{
    соотношением сторон (тогда по бокам/сверху-снизу появятся поля цвета
    фона --bg-dark, а не обрежется впечатанный в картинку текст).
    ===================================================================== */
+/* 31.10.2026: баннер сделан «узким» по образцу supraten.md — картинки
+   1920×500 (3.84:1), рамка внутри контейнера (как .container: 1280 с полями
+   20px) со скруглением 10px, а не от края до края экрана. На мобильном
+   (<768px) отдельные картинки 1942×809 (без -wide), там узкая полоса
+   нечитаема. */
 .ip-season-promo{
   position: relative;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  width: calc(100% - 40px);
+  max-width: 1240px;
+  margin: 16px auto;
+  border-radius: 10px;
   overflow: hidden;
   background: var(--bg-dark);
 }
@@ -949,7 +957,7 @@ button:where(.ip-scroll-top)::after{
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 2.4;
+  aspect-ratio: 1920 / 500;
 }
 
 .ip-season-promo__banner{
@@ -1064,9 +1072,7 @@ html[lang^="ro"] .ip-season-promo__scrim{
   /* Те же 20px и max-width 1280px, что у .container — чтобы текст начинался
      строго под кнопкой "Каталог"/поисковой строкой выше, а не съезжал левее
      или правее них (секция сама намеренно full-bleed, без .container). */
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 28px 20px;
+  padding: 22px 32px;
   pointer-events: none;
 }
 
@@ -1085,7 +1091,8 @@ html[lang^="ro"] .ip-season-promo__scrim{
    специфичность важнее порядка объявления. */
 .ip-season-promo__overlay .ip-season-promo__overlay-title{
   color: var(--on-dark);
-  font-size: 36px;
+  font-size: 30px;
+  line-height: 1.15;
   font-weight: 900;
   margin: 0;
   text-shadow:
@@ -1132,11 +1139,14 @@ html[lang^="ro"] .ip-season-promo__scrim{
 
 .ip-season-promo__overlay-links{
   display: flex;
-  /* В столбик, не в ряд (обратная связь 22.09.2026). */
-  flex-direction: column;
+  /* В ряд на десктопе — в узком баннере (3.84:1) столбик из 3–4 кнопок
+     не помещается по высоте; на мобильном остаётся столбик (см. ниже,
+     обратная связь 22.09.2026). */
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 6px;
   pointer-events: auto;
 }
 
