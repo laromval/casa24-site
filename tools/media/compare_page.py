@@ -84,10 +84,11 @@ def gallery_html(pid, done=False):
         f'<i><u data-main="1" title="сделать главным фото">★</u><u data-r="-90" title="повернуть против часовой">⟲</u><u data-r="90" title="повернуть по часовой">⟳</u><u data-dl="1" title="скачать">⤓</u></i></span>'
         for g in files if os.path.basename(g) not in on_site_gallery)
     to = ('' if done else
-          '<label class="gto" title="ссылка, перетаскивание и Ctrl+V пойдут в галерею, а не в новое фото">'
-          '<input type="checkbox"> ссылку / перетаскивание — в галерею</label>')
+          '<label class="gto" title="первая картинка из Google становится главной, следующие сами идут в доп. фото; отметьте, если и первую нужно в доп. фото">'
+          '<input type="checkbox"> и первую картинку — в доп. фото</label>')
     return (f'<div class="gal"><span class="gl">{"Новые доп. фото:" if done else "Галерея (доп. фото):"}</span><span class="gis">{imgs}</span>'
-            f'<label class="up gup">+ <span class="lg">добавить в галерею</span><span class="sm">доп. фото</span><input type="file" accept="image/*" multiple hidden></label>{to}</div>')
+            + (f'<label class="up gup">+ <span class="lg">добавить в галерею</span><span class="sm">доп. фото</span><input type="file" accept="image/*" multiple hidden></label>' if done else '')
+            + f'{to}</div>')
 
 
 cards = []
@@ -116,7 +117,7 @@ for pid in order:
     tools = (f'<div class="tools"><div class="menu"><button type="button" class="mbtn" title="скачать / загрузить фото">⋯</button>'
              f'<div class="mlist" hidden><button type="button" class="dl" data-what="old">Скачать оригинал</button>'
              f'<button type="button" class="dl" data-what="new">Скачать новое</button>'
-             f'<label class="up">Загрузить фото<input type="file" accept="image/*" hidden></label>{CAMN}'
+             f'<label class="up" title="можно выбрать несколько файлов: первый станет главным, остальные — доп. фото">Загрузить фото<input type="file" accept="image/*" multiple hidden></label>{CAMN}'
              f'<button type="button" class="mo m-crop">Кадрировать</button><button type="button" class="mo m-cut">Удалить фон</button>'
              f'<button type="button" class="gonb">Скрыть навсегда</button></div></div>'
              f'<button type="button" class="cropb">Кадрировать</button>'
@@ -182,9 +183,11 @@ page = f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name
 <title>Редактор фото — Casa24</title><style>
 body{{font:14px system-ui,sans-serif;margin:16px;background:#eceff1;color:#222}}
 h1{{font-size:20px}} .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}}
-.top{{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 10px}}
+.top{{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:-16px -16px 10px;padding:10px 16px;position:sticky;top:0;z-index:8;background:#eceff1}}
+.top.sh{{box-shadow:0 2px 8px rgba(0,0,0,.18)}} .card,h2{{scroll-margin-top:calc(var(--toph,60px) + 6px)}}
 .srch{{position:relative;display:flex;gap:6px;flex:1;min-width:240px;max-width:520px}} .srch input{{flex:1;min-width:0;font:inherit;font-size:14px;padding:6px 8px;border:1px solid #b0bec5;border-radius:6px}}
-.srch>button{{border:0;border-radius:6px;background:#263238;color:#fff;font-weight:600}}
+.srch>button{{border:0;border-radius:6px;background:#e65100;color:#fff;font-weight:600}}
+.undo{{padding:6px 14px;background:#fff;border:1px solid #b0bec5;border-radius:6px;font-weight:600}} .undo:disabled{{opacity:.45;cursor:default}} .undo sup{{font-size:10px;margin-left:2px}}
 #sres{{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:8;background:#fff;border:1px solid #cfd8dc;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.22);max-height:70vh;overflow:auto}} #sres[hidden]{{display:none}}
 #sres .sr{{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #eceff1}} #sres img{{width:48px;height:48px;object-fit:contain;flex:none;background:#fafafa;border:1px solid #eee}}
 #sres .si{{flex:1;min-width:0;font-size:13px}} #sres .si small{{display:block;color:#777;font-size:11px}} #sres .sn{{padding:10px;color:#555;font-size:13px}}
@@ -231,17 +234,17 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 #cam .cre{{background:#fff;color:#222}} #cam .cok{{background:#2e7d32;color:#fff;font-weight:600}} #cam [hidden]{{display:none}}
 .shb:hover{{border-color:#f28c28;color:#e65100}} .shb.busy{{opacity:.5;pointer-events:none}}
 .sm{{display:none}}
-@media (max-width:700px){{body{{margin:6px}} .grid{{grid-template-columns:1fr;gap:8px}} .help p{{font-size:13px}}
-  html{{scroll-snap-type:y proximity}} .top{{scroll-snap-align:start}} .card{{scroll-snap-align:start;scroll-margin-top:4px;display:flex;flex-direction:column;padding:6px}}
+@media (max-width:700px){{body{{margin:6px}} .top{{margin:-6px -6px 8px;padding:6px;gap:8px}} .top .undo{{padding:6px 9px;font-size:17px;line-height:1}} .grid{{grid-template-columns:1fr;gap:8px}} .help p{{font-size:13px}}
+  html{{scroll-snap-type:y proximity}} .top{{scroll-snap-align:start}} .card{{scroll-snap-align:start;display:flex;flex-direction:column;padding:6px}}
   .card .meta{{order:-1;margin-bottom:4px}} .card .meta a{{font-weight:600;font-size:15px}} .card .cat{{font-size:11px}} .fl{{margin-top:2px}}
-  .lg,.gto,.gal .gl,figcaption{{display:none}} body{{overflow-x:hidden}} .card{{min-width:0}}
+  .lg,.gal .gl,figcaption{{display:none}} .gto{{font-size:13px;flex-basis:100%}} body{{overflow-x:hidden}} .card{{min-width:0}}
   .tools .cropb,.tools .cutb{{order:5;flex:1;font-size:14px!important;padding:8px 10px!important}} .sm{{display:inline}} .pair img{{max-height:34vh}}
   .row{{margin-top:6px}} .tools{{flex-wrap:wrap;gap:5px;width:100%}} .tools .find{{gap:5px}}
   .tools button,.tools .gbtn,.tools .fbtn{{font-size:14px!important;padding:8px 10px!important;white-space:nowrap}}
   .tools .shb{{padding:6px 12px!important;background:#e65100;color:#fff;border-color:#e65100}} .shb svg{{width:24px;height:24px}}
   .tools .rot button{{padding:6px 9px!important;font-size:17px!important}} .url{{margin-top:5px}} .url input{{font-size:14px;padding:7px}} .url button{{padding:7px 10px}}
   .gal{{margin-top:5px}} .gal .up{{font-size:13px;padding:6px 10px}} .note{{margin:5px 0 0;font-size:13px;padding:6px}} .ok{{margin:6px 0 0;padding:9px}}
-  .bar{{gap:8px;padding:8px;margin-top:8px;font-size:14px}} .bar .all{{display:none}} .bar .save{{padding:9px 14px;margin-left:auto}} #msg{{flex-basis:100%;font-size:12px}} #msg:empty{{display:none}}}}
+.bar{{gap:8px;padding:8px;margin-top:8px;font-size:14px}} .bar .all{{display:none}} .bar .save{{padding:9px 14px;margin-left:auto}} #msg{{flex-basis:100%;font-size:12px}} #msg:empty{{display:none}}}}
 .card[data-choice="none"] .cutb,.card[data-choice="none"] .cropb,.card[data-choice="none"] .mo{{display:none!important}} .mlist .mo{{display:none}}
 .card.gone{{border-color:#9e9e9e;background:#e0e0e0}} .card.gone .pair,.card.gone .url,.card.gone .gal,.card.gone .note,.card.gone .ok{{opacity:.35}}
 .card.gone::before{{content:"Будет скрыт навсегда — «⋯» → «Не скрывать», чтобы отменить";display:block;font-weight:600;color:#c62828;font-size:13px;margin-bottom:4px}}
@@ -266,7 +269,7 @@ figcaption{{font-size:11px;color:#888;text-align:center}}
 .bar{{position:sticky;bottom:0;background:#263238;color:#fff;padding:10px;margin-top:16px;border-radius:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}}
 button{{font:inherit;padding:6px 12px;cursor:pointer}} .save{{background:#f28c28;color:#fff;border:0;border-radius:4px;font-weight:600}}
 </style></head><body>
-<div class="top"><button type="button" class="helpb" onclick="this.classList.toggle('act');help.hidden=!help.hidden">Инструкция</button>
+<div class="top"><button class="undo" id="undoBtn" onclick="doUndo()" title="Отменить последнее действие (Ctrl+Z), до 10 шагов" aria-label="Отменить">↶<span class="lg"> Отменить</span></button><button type="button" class="helpb" onclick="this.classList.toggle('act');help.hidden=!help.hidden">Инструкция</button>
 <b>Загружено {len(order)} {"товар" if len(order) % 10 == 1 and len(order) % 100 != 11 else "товара" if 2 <= len(order) % 10 <= 4 and not 12 <= len(order) % 100 <= 14 else "товаров"}</b>
 <form class="srch" onsubmit="event.preventDefault();findProd()"><input id="sq" type="search" enterkeyhint="search" placeholder="Найти товар: название, артикул или ID">
 <button type="submit">Найти</button><div id="sres" hidden></div></form></div>
@@ -310,6 +313,8 @@ sres.addEventListener('click',async e=>{{const b=e.target.closest('button');if(!
     if(!r.ok)throw new Error(d.error||r.status);history.scrollRestoration='manual';scrollTo(0,0);location.reload();   // новый товар — первая карточка
   }}catch(err){{b.textContent='Ошибка';b.title=err.message;b.disabled=false;}}}});
 document.addEventListener('click',e=>{{if(!e.target.closest('.srch'))sres.hidden=true;}});
+const topEl=document.querySelector('.top');function topH(){{document.documentElement.style.setProperty('--toph',topEl.offsetHeight+'px');}}
+topH();addEventListener('resize',topH);addEventListener('scroll',()=>topEl.classList.toggle('sh',scrollY>4),{{passive:true}});
 const KEY='casa24-photo-review-{batch}';
 let st={{}};try{{st=JSON.parse(localStorage.getItem(KEY)||'{{}}')}}catch(e){{}}
 function persist(){{try{{localStorage.setItem(KEY,JSON.stringify(st))}}catch(e){{}}}}
@@ -372,7 +377,9 @@ capply.addEventListener('click',()=>{{const c=crop.c,nw=cimg.naturalWidth,nh=cim
    .then(x=>x.json().then(j=>{{if(!x.ok)throw j.error;if(dc)reChanged(c,j.src);else{{own(c,j.src);rec(c);}}cropm.hidden=true;msg.textContent='✓ выровнено для ID '+c.dataset.id+' ('+j.size.join('×')+')';}}))
    .catch(e=>{{cinfo.textContent='не получилось: '+(e||'сервер не ответил');}});}});
 function ownDone(c,j,what){{own(c,j.src);rec(c);msg.textContent='✓ '+what+' для ID '+c.dataset.id+' ('+j.size.join('×')+')'+(Math.max(...j.size)<600?' — фото маленькое, на сайте будет мутным':'');}}
-function toGal(c){{return c.classList.contains('dcard')||c.querySelector('.gto input').checked;}}
+// куда идёт картинка из Google (перетаскивание, Ctrl+V, «Взять»): первая — в новое главное фото,
+// следующие — в доп. фото (главное уже выбрано). Заменить главное — ★ на доп. фото или «Загрузить фото».
+function toGal(c){{return c.classList.contains('dcard')||c.querySelector('.gto input').checked||c.dataset.choice==='own';}}
 function galAdd(c,j){{const s=document.createElement('span');s.className='gi';s.dataset.name=j.name;
   s.innerHTML='<img src="'+j.src+'"><b title="убрать из галереи">✕</b><i><u data-main="1" title="сделать главным фото">★</u><u data-r="-90" title="повернуть против часовой">⟲</u><u data-r="90" title="повернуть по часовой">⟳</u><u data-dl="1" title="скачать">⤓</u></i>';c.querySelector('.gis').appendChild(s);rec(c);
   if(c.classList.contains('dcard')){{c.querySelector('.gok input').checked=true;dOn(c);}}   // доп. фото добавлено — сразу отметка «Добавить на сайт»
@@ -381,13 +388,21 @@ function galAdd(c,j){{const s=document.createElement('span');s.className='gi';s.
 document.addEventListener('click',e=>{{const u=e.target.closest('.gi u');if(!u)return;e.stopPropagation();
   const gi=u.closest('.gi'),c=u.closest('.card'),img=gi.querySelector('img');
   if(u.dataset.dl)return download(img.src.split('?')[0],gi.dataset.name);
-  if(u.dataset.main&&c.classList.contains('dcard')&&!u.dataset.mode){{   // у залитого товара — сначала выбор: прежнее главное куда
+  if(u.dataset.main&&!u.dataset.mode){{   // сначала выбор: прежнее главное — в доп. фото (поменять местами) или удалить
+    const dc=c.classList.contains('dcard');
     document.querySelectorAll('.smenu').forEach(m=>m.remove());const m=document.createElement('div');m.className='smenu';
-    m.innerHTML='<button data-mode="swap">Сделать главным — прежнее главное оставить в доп. фото</button>'+
-                '<button data-mode="drop">Сделать главным — прежнее главное убрать с сайта</button>';
+    m.innerHTML='<button data-mode="swap">Сделать главным — прежнее главное в доп. фото (поменять местами)</button>'+
+                '<button data-mode="drop">Сделать главным — прежнее главное '+(dc?'убрать с сайта':'удалить')+'</button>';
     m.addEventListener('click',ev=>{{const b=ev.target.closest('button');if(!b)return;ev.stopPropagation();m.remove();
-      c.querySelector('.rmode select').value=b.dataset.mode;rmodeSave(c);u.dataset.mode=b.dataset.mode;u.click();delete u.dataset.mode;}});
+      if(dc){{c.querySelector('.rmode select').value=b.dataset.mode;rmodeSave(c);}}
+      u.dataset.mode=b.dataset.mode;u.click();delete u.dataset.mode;}});
     gi.appendChild(m);return;}}
+  if(u.dataset.main&&u.dataset.mode==='swap'&&!c.classList.contains('dcard')){{
+    return fetch('/gallery-swap',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{id:c.dataset.id,name:gi.dataset.name,cur:c.dataset.choice}})}})
+     .then(x=>x.json().then(j=>{{if(!x.ok)throw j.error;gi.remove();const mn=c.querySelector('.main');mn.src=j.src;
+       c.dataset.choice='own';c.querySelector('.ch').textContent='own';setRot(c,0);galAdd(c,j.gallery);
+       msg.textContent='✓ поменял местами: доп. фото стало главным, прежнее главное — в доп. фото';}}))
+     .catch(e=>{{msg.textContent='не удалось: '+(e||'');}});}}
   if(u.dataset.main){{const dc=c.classList.contains('dcard');   // доп. фото → новое главное (у залитого товара — замена главного)
     return fetch('/gallery-promote',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{id:c.dataset.id,name:gi.dataset.name,to:dc?'re':'own'}})}})
      .then(x=>x.json().then(j=>{{if(!x.ok)throw j.error;gi.remove();if(dc)reChanged(c,j.src);else ownDone(c,j,'доп. фото стало главным');}}))
@@ -431,7 +446,30 @@ document.addEventListener('keydown',e=>{{if(e.key!=='Escape')return;if(!zoom.hid
 function download(url,name){{const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}}
 function setRot(c,r){{c.dataset.rot=((r%360)+360)%360;c.querySelector('.main').style.transform='rotate('+c.dataset.rot+'deg)';}}
 function count(){{n.textContent=cards.filter(c=>c.classList.contains('on')).length;}}
-function rec(c){{if(c.classList.contains('dcard'))return;st[c.dataset.id]={{on:c.classList.contains('on'),choice:c.dataset.choice,note:c.querySelector('.note').value,rot:+(c.dataset.rot||0),search:c.classList.contains('search'),gone:c.classList.contains('gone')}};persist();count();}}
+function rec(c){{if(c.classList.contains('dcard'))return;st[c.dataset.id]={{on:c.classList.contains('on'),choice:c.dataset.choice,note:c.querySelector('.note').value,rot:+(c.dataset.rot||0),search:c.classList.contains('search'),gone:c.classList.contains('gone')}};persist();count();undoRec(c.dataset.id);}}
+// ---- «Отменить» / Ctrl+Z: до 10 последних действий. Файлы карточки откатывает сервер по снимку (snap),
+// отметки карточки — из прежнего состояния; после отмены страница перезагружается.
+const UKEY='casa24-undo-{batch}';let undoStack=[];try{{undoStack=JSON.parse(sessionStorage.getItem(UKEY)||'[]')}}catch(e){{}}
+const lastState={{}};const _fetch=window.fetch.bind(window);
+function clone(o){{return o?JSON.parse(JSON.stringify(o)):null;}}
+function undoSave(){{undoStack=undoStack.slice(-10);try{{sessionStorage.setItem(UKEY,JSON.stringify(undoStack))}}catch(e){{}}
+  const b=document.getElementById('undoBtn');if(b){{b.disabled=!undoStack.length;b.innerHTML='↶<span class="lg"> Отменить</span>'+(undoStack.length?'<sup>'+undoStack.length+'</sup>':'');}}}}
+function undoRec(id){{const now=clone(st[id]),prev=lastState[id];const strip=o=>JSON.stringify(Object.assign({{}},o||{{}},{{note:''}}));
+  const top=undoStack[undoStack.length-1];
+  if(top&&top.id===id&&top.snap&&Date.now()-top.t<3000&&!top.client){{top.client=1;}}
+  else if(strip(prev)!==strip(now))undoStack.push({{id,prev:prev===undefined?null:prev,t:Date.now()}});
+  lastState[id]=now;undoSave();}}
+window.fetch=async(u,o)=>{{const r=await _fetch(u,o);
+  try{{if(o&&o.method==='POST'&&!String(u).includes('/undo')&&!String(u).includes('/save')){{const j=await r.clone().json();
+    if(j&&j.snap){{let id=(String(u).match(/[?&]id=([0-9]+)/)||[])[1];if(!id)try{{id=String(JSON.parse(o.body).id)}}catch(e){{}}
+      if(id){{undoStack.push({{id,snap:j.snap,prev:lastState[id]===undefined?null:lastState[id],t:Date.now()}});undoSave();}}}}}}}}catch(e){{}}
+  return r;}};
+async function doUndo(){{const e=undoStack.pop();if(!e){{msg.textContent='отменять нечего';return;}}undoSave();
+  msg.textContent='отменяю…';
+  if(e.snap){{const r=await _fetch('/undo',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{id:e.id,snap:e.snap}})}});
+    if(!r.ok){{msg.textContent='не удалось отменить: снимок недоступен';return;}}}}
+  if(e.prev)st[e.id]=e.prev;else delete st[e.id];persist();location.reload();}}
+document.addEventListener('keydown',e=>{{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&(e.code==='KeyZ'||e.key==='z'||e.key==='я')&&!(e.target.closest&&e.target.closest('input,textarea,select'))){{e.preventDefault();doUndo();}}}});
 cards.forEach(c=>{{
   const cb=c.querySelector('.ok input'),alt=c.querySelector('.alt'),note=c.querySelector('.note'),s=st[c.dataset.id];
   if(s){{if(s.choice!==c.dataset.choice)swap(c);cb.checked=s.on;c.classList.toggle('on',s.on);note.value=s.note||'';setRot(c,s.rot||0);c.classList.toggle('search',!!s.search&&!s.on);goneSet(c,!!s.gone&&!s.on);}}
@@ -465,18 +503,18 @@ cards.forEach(c=>{{
     const h=dt.getData('text/html');if(h){{const m=h.match(/<img[^>]+src=["']([^"']+)/i);if(m)u=m[1].replace(/&amp;/g,'&');}}
     if(!u)u=(dt.getData('text/plain')||'').trim();
     if(u)takeUrl(c,u);else msg.textContent='не удалось понять, что перетащили — скопируйте адрес картинки и вставьте в поле';}});
-  const gup=c.querySelector('.gup'),gfi=gup.querySelector('input');
-  gfi.addEventListener('change',async()=>{{gup.classList.add('busy');for(const f of gfi.files)await putFile(c,f,true);gup.classList.remove('busy');gfi.value='';}});
+  const gup=c.querySelector('.gup'),gfi=gup&&gup.querySelector('input');
+  if(gfi)gfi.addEventListener('change',async()=>{{gup.classList.add('busy');for(const f of gfi.files)await putFile(c,f,true);gup.classList.remove('busy');gfi.value='';}});
   c.querySelector('.gis').addEventListener('click',e=>{{const b=e.target.closest('.gi b');if(!b)return;e.stopPropagation();const gi=b.parentNode;
     fetch('/gallery-delete',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{id:c.dataset.id,name:gi.dataset.name}})}})
      .then(x=>{{if(!x.ok)throw 0;gi.remove();rec(c);msg.textContent='фото убрано из галереи';}}).catch(()=>{{msg.textContent='не удалось убрать фото';}});}});
   const up=c.querySelector('.up:not(.gup)'),fi=up.querySelector('input');
-  fi.addEventListener('change',()=>{{const f=fi.files[0];if(!f)return;up.classList.add('busy');
-    fetch('/upload?id='+c.dataset.id,{{method:'POST',body:f}}).then(x=>x.json().then(j=>{{if(!x.ok)throw j.error;own(c,j.src);rec(c);
-      msg.textContent='✓ своё фото добавлено для ID '+c.dataset.id+' ('+j.size.join('×')+')';}}))
-     .catch(e=>{{msg.textContent='не удалось загрузить фото: '+(e||'сервер не ответил');}}).finally(()=>{{up.classList.remove('busy');fi.value='';}});}});
+  // несколько файлов: первый — новое главное (если главное ещё не своё), остальные — доп. фото
+  fi.addEventListener('change',async()=>{{const fs=[...fi.files];if(!fs.length)return;up.classList.add('busy');
+    for(const f of fs)await putFile(c,f);up.classList.remove('busy');fi.value='';}});
   if(alt)alt.addEventListener('click',()=>{{swap(c);rec(c);}});
 }});count();
+cards.forEach(c=>{{lastState[c.dataset.id]=clone(st[c.dataset.id]);}});undoSave();
 // очередь «Удалить фон»: сервер режет по одному фото, страница раз в 2 с спрашивает состояние, готовое ставит новым фото
 const cutWait=new Set();let cutTimer=0;
 function cutShow(st){{cards.forEach(c=>{{const id=c.dataset.id,b=c.querySelector('.cutb'),s=st[id];
@@ -551,8 +589,8 @@ dcards.forEach(c=>{{c.querySelectorAll('.rok input,.gok input').forEach(x=>x.add
   const rf=c.querySelector('.reup input');rf.addEventListener('change',()=>{{const f=rf.files[0];if(!f)return;msg.textContent='загружаю…';
     fetch('/upload?id='+c.dataset.id+'&to=re',{{method:'POST',body:f}}).then(x=>x.json().then(j=>{{if(!x.ok)throw j.error;reChanged(c,j.src);}}))
      .catch(e=>{{msg.textContent='не удалось: '+(e||'сервер не ответил');}}).finally(()=>{{rf.value='';}});}});
-  const gup=c.querySelector('.gup'),gfi=gup.querySelector('input');
-  gfi.addEventListener('change',async()=>{{gup.classList.add('busy');for(const f of gfi.files)await putFile(c,f,true);gup.classList.remove('busy');gfi.value='';}});
+  const gup=c.querySelector('.gup'),gfi=gup&&gup.querySelector('input');
+  if(gfi)gfi.addEventListener('change',async()=>{{gup.classList.add('busy');for(const f of gfi.files)await putFile(c,f,true);gup.classList.remove('busy');gfi.value='';}});
   c.querySelector('.gis').addEventListener('click',e=>{{const b=e.target.closest('.gi b');if(!b)return;const gi=b.parentNode;
     fetch('/gallery-delete',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{id:c.dataset.id,name:gi.dataset.name}})}})
      .then(x=>{{if(!x.ok)throw 0;gi.remove();msg.textContent='фото убрано';}}).catch(()=>{{msg.textContent='не удалось убрать фото';}});}});

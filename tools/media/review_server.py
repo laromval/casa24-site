@@ -24,9 +24,11 @@ POST /add {id} — добавить найденный товар в парти�
 import hmac
 import html
 import io
+import glob
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -174,6 +176,43 @@ def cut_worker():
             proc.wait()
 
 
+MUTATING = {"/upload", "/crop", "/fetch", "/gallery-delete", "/gallery-rotate", "/gallery-promote", "/gallery-swap",
+            "/re-edit", "/cut-bg"}
+UNDO_KEEP = 12
+
+
+def card_files(pid):
+    out = os.path.join(ROOT, "out")
+    names = [f"{pid}.own.webp", f"{pid}.re.webp"] + [os.path.basename(g) for g in glob.glob(os.path.join(out, f"{pid}.g*.webp"))]
+    return [n for n in names if os.path.exists(os.path.join(out, n))]
+
+
+def snapshot(pid):
+    """Копия файлов карточки (own, re, доп. фото) до изменения — для «Отменить» / Ctrl+Z."""
+    snap = str(int(time.time() * 1000))
+    d = os.path.join(ROOT, "history", pid, snap)
+    os.makedirs(d, exist_ok=True)
+    for n in card_files(pid):
+        shutil.copy2(os.path.join(ROOT, "out", n), os.path.join(d, n))
+    older = sorted(os.listdir(os.path.join(ROOT, "history", pid)))
+    for old in older[:-UNDO_KEEP]:
+        shutil.rmtree(os.path.join(ROOT, "history", pid, old), ignore_errors=True)
+    return snap
+
+
+def restore(pid, snap):
+    d = os.path.join(ROOT, "history", pid, snap)
+    if not os.path.isdir(d):
+        raise FileNotFoundError("снимок уже недоступен")
+    for n in card_files(pid):
+        os.remove(os.path.join(ROOT, "out", n))
+    for n in os.listdir(d):
+        shutil.copy2(os.path.join(d, n), os.path.join(ROOT, "out", n))
+    for s in os.listdir(os.path.join(ROOT, "history", pid)):    # этот и более поздние снимки больше не нужны
+        if s >= snap:
+            shutil.rmtree(os.path.join(ROOT, "history", pid, s), ignore_errors=True)
+
+
 class Handler(SimpleHTTPRequestHandler):
     set_cookie = False
 
@@ -215,6 +254,8 @@ class Handler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def reply(self, code, payload):
+        if code == 200 and isinstance(payload, dict) and getattr(self, "_snap", None):
+            payload["snap"] = self._snap          # страница кладёт его в стек «Отменить»
         body = json.dumps(payload, ensure_ascii=False).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -325,6 +366,38 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception:  # noqa: BLE001
             return self.reply(400, {"error": "не удалось повернуть"})
         self.reply(200, {"src": f"out/{name}?t={int(time.time() * 1000)}"})
+
+    def gallery_swap(self):
+        """{id, name: "<id>.gN.webp", cur: вариант главного} — поменять местами: доп. фото → главное (own),
+        прежнее главное → новым доп. фото."""
+        try:
+            req = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)))
+            pid, name, cur = str(req["id"]), str(req["name"]), str(req["cur"])
+            assert re.fullmatch(r"\d{1,10}", pid) and re.fullmatch(rf"{re.escape(pid)}\.g\d+\.webp", name) and cur in VARIANTS
+            out = os.path.join(ROOT, "out")
+            main_raw = open(os.path.join(out, f"{pid}.{cur}.webp"), "rb").read()
+            os.replace(os.path.join(out, name), os.path.join(out, f"{pid}.own.webp"))
+            n = 1
+            while os.path.exists(os.path.join(out, f"{pid}.g{n}.webp")):
+                n += 1
+            gname = f"{pid}.g{n}.webp"
+            open(os.path.join(out, gname), "wb").write(main_raw)
+        except Exception:  # noqa: BLE001
+            return self.reply(400, {"error": "не удалось поменять местами"})
+        t = int(time.time() * 1000)
+        self.reply(200, {"src": f"out/{pid}.own.webp?t={t}", "size": [1000, 1000],
+                         "gallery": {"name": gname, "src": f"out/{gname}?t={t}", "size": [1000, 1000]}})
+
+    def undo(self):
+        """{id, snap} — вернуть файлы карточки (own, re, доп. фото) к снимку до действия."""
+        try:
+            req = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)))
+            pid, snap = str(req["id"]), str(req["snap"])
+            assert re.fullmatch(r"\d{1,10}", pid) and re.fullmatch(r"\d{10,16}", snap)
+            restore(pid, snap)
+        except Exception as e:  # noqa: BLE001
+            return self.reply(400, {"error": f"не удалось отменить: {e}"})
+        self.reply(200, {"ok": True})
 
     def gallery_promote(self):
         """{id, name: "<id>.gN.webp", to: "own" | "re"} — доп. фото становится новым главным (файл переносится)."""
@@ -468,6 +541,22 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or (self.path == "/open-chrome" and not self.local()):
             return self.send_error(403, "Forbidden", "Откройте ссылку с ключом, которую прислал Claude.")
+        self._snap = None
+        if urlparse(self.path).path in MUTATING:
+            raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+            self.rfile = io.BytesIO(raw)              # обработчик дочитает тело как обычно
+            pid = (parse_qs(urlparse(self.path).query).get("id") or [""])[0]
+            if not pid:
+                try:
+                    pid = str(json.loads(raw or b"{}").get("id", ""))
+                except Exception:  # noqa: BLE001
+                    pid = ""
+            if re.fullmatch(r"\d{1,10}", pid):
+                self._snap = snapshot(pid)
+        if self.path == "/undo":
+            return self.undo()
+        if self.path == "/gallery-swap":
+            return self.gallery_swap()
         if self.path.startswith("/upload"):
             return self.upload()
         if self.path == "/crop":

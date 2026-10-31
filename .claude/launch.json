@@ -35,36 +35,6 @@
         "4174"
       ],
       "port": 4174
-    },
-    {
-      "name": "media-batch-1",
-      "runtimeExecutable": "python",
-      "runtimeArgs": [
-        "tools/media/review_server.py",
-        "tools/media/batch-1",
-        "4175"
-      ],
-      "port": 4175
-    },
-    {
-      "name": "media-batch-2",
-      "runtimeExecutable": "python",
-      "runtimeArgs": [
-        "tools/media/review_server.py",
-        "tools/media/batch-2",
-        "4177"
-      ],
-      "port": 4177
-    },
-    {
-      "name": "media-batch-3",
-      "runtimeExecutable": "python",
-      "runtimeArgs": [
-        "tools/media/review_server.py",
-        "tools/media/batch-3",
-        "4178"
-      ],
-      "port": 4178
     }
   ]
 }

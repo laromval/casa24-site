@@ -47,3 +47,4 @@ tools/media/pilot/
 tools/media/found-*/
 tools/media/edited/
 tools/media/batch-*/
+__pycache__/

@@ -1,6 +1,7 @@
 """Быстрая партия плохих фото — без вырезки фона моделью: отобрать, скачать, показать на странице проверки.
 
-Запуск: `python make_batch.py <имя партии> [сколько=30]` — СНАЧАЛА товары в наличии вообще без фото (список прямо
+Запуск: `python make_batch.py [папка=edited] [сколько=30]` — по умолчанию товары ДОБАВЛЯЮТСЯ в общую папку
+tools/media/edited (одна страница проверки на всё: вверху на замену, внизу «Уже на сайте»), уже лежащие там не повторяются; — СНАЧАЛА товары в наличии вообще без фото (список прямо
 с сайта по SSH; на витрине они скрыты mu-plugin'ом casa24-hide-no-photo.php, пока фото не появится) — у них нет src/ и full,
 только карточка с пометкой «нет фото»; товары «Скрыть навсегда» (метка casa24_hidden на сайте) не берутся вовсе; затем из audit.json товары в наличии с небелым фоном,
 которые ещё не залиты ни из одной партии (journal.jsonl в tools/media/*/), сначала самые «небелые»;
@@ -70,8 +71,9 @@ def to_square(im):
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    name = sys.argv[1]
-    count = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+    args = [a for a in sys.argv[1:]]
+    name = args.pop(0) if args and not args[0].isdigit() else "edited"
+    count = int(args[0]) if args else 30
     d = os.path.join(HERE, name)
     for sub in ("src", "out"):
         os.makedirs(os.path.join(d, sub), exist_ok=True)
@@ -79,10 +81,9 @@ def main():
     done = set()
     for j in glob.glob(os.path.join(HERE, "*", "journal.jsonl")):
         done |= {json.loads(l)["id"] for l in open(j, encoding="utf-8") if l.strip()}
-    taken = set()                       # уже в других (ещё не залитых) партиях
+    taken = set()                       # уже в какой-либо папке (в т. ч. в этой — ждут замены)
     for pj in glob.glob(os.path.join(HERE, "*", "pick.json")):
-        if os.path.dirname(pj) != d:
-            taken |= {str(x["id"]) for x in json.load(open(pj, encoding="utf-8"))}
+        taken |= {str(x["id"]) for x in json.load(open(pj, encoding="utf-8"))}
 
     pick, report = [], {}
     no_photo, hidden = no_photo_products()
@@ -120,9 +121,14 @@ def main():
         if len(pick) % 20 == 0:
             print(f"{len(pick)}/{count}", flush=True)
         time.sleep(0.2)
-    json.dump(pick, open(os.path.join(d, "pick.json"), "w", encoding="utf-8"), ensure_ascii=False)
-    json.dump(report, open(os.path.join(d, "out", "report.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    print(f"партия {name}: {len(pick)} товаров")
+    # дописать к тому, что уже лежит в папке (не затирать)
+    pp, rp = os.path.join(d, "pick.json"), os.path.join(d, "out", "report.json")
+    old_pick = json.load(open(pp, encoding="utf-8")) if os.path.exists(pp) else []
+    old_report = json.load(open(rp, encoding="utf-8")) if os.path.exists(rp) else {}
+    old_report.update(report)
+    json.dump(old_pick + pick, open(pp, "w", encoding="utf-8"), ensure_ascii=False)
+    json.dump(old_report, open(rp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print(f"{name}: добавлено {len(pick)} товаров, всего в папке {len(old_pick) + len(pick)}")
 
 
 if __name__ == "__main__":
