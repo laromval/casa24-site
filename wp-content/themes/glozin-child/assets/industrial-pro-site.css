@@ -986,3 +986,11 @@ body.ip-site article:has(.c24-info-hero) .wp-block-table tbody tr:nth-child(even
     gap: 12px;
   }
 }
+
+/* Окно поиска, «Рекомендуемые товары» списком (телефон/планшет): миниатюра сжималась до ~24px */
+@media (max-width: 1199px) {
+	.header-search__products .product-inner > .product-thumbnail {
+		flex: 0 0 80px;
+		width: 80px;
+	}
+}
