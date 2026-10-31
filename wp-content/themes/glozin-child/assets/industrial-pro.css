@@ -422,24 +422,34 @@ button:where(.ip-scroll-top)::after{
   display: none;
 }
 
+/* RU/RO — такие же кружки, как кнопки корзины и темы (обратная связь 31.10.2026:
+   мелкий текст плохо было видно). Текущий язык — оранжевый кружок. */
 .ip-lang-switch{
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 6px;
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .ip-lang-switch a{
-  color: var(--topbar-text);
-  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--topbar-chip-icon);
+  background: var(--topbar-chip-bg);
 }
 
 .ip-lang-switch a.is-active,
 .ip-lang-switch a:hover{
-  color: var(--accent);
+  color: #060c13;
+  background: var(--accent);
 }
 
 .ip-theme-toggle{
@@ -2067,12 +2077,13 @@ html[lang^="ro"] .ip-season-promo__scrim{
   }
 
   .ip-lang-switch{
-    font-size: 10px;
-    gap: 0;
+    font-size: 11px;
+    gap: 2px;
   }
 
   .ip-lang-switch a{
-    padding: 3px 2px;
+    width: 28px;
+    height: 28px;
   }
 }
 
