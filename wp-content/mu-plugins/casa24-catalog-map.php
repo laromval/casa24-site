@@ -858,12 +858,103 @@ function casa24_catalog_redirect_old_categories() {
 	}
 
 	$link = get_term_link( $ids[ $key ], 'product_cat' );
-	if ( ! is_wp_error( $link ) ) {
+	if ( ! is_wp_error( $link ) && ! casa24_catalog_is_current_url( $link ) ) {
 		wp_safe_redirect( $link, 301, 'Casa24 catalog' );
 		exit;
 	}
 }
 add_action( 'template_redirect', 'casa24_catalog_redirect_old_categories', 5 );
+
+/**
+ * Адрес совпадает с текущим запросом (без учёта регистра %-кодов) — защита
+ * от переадресации страницы самой на себя.
+ *
+ * @param string $link Адрес.
+ * @return bool
+ */
+function casa24_catalog_is_current_url( $link ) {
+	$current = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- только сравнение.
+	$path    = static function ( $url ) {
+		return untrailingslashit( strtolower( rawurldecode( (string) wp_parse_url( $url, PHP_URL_PATH ) ) ) );
+	};
+
+	return $path( $link ) === $path( $current );
+}
+
+/**
+ * Тот же 301 со старой категории, но раньше — из разбора запроса WPML.
+ *
+ * WPML в parse_query переадресует (302) категорию на её перевод, сравнивая
+ * slug из адреса со slug перевода. У RO-групп 1С slug кириллические, в адресе
+ * они %-кодированы иначе — WPML считает их разными и шлёт страницу саму на
+ * себя (цикл, найден 31.10.2026). Поэтому старую категорию уводим на новую
+ * до этой проверки. Новые категории текущего языка и чужие запросы не трогаем.
+ *
+ * @param WP_Query $q Запрос.
+ * @return WP_Query
+ */
+function casa24_catalog_redirect_old_categories_early( $q ) {
+	if ( ! $q instanceof WP_Query || ! $q->is_main_query() || is_admin() || wp_doing_ajax() || ! $q->is_tax || empty( $q->tax_query->queries ) || ! casa24_catalog_is_ready() ) {
+		return $q;
+	}
+
+	$slug = '';
+	foreach ( $q->tax_query->queries as $query ) {
+		if ( isset( $query['taxonomy'], $query['field'], $query['terms'] ) && 'product_cat' === $query['taxonomy'] && 'slug' === $query['field'] ) {
+			$slug = (string) end( $query['terms'] );
+		}
+	}
+	if ( '' === $slug ) {
+		return $q;
+	}
+
+	global $wpdb;
+	$lang = (string) apply_filters( 'wpml_current_language', casa24_catalog_default_lang() );
+	$rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT t.term_id, i.language_code AS lang, m.meta_value AS catalog_key
+			 FROM {$wpdb->terms} t
+			 JOIN {$wpdb->term_taxonomy} tt ON tt.term_id = t.term_id AND tt.taxonomy = 'product_cat'
+			 LEFT JOIN {$wpdb->prefix}icl_translations i ON i.element_id = tt.term_taxonomy_id AND i.element_type = 'tax_product_cat'
+			 LEFT JOIN {$wpdb->termmeta} m ON m.term_id = t.term_id AND m.meta_key = %s
+			 WHERE t.slug = %s",
+			CASA24_CATALOG_META,
+			sanitize_title( rawurldecode( $slug ) )
+		)
+	);
+
+	// Новая категория этого языка — её страница, обычный путь. Новая другого
+	// языка (RU-slug под /ro/) — сразу на её перевод, иначе WPML даст 302.
+	$old = null;
+	$key = null;
+	foreach ( $rows as $row ) {
+		if ( null !== $row->catalog_key && '' !== $row->catalog_key ) {
+			if ( $lang === $row->lang ) {
+				return $q;
+			}
+			$key = $row->catalog_key;
+		} elseif ( ! $old || $lang === $row->lang ) {
+			$old = $row;
+		}
+	}
+	if ( ! $key && $old ) {
+		$key = casa24_catalog_redirect_key( (object) array( 'term_id' => (int) $old->term_id ) );
+	}
+
+	$ids = casa24_catalog_term_ids( $lang );
+	if ( ! $key || empty( $ids[ $key ] ) ) {
+		return $q;
+	}
+
+	$link = get_term_link( $ids[ $key ], 'product_cat' );
+	if ( ! is_wp_error( $link ) && ! casa24_catalog_is_current_url( $link ) ) {
+		wp_safe_redirect( $link, 301, 'Casa24 catalog' );
+		exit;
+	}
+
+	return $q;
+}
+add_filter( 'wpml_pre_parse_query', 'casa24_catalog_redirect_old_categories_early' );
 
 /**
  * 301 с адресов категорий первой версии нового дерева, которых больше нет
@@ -892,7 +983,7 @@ function casa24_catalog_redirect_legacy() {
 	}
 
 	$link = get_term_link( $ids[ $key ], 'product_cat' );
-	if ( ! is_wp_error( $link ) ) {
+	if ( ! is_wp_error( $link ) && ! casa24_catalog_is_current_url( $link ) ) {
 		wp_safe_redirect( $link, 301, 'Casa24 catalog' );
 		exit;
 	}
