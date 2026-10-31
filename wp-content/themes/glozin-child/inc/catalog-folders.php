@@ -340,7 +340,8 @@ function glozin_child_folders_render() {
 
 	echo '<div class="casa24-folders">';
 
-	// Слева: подкатегории и их подгруппы (как оглавление раздела).
+	// Слева: подкатегории и их подгруппы (как оглавление раздела), под ними — «Рекомендуемые товары».
+	echo '<div class="casa24-folders__side">';
 	echo '<nav class="casa24-folders__nav" aria-label="' . esc_attr__( 'Подкатегории', 'glozin-child' ) . '">';
 	foreach ( $node['children'] as $child ) {
 		echo '<div class="casa24-folders__nav-group">';
@@ -367,6 +368,8 @@ function glozin_child_folders_render() {
 		echo '</div>';
 	}
 	echo '</nav>';
+	glozin_child_folders_recommended();
+	echo '</div>';
 
 	echo '<div class="casa24-folders__main">';
 
@@ -412,6 +415,36 @@ function glozin_child_folders_render() {
 	}
 
 	echo '</div></div>';
+}
+
+/**
+ * «Рекомендуемые товары» (избранные) — тот же виджет Glozin и с теми же настройками,
+ * что в панели фильтров конечного раздела (Внешний вид → Виджеты → Catalog Filters Sidebar).
+ */
+function glozin_child_folders_recommended() {
+	$class = '\Glozin\Addons\Widgets\Products_List';
+	if ( ! class_exists( $class ) ) {
+		return;
+	}
+
+	$instances = get_option( 'widget_glozin-products-list', array() );
+	$instance  = isset( $instances[1] ) ? $instances[1] : array(
+		'title' => 'Recommended products',
+		'limit' => 6,
+		'type'  => 'featured_products',
+	);
+
+	// Glozin регистрирует виджет объектом, поэтому the_widget( $class ) его не находит — вызываем напрямую.
+	$widget = new $class();
+	$widget->widget(
+		array(
+			'before_widget' => '<div class="widget glozin-products-list-widget casa24-folders__recommended">',
+			'after_widget'  => '</div>',
+			'before_title'  => '<h2 class="widget-title casa24-folders__recommended-title">',
+			'after_title'   => '</h2>',
+		),
+		$instance
+	);
 }
 
 /**

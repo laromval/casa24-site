@@ -1046,3 +1046,28 @@ body.ip-site article:has(.c24-info-hero) .wp-block-table tbody tr:nth-child(even
 		padding-top: var(--c24-search-top, 0px);
 	}
 }
+
+/* Страница-папка (подкатегории): «Рекомендуемые товары» под списком слева; на телефоне/планшете — в конце страницы */
+.casa24-folders__side {
+	display: flex;
+	flex-direction: column;
+	gap: 36px;
+	min-width: 0;
+}
+.casa24-folders__recommended {
+	margin: 0;
+}
+.casa24-folders__recommended-title {
+	margin: 0 0 16px;
+	font-size: 16px;
+	line-height: 1.3;
+	text-transform: uppercase;
+}
+@media (max-width: 1024px) {
+	.casa24-folders__side {
+		order: 2;
+	}
+	.casa24-folders__recommended .glozin-products-list-widget__wrapper {
+		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	}
+}
