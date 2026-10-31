@@ -270,10 +270,20 @@ function glozin_child_folders_tile( $child, $ids ) {
 				return $b['count'] - $a['count'];
 			}
 		);
+		// Подгруппа без отобранных фото — её собственная картинка (фото товара, не
+		// другой коллаж), иначе она выпадает и коллаж показывает одну подгруппу
+		// (обратная связь 30.10.2026: «фото взяты только из одной категории»).
 		$picks = array_filter(
 			array_map(
 				function ( $sub ) use ( $ids ) {
-					return glozin_child_folders_picks( $sub, $ids );
+					$list = glozin_child_folders_picks( $sub, $ids );
+					if ( ! $list ) {
+						$own = glozin_child_folders_thumb( $sub, $ids );
+						if ( $own && ! get_post_meta( $own, '_casa24_collage_for', true ) ) {
+							$list = array( $own );
+						}
+					}
+					return $list;
 				},
 				$subs
 			)
