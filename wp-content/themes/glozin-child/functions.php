@@ -276,6 +276,35 @@ function glozin_child_translate_save_label( $translated, $text, $domain ) {
     return $translated;
 }
 
+// Окно поиска: блок избранных товаров (Customizer → header_search_products_type = featured_products)
+add_filter( 'gettext', 'glozin_child_translate_search_products_label', 20, 3 );
+function glozin_child_translate_search_products_label( $translated, $text, $domain ) {
+    if ( $text !== 'Popular Products' || $domain !== 'glozin' ) {
+        return $translated;
+    }
+
+    $lang = defined( 'ICL_LANGUAGE_CODE' ) ? ICL_LANGUAGE_CODE : 'ru';
+
+    return 'ro' === $lang ? 'Produse recomandate' : 'Рекомендуемые товары';
+}
+
+// Glozin передаёт тип featured_products без visibility=featured — WC тогда отдаёт просто новые товары
+add_filter( 'woocommerce_shortcode_products_query', 'glozin_child_featured_products_only', 10, 3 );
+function glozin_child_featured_products_only( $query_args, $attributes, $type ) {
+    if ( 'featured_products' !== $type || ( isset( $attributes['visibility'] ) && 'featured' === $attributes['visibility'] ) ) {
+        return $query_args;
+    }
+
+    $query_args['tax_query'][] = array(
+        'taxonomy' => 'product_visibility',
+        'field'    => 'name',
+        'terms'    => 'featured',
+        'operator' => 'IN',
+    );
+
+    return $query_args;
+}
+
 
 add_filter( 'woocommerce_package_rates', function( $rates ) {
 
