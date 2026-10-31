@@ -460,6 +460,48 @@ get_header();
 
 	<?php if ( class_exists( 'WooCommerce' ) ) : ?>
 
+		<?php
+		/*
+		 * 5a. Рекомендуемые товары (31.10.2026) — избранные (★ в списке товаров),
+		 * те же, что в окне поиска и в «Рекомендуемых товарах» каталога.
+		 * Нет избранных — блока нет.
+		 */
+		$ip_featured_ids = function_exists( 'wc_get_featured_product_ids' ) ? wc_get_featured_product_ids() : array();
+		$ip_featured_query = new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => 8,
+				'post__in'       => ! empty( $ip_featured_ids ) ? $ip_featured_ids : array( 0 ),
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'no_found_rows'  => true,
+			)
+		);
+
+		if ( $ip_featured_query->have_posts() ) :
+			?>
+			<section class="ip-section ip-section--recommended">
+				<div class="container">
+					<div class="ip-section__head">
+						<h2><?php esc_html_e( 'Рекомендуемые товары', 'glozin-child' ); ?></h2>
+					</div>
+
+					<ul class="ip-products-grid">
+						<?php
+						while ( $ip_featured_query->have_posts() ) :
+							$ip_featured_query->the_post();
+							glozin_child_render_product_card( wc_get_product( get_the_ID() ) );
+						endwhile;
+						?>
+					</ul>
+				</div>
+			</section>
+			<?php
+			wp_reset_postdata();
+		endif;
+		?>
+
 		<!-- =============================================================
 		     6a. Топ продаж — сортировка по total_sales (фактические продажи)
 		     ============================================================= -->

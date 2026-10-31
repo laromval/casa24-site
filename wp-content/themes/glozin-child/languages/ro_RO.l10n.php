@@ -34,6 +34,7 @@ return array(
 		'Вперёд' => 'Înainte',
 		'Товаров: %s' => 'Mărfuri: %s',
 		'Категории товаров появятся здесь после подключения каталога WooCommerce.' => 'Categoriile de mărfuri vor apărea aici după conectarea catalogului WooCommerce.',
+		'Рекомендуемые товары' => 'Produse recomandate',
 		'Топ продаж' => 'Top vânzări',
 		'Смотреть всё' => 'Vezi tot',
 		'Товары появятся здесь после подключения каталога WooCommerce.' => 'Mărfurile vor apărea aici după conectarea catalogului WooCommerce.',

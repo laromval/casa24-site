@@ -2173,3 +2173,10 @@ html[lang^="ro"] .ip-season-promo__scrim{
     height: 42px;
   }
 }
+
+/* Главная, «Рекомендуемые товары»: на широком экране 5 в ряд */
+@media (min-width: 1200px){
+  .ip-section--recommended .ip-products-grid{
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
