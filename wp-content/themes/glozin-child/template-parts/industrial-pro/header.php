@@ -78,7 +78,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				 */
 				?>
 				<?php /* Не вошёл — окно входа Glozin (#login-modal), вошёл — страница личного кабинета. */ ?>
-				<a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ) ); ?>" class="ip-icon-btn"<?php echo is_user_logged_in() ? '' : ' data-toggle="modal" data-target="login-modal"'; ?> aria-label="<?php esc_attr_e( 'Зарегистрироваться / Личный кабинет', 'glozin-child' ); ?>">
+				<a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ) ); ?>" class="ip-icon-btn<?php echo is_user_logged_in() ? ' ip-icon-btn--active' : ''; ?>"<?php echo is_user_logged_in() ? '' : ' data-toggle="modal" data-target="login-modal"'; ?> aria-label="<?php esc_attr_e( 'Зарегистрироваться / Личный кабинет', 'glozin-child' ); ?>">
 					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
 						<circle cx="12" cy="7" r="4"></circle>

@@ -101,3 +101,48 @@ function glozin_child_barcode_ajax_query_filter($sql) {
 
     return $sql;
 }
+
+/**
+ * Поиск по основе слова: «бензопилы» находит «Бензопила …».
+ * Родной поиск WooCommerce ищет подстроку, поэтому у русского слова отрезаем падежное окончание
+ * (только в LIKE-условиях поиска на сайте, в админке не трогаем).
+ */
+function glozin_child_search_stem_word($word) {
+    $len = mb_strlen($word);
+    if ($len < 5) {
+        return $word;
+    }
+    foreach (array('ами', 'ями', 'ов', 'ев', 'ей', 'ой', 'ом', 'ем', 'ых', 'их', 'ую', 'юю', 'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ах', 'ях', 'ам', 'ям', 'ы', 'и', 'а', 'я', 'у', 'ю', 'е', 'о') as $end) {
+        $l = mb_strlen($end);
+        if ($len - $l >= 4 && mb_substr($word, -$l) === $end) {
+            return mb_substr($word, 0, $len - $l);
+        }
+    }
+    return $word;
+}
+
+add_filter('query', 'glozin_child_search_stem_query', 1);
+function glozin_child_search_stem_query($sql) {
+    if (is_admin() && ! wp_doing_ajax()) {
+        return $sql;
+    }
+    if (! str_contains($sql, 'post_title') || ! preg_match('/post_title\s+LIKE/i', $sql)) {
+        return $sql;
+    }
+    $is_ajax_search = isset($_POST['term']) && ! empty($_GET['wc-ajax']) && 'glozin_instance_search_form' === $_GET['wc-ajax'];
+    $is_page_search = ! wp_doing_ajax() && isset($_GET['s']) && ! empty($_GET['post_type']) && 'product' === $_GET['post_type'];
+    if (! $is_ajax_search && ! $is_page_search) {
+        return $sql;
+    }
+
+    return preg_replace_callback(
+        "/(post_title\s+LIKE\s+')([^']*)(')/u",
+        function ($m) {
+            $inner = preg_replace_callback('/\p{Cyrillic}{5,}/u', function ($w) {
+                return glozin_child_search_stem_word($w[0]);
+            }, $m[2]);
+            return $m[1] . $inner . $m[3];
+        },
+        $sql
+    );
+}

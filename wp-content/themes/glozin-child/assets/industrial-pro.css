@@ -390,7 +390,8 @@ button:where(.ip-scroll-top)::after{
   cursor: pointer;
 }
 
-.ip-topbar__actions .ip-icon-btn:hover{
+.ip-topbar__actions .ip-icon-btn:hover,
+.ip-topbar__actions .ip-icon-btn--active{
   color: #060c13;
   background: var(--accent);
 }
@@ -2189,4 +2190,86 @@ html[lang^="ro"] .ip-season-promo__scrim{
   .ip-section--recommended .ip-products-grid{
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
+}
+
+/* Поиск: без блока «Рекомендуемые товары» при открытии — навязчивая реклама.
+   Результаты поиска (.modal__content-results) остаются. */
+.search-modal .modal__content-suggestion,
+.header-search__products{
+  display: none !important;
+}
+
+/* Пока в поиске нет результатов — пустая белая панель под строкой не нужна. */
+.search-modal .modal__content:has(.modal__content-results:empty){
+  display: none !important;
+}
+
+/* Поиск на планшете/телефоне: Glozin ниже 1200px открывает его отдельной боковой «страницей»
+   на весь экран. Делаем как на компьютере — панель сверху под шапкой на всю ширину. */
+@media (max-width: 1199px){
+  #search-modal.search-type-popup{
+    --gz-modal-content-width: 100%;
+  }
+  #search-modal.search-type-popup.animation-slide.animation-slide--top .modal__container,
+  #search-modal.search-type-popup.animation-slide.animation-slide--top.modal--open:not(.loading) .modal__container{
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    transform: none;
+    padding-top: var(--c24-search-top, 0px);
+  }
+  #search-modal.search-type-popup .modal__header{
+    display: none;
+  }
+  #search-modal.search-type-popup .modal__wrapper{
+    height: auto;
+    padding: 15px;
+    max-height: 80vh;
+    box-shadow: none;
+  }
+  #search-modal.search-type-popup .modal__button-close{
+    display: none;
+  }
+}
+
+/* Поиск без результатов: ни белой панели, ни затемнения страницы — только строка поиска в шапке.
+   Подложка остаётся прозрачной, чтобы клик мимо по-прежнему закрывал окно. */
+#search-modal:has(.modal__content-results:empty) .modal__container{
+  opacity: 0 !important;
+  pointer-events: none;
+}
+#search-modal:has(.modal__content-results:empty) .modal__backdrop{
+  background: transparent !important;
+  opacity: 1 !important;
+}
+
+/* Результаты поиска — квадратные карточки сеткой, как в каталоге (вместо узких строк) */
+.search-modal .destroy-swiper ul.products{
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  flex-flow: unset !important;
+}
+.search-modal .destroy-swiper ul.products li.product{
+  width: auto;
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0 !important;
+}
+.search-modal .destroy-swiper ul.products li.product .product-inner{
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  height: 100%;
+}
+.search-modal .destroy-swiper ul.products li.product .product-thumbnail{
+  width: 100% !important;
+}
+.search-modal .destroy-swiper ul.products li.product .product-summary{
+  align-items: center;
+  text-align: center;
+  padding: 0 8px 10px;
 }
