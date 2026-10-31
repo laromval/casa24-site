@@ -417,7 +417,7 @@ function casa24_supplier_sync( $dry = false ) {
  * Новый раздел добавляется тут (или option casa24_supplier_categories) после сопоставления с деревом каталога.
  */
 function casa24_supplier_category_map() {
-	return (array) get_option( 'casa24_supplier_categories', array( '486_487' => 1695 ) ); // Бензопилы => Пилы электрические и бензопилы
+	return (array) get_option( 'casa24_supplier_categories', array( '486_487' => 1695, '507' => 1915 ) ); // Бензопилы => Пилы электрические и бензопилы; Тачки => Тачки
 }
 
 /** Коды товаров поставщика, которые не добавляем (дубль нашего товара из 1С и т. п.). */
@@ -426,7 +426,12 @@ function casa24_supplier_ignored_ids() {
 }
 
 function casa24_supplier_norm_url( $url ) {
-	return urldecode( strtok( html_entity_decode( $url ), '?' ) );
+	$url = html_entity_decode( $url );
+	// часть товаров в списках даётся ссылкой index.php?route=product/product&product_id=N — query нужен, по ней товар и узнаём
+	if ( preg_match( '/product_id=(\d+)/', $url, $m ) ) {
+		return casa24_suppliers()['instrumentmarket']['site'] . '/index.php?route=product/product&product_id=' . $m[1];
+	}
+	return urldecode( strtok( $url, '?' ) );
 }
 
 function casa24_supplier_http( $url ) {
@@ -467,13 +472,15 @@ function casa24_supplier_list_category( $path ) {
 			return null;
 		}
 		$found = 0;
-		foreach ( array_slice( preg_split( '/<div class="product-grid-item/', $html ), 1 ) as $blk ) {
-			if ( preg_match( '/<div class="name"><a href="([^"]+)"/', $blk, $m ) ) {
+		// боковой блок «популярные» стоит выше основного списка — берём только товары самого раздела
+		$main = false !== strpos( $html, 'main-products' ) ? substr( $html, strpos( $html, 'main-products' ) ) : '';
+		foreach ( array_slice( preg_split( '/<div class="product-grid-item/', $main ), 1 ) as $blk ) {
+			if ( preg_match( '/<(?:h4|div) class="name"><a href="([^"]+)"/', $blk, $m ) ) {
 				++$found;
 				$items[ html_entity_decode( $m[1] ) ] = false !== strpos( $blk, 'label-outofstock' );
 			}
 		}
-		if ( ! $found || false === strpos( $html, 'page=' . ( $page + 1 ) ) ) {
+		if ( ! $found || false === strpos( $main, 'page=' . ( $page + 1 ) ) ) {
 			break;
 		}
 	}
@@ -484,7 +491,9 @@ function casa24_supplier_list_category( $path ) {
 function casa24_supplier_tidy_title( $title, $brand ) {
 	$words = preg_split( '/\s+/u', trim( $title ) );
 	foreach ( $words as $i => $w ) {
-		if ( preg_match( '/\p{Cyrillic}/u', $w ) && mb_strtoupper( $w ) === $w && mb_strlen( $w ) > 1 ) {
+		if ( $brand && 0 === mb_strlen( $brand ) - mb_strlen( $w ) && mb_strtolower( $w ) === mb_strtolower( $brand ) ) {
+			$w = $brand;
+		} elseif ( preg_match( '/\p{Cyrillic}/u', $w ) && ! preg_match( '/\d/', $w ) && mb_strtoupper( $w ) === $w && mb_strlen( $w ) > 1 ) {
 			$w = mb_strtolower( $w );
 		} elseif ( $brand && 0 === strcasecmp( $w, $brand ) ) {
 			$w = $brand;
@@ -619,7 +628,8 @@ function casa24_supplier_discover( $dry = false, $max_new = 10 ) {
 	foreach ( $wpdb->get_col( "SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_casa24_supplier_url'" ) as $u ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$known[ casa24_supplier_norm_url( $u ) ] = true;
 	}
-	$ignored = casa24_supplier_ignored_ids();
+	$known_ids = array_flip( $wpdb->get_col( "SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_casa24_supplier_id'" ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	$ignored   = casa24_supplier_ignored_ids();
 	$special = casa24_supplier_special_urls();
 	if ( null === $special ) {
 		$log['errors'][] = 'special page unreadable';
@@ -643,6 +653,10 @@ function casa24_supplier_discover( $dry = false, $max_new = 10 ) {
 			$html = casa24_supplier_http( $url );
 			usleep( 600000 );
 			$d = $html ? casa24_supplier_parse_product( $html, $norm ) : null;
+			if ( $d && isset( $known_ids[ $d['supplier_id'] ] ) ) {
+				++$log['skipped'];
+				continue;
+			}
 			if ( ! $d || ! $d['in_stock'] || $d['price'] < 5 || ! $d['images'] || in_array( $d['supplier_id'], $ignored, true ) ) {
 				if ( $d ) {
 					++$log['skipped'];
@@ -652,13 +666,23 @@ function casa24_supplier_discover( $dry = false, $max_new = 10 ) {
 				continue;
 			}
 			$title = casa24_supplier_tidy_title( $d['title'], $d['brand'] );
-			if ( preg_match_all( '/[A-Za-z0-9][A-Za-z0-9\-.]*\d[A-Za-z0-9\-.]*/', $title, $mt ) ) {
-				$token = end( $mt[0] );
-				$dup   = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'product' AND post_status IN ('publish','draft','private') AND post_title LIKE %s LIMIT 1", '%' . $wpdb->esc_like( $token ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-				if ( $dup ) {
-					$log['conflicts'][ $d['supplier_id'] ] = array( $title, (int) $dup );
-					continue;
+			// «Та же модель» = в названии нашего товара есть код модели поставщика (латиница+цифры, напр. WB6419, CS5200)
+			$dup = 0;
+			if ( preg_match_all( '/[A-Za-z0-9][A-Za-z0-9.\-]*/', $title, $mt ) ) {
+				foreach ( $mt[0] as $token ) {
+					if ( strlen( $token ) < 4 || ! preg_match( '/[A-Za-z]/', $token ) || ! preg_match( '/\d/', $token ) ) {
+						continue;
+					}
+					// код модели у разных брендов бывает общим (WB6419 у Elefant, Rotor, Partner…) — совпадать должен и бренд
+					$dup = (int) $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'product' AND post_status IN ('publish','draft','private') AND post_title LIKE %s AND post_title LIKE %s LIMIT 1", '%' . $wpdb->esc_like( $token ) . '%', '%' . $wpdb->esc_like( $d['brand'] ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+					if ( $dup ) {
+						break;
+					}
 				}
+			}
+			if ( $dup ) {
+				$log['conflicts'][ $d['supplier_id'] ] = array( $title, $dup );
+				continue;
 			}
 			if ( $dry ) {
 				$log['added'][ $d['supplier_id'] ] = $title . ' — ' . $d['price'];

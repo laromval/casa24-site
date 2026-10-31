@@ -41,6 +41,8 @@
 | Секатор | **secator** | foarfecă de grădină | |
 | Шланг поливочный | **furtun pentru udat** | furtun de grădină | |
 | Тачка | **roabă** | roabă | |
+| Бензопила | **drujbă** | fierăstrău cu motor | В MD называют «drujbă» (добавлено 31.10.2026) |
+| Грузовая тележка | **cărucior de marfă** | | Тележки Elefant EHT (31.10.2026) |
 | Ведро | **găleată** (мн. găleți) | găleată | Не «vadră» |
 | Бочка | **butoi** (мн. butoaie) | butoi | Уже используется в URL `bidoane-si-butoaie` |
 | Банки (для консервации) | **borcane** | borcane | |

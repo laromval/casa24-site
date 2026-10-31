@@ -22,13 +22,15 @@ def list_category(path):
     while True:
         t = get(f'{BASE}/index.php?route=product/category&path={path}&limit=100&page={page}')
         found = 0
-        for blk in re.split(r'<div class="product-grid-item', t)[1:]:
-            m = re.search(r'<div class="name"><a href="([^"]+)"', blk)
+        # боковой блок «популярные» стоит выше основного списка — берём только товары раздела
+        main = t.split('main-products', 1)[-1] if 'main-products' in t else ''
+        for blk in re.split(r'<div class="product-grid-item', main)[1:]:
+            m = re.search(r'<(?:h4|div) class="name"><a href="([^"]+)"', blk)
             if not m:
                 continue
             found += 1
             items[html.unescape(m.group(1))] = 'label-outofstock' in blk
-        if not found or f'page={page + 1}' not in t:
+        if not found or f'page={page + 1}' not in main:
             break
         page += 1
         time.sleep(0.5)
