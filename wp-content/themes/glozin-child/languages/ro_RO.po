@@ -88,6 +88,12 @@ msgstr "Categorii"
 msgid "Все категории"
 msgstr "Toate categoriile"
 
+msgid "Назад"
+msgstr "Înapoi"
+
+msgid "Вперёд"
+msgstr "Înainte"
+
 msgid "Товаров: %s"
 msgstr "Mărfuri: %s"
 
@@ -181,6 +187,21 @@ msgstr "Datele contului sunt folosite pentru autentificare, istoricul comenzilor
 msgid "Ваши данные используются для оформления, оплаты и доставки заказа. Подробнее — в %s."
 msgstr "Datele dvs. sunt folosite pentru perfectarea, achitarea și livrarea comenzii. Detalii — în %s."
 
+msgid "Подкатегории"
+msgstr "Subcategorii"
+
+msgid "Свернуть"
+msgstr "Restrânge"
+
+msgid "Показать ещё…"
+msgstr "Arată mai mult…"
+
+msgid "Хиты продаж в этой категории"
+msgstr "Cele mai vândute din această categorie"
+
+msgid "Хиты продаж"
+msgstr "Cele mai vândute"
+
 msgid "Casa24.md — на главную"
 msgstr "Casa24.md — pagina principală"
 
@@ -225,6 +246,12 @@ msgstr "Magazin online"
 
 msgid "Доставка и оплата"
 msgstr "Livrare și achitare"
+
+msgid "Доставка"
+msgstr "Livrare"
+
+msgid "Оплата"
+msgstr "Achitare"
 
 msgid "Публичная оферта"
 msgstr "Ofertă publică"

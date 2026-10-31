@@ -175,6 +175,196 @@ body.ip-site .catalog-top-categories :is(h2, h3, h6, .catalog-top-categories__ti
   letter-spacing: 0.02em;
 }
 
+/* Каталог «папками» (inc/catalog-folders.php): раздел с подкатегориями —
+   слева их список, справа плитки и «Хиты продаж». */
+body.casa24-folders-page #primary{
+  width: 100%;
+  max-width: 100%;
+  flex: 1 1 100%;
+}
+
+.casa24-folders{
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.casa24-folders__nav{
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.casa24-folders__nav-title{
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.casa24-folders__nav-list{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.casa24-folders__nav-list li{
+  margin: 0 0 5px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.casa24-folders__nav-list a{
+  color: var(--text-muted);
+}
+
+.casa24-folders__nav-title:hover,
+.casa24-folders__nav-list a:hover{
+  color: var(--accent-dark);
+}
+
+.casa24-folders__nav-list .is-extra{
+  display: none;
+}
+
+.casa24-folders__nav-group.is-open .is-extra{
+  display: list-item;
+}
+
+.casa24-folders__nav-more{
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.casa24-folders__grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 20px;
+  margin: 0 0 48px;
+  padding: 0;
+  list-style: none;
+}
+
+.casa24-folders__tile a{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding: 16px 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: center;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.casa24-folders__tile a:hover{
+  border-color: var(--accent);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+  color: var(--text);
+}
+
+.casa24-folders__tile-image{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 0;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.casa24-folders__tile-image img{
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Коллаж из фото подгрупп: 2×2, при трёх — первое на всю высоту слева. */
+.casa24-folders__collage{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+}
+
+.casa24-folders__collage--2{
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.casa24-folders__collage--3 .casa24-folders__collage-cell:first-child{
+  grid-row: span 2;
+}
+
+.casa24-folders__collage-cell{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.casa24-folders__collage-cell img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.casa24-folders__tile-name{
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.casa24-folders__hits-title{
+  margin: 0 0 24px;
+  font-size: 24px;
+}
+
+@media (max-width: 1024px){
+  /* На планшете и телефоне список слева не нужен — те же ссылки в плитках. */
+  .casa24-folders{
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .casa24-folders__nav{
+    display: none;
+  }
+}
+
+@media (max-width: 575px){
+  .casa24-folders__grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .casa24-folders__tile a{
+    padding: 12px 8px;
+  }
+
+  .casa24-folders__tile-name{
+    font-size: 13px;
+  }
+
+  .casa24-folders__hits-title{
+    font-size: 20px;
+  }
+}
+
 /* Боковая панель фильтров. */
 body.ip-site .catalog-filters-sidebar :is(.widget-title, .products-filter__filter-name, h2, h3){
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
@@ -197,6 +387,10 @@ body.ip-site :is(.onsale, .woocommerce-badge, .gz-badge, .product-badge){
   font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
+}
+/* «Хиты продаж» добираются новыми товарами, пока продаж мало — «Новинка» под заголовком «Хиты» нелогична (30.10.2026). */
+.casa24-folders__hits .woocommerce-badge.new{
+  display: none;
 }
 
 /* Пагинация. */
@@ -616,5 +810,179 @@ body.ip-site #nbcc-cookie-root #nbcc-cookie-accept:focus-visible{
 
   body.ip-site #nbcc-cookie-root #nbcc-cookie-description{
     font-size: 14px !important;
+  }
+}
+
+/* =====================================================================
+   6. Информационные страницы: Доставка, Оплата, Обмен и возврат
+   (30.10.2026). Обложка с фото и заголовком + карточки-обещания — разметка
+   лежит в самой странице (блок «HTML» в начале контента), классы c24-info-*.
+   Ниже — аккуратнее оформленный обычный текст условий на этих же страницах.
+   ===================================================================== */
+body.ip-site .c24-info-hero{
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 380px;
+  margin: 0 0 28px;
+  padding: 48px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--bg-dark) var(--c24-hero) center right / cover no-repeat;
+  color: var(--on-dark);
+}
+
+/* Затемнение слева — под текстом; справа фото остаётся живым. */
+body.ip-site .c24-info-hero::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(16, 23, 31, .92) 0%, rgba(16, 23, 31, .78) 38%, rgba(16, 23, 31, .15) 70%, rgba(16, 23, 31, 0) 100%);
+}
+
+body.ip-site .c24-info-hero__inner{
+  position: relative;
+  max-width: 520px;
+}
+
+body.ip-site .c24-info-hero__kicker{
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px 12px;
+  border-radius: 2px;
+  background: var(--accent);
+  color: #060c13;
+  font: 700 13px/1.2 "Roboto Condensed", "Arial Narrow", sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body.ip-site .c24-info-hero h2{
+  margin: 0 0 14px;
+  color: var(--on-dark);
+  font-size: clamp(28px, 3.4vw, 42px);
+  line-height: 1.08;
+}
+
+body.ip-site .c24-info-hero p{
+  margin: 0;
+  color: var(--on-dark);
+  font-size: 17px;
+  line-height: 1.55;
+  opacity: .92;
+}
+
+body.ip-site .c24-info-cards{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 40px;
+}
+
+body.ip-site .c24-info-card{
+  padding: 22px 20px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 2px;
+  background: var(--surface);
+}
+
+body.ip-site .c24-info-card__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 14px;
+  border-radius: 2px;
+  background: rgba(250, 110, 29, .12);
+  color: var(--accent-dark);
+}
+
+body.ip-site .c24-info-card h3{
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+body.ip-site .c24-info-card p{
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Текст условий под карточками: заголовки разделов (h3). */
+body.ip-site article:has(.c24-info-hero) h3.wp-block-heading{
+  margin: 36px 0 14px;
+  padding-left: 12px;
+  border-left: 4px solid var(--accent);
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+body.ip-site article:has(.c24-info-hero) .wp-block-list li{
+  margin-bottom: 8px;
+  line-height: 1.55;
+}
+
+body.ip-site article:has(.c24-info-hero) .wp-block-list li::marker{
+  color: var(--accent);
+}
+
+body.ip-site article:has(.c24-info-hero) .wp-block-table{
+  overflow-x: auto;
+}
+
+body.ip-site article:has(.c24-info-hero) .wp-block-table table{
+  border-collapse: collapse;
+  background: var(--surface);
+}
+
+body.ip-site article:has(.c24-info-hero) .wp-block-table thead td{
+  background: var(--bg-dark);
+  color: var(--on-dark);
+}
+
+body.ip-site article:has(.c24-info-hero) .wp-block-table td{
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+}
+
+body.ip-site article:has(.c24-info-hero) .wp-block-table tbody tr:nth-child(even){
+  background: var(--bg-light);
+}
+
+@media (max-width: 1024px){
+  body.ip-site .c24-info-cards{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px){
+  body.ip-site .c24-info-hero{
+    min-height: 0;
+    /* Фото 16:9 на всю ширину сверху (ширина блока ≈ 100vw − поля контейнера), текст ниже на тёмном. */
+    padding: calc(50vw - 10px) 20px 24px;
+    align-items: flex-end;
+    background-position: center top;
+    background-size: 100% auto;
+  }
+
+  body.ip-site .c24-info-hero::before{
+    background: linear-gradient(180deg, rgba(16, 23, 31, 0) 0, rgba(16, 23, 31, 0) 32vw, var(--bg-dark) calc(50vw - 4px));
+  }
+
+  body.ip-site .c24-info-hero p{
+    font-size: 15px;
+  }
+
+  body.ip-site .c24-info-cards{
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }

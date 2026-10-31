@@ -138,6 +138,45 @@
 		}
 	}, true );
 
+	/*
+	 * Лента категорий на главной в два ряда (обратная связь 29.10.2026).
+	 * Стрелки листают на ширину видимой части; на краях гаснут, а если все
+	 * разделы и так помещаются — прячутся совсем.
+	 */
+	document.addEventListener( 'DOMContentLoaded', function () {
+		var root = document.querySelector( '[data-ip-cat-slider]' );
+		var track = root ? root.querySelector( '[data-ip-cat-track]' ) : null;
+		var nav = root ? root.querySelector( '[data-ip-cat-nav]' ) : null;
+		if ( ! track || ! nav ) {
+			return;
+		}
+
+		var prev = nav.querySelector( '[data-ip-cat-prev]' );
+		var next = nav.querySelector( '[data-ip-cat-next]' );
+
+		function update() {
+			var max = track.scrollWidth - track.clientWidth;
+			nav.hidden = max <= 1;
+			prev.disabled = track.scrollLeft <= 1;
+			next.disabled = track.scrollLeft >= max - 1;
+		}
+
+		function scrollByPage( dir ) {
+			track.scrollBy( { left: dir * track.clientWidth, behavior: 'smooth' } );
+		}
+
+		prev.addEventListener( 'click', function () {
+			scrollByPage( -1 );
+		} );
+		next.addEventListener( 'click', function () {
+			scrollByPage( 1 );
+		} );
+
+		track.addEventListener( 'scroll', update, { passive: true } );
+		window.addEventListener( 'resize', update );
+		update();
+	} );
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		var button = document.querySelector( '[data-ip-scroll-top]' );
 		if ( ! button ) {
@@ -367,7 +406,13 @@
 			wrap.style.animationDuration = fallDuration + 's, ' + swayDuration + 's';
 			wrap.style.animationDelay = fallDelay + 's, ' + swayDelay + 's';
 
-			wrap.innerHTML = '<svg viewBox="0 0 24 24" fill="' + LEAF_COLORS[ colorIndex % LEAF_COLORS.length ] + '"><path d="' + LEAF_PATH + '"></path></svg>';
+			// Цвет задаём прямо на <path> — и атрибутом, и inline-стилем: в
+			// старых браузерах (Windows 7) fill с <svg> не доходил до листа,
+			// и он рисовался чёрным (обратная связь 28.10.2026). Inline-стиль
+			// перебивает любые общие правила темы вида "svg path { fill }".
+			var color = LEAF_COLORS[ colorIndex % LEAF_COLORS.length ];
+			wrap.style.color = color;
+			wrap.innerHTML = '<svg viewBox="0 0 24 24" fill="' + color + '" style="fill:' + color + '"><path d="' + LEAF_PATH + '" fill="' + color + '" style="fill:' + color + '"></path></svg>';
 			return wrap;
 		}
 

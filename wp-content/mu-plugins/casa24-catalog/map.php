@@ -1323,6 +1323,7 @@ return array(
 		'Не разобрано' => 'ne-razobrano',
 	),
 	'products' => array(
+		1068434 => 'suveniry',        // «Керосинка хелоин» — в 1С по ошибке в группе «Клейкие ленты» (30.10.2026)
 		1055407 => 'dveri-vhodnye',
 		1055408 => 'dveri-vhodnye',
 		1055409 => 'dveri-vhodnye',

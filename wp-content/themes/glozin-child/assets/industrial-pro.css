@@ -1228,6 +1228,8 @@ html[lang^="ro"] .ip-season-promo__scrim{
   align-items: center;
   gap: 12px;
   min-width: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .ip-usp-item__icon{
@@ -1240,6 +1242,18 @@ html[lang^="ro"] .ip-season-promo__scrim{
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+  transition: color .2s, border-color .2s;
+}
+
+/* Пункт — ссылка на страницу из подвала: при наведении иконка и
+   заголовок окрашиваются в акцентный цвет. */
+.ip-usp-item:hover .ip-usp-item__icon{
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.ip-usp-item:hover .ip-usp-item__title{
+  color: var(--accent);
 }
 
 .ip-usp-item__body{
@@ -1439,6 +1453,95 @@ html[lang^="ro"] .ip-season-promo__scrim{
 
   .ip-category-card__link{
     padding: 20px;
+  }
+}
+
+/* Лента категорий на главной (обратная связь 29.10.2026: сетка из 21 раздела
+   занимала пол-экрана). Два ряда, прокрутка вбок — пальцем, колесом
+   с Shift или стрелками в заголовке (ui-interactions.js, [data-ip-cat-slider]).
+   Колонка ≈ 1/2 ширины на телефоне (с краешком следующей — видно, что лента листается), 1/3 на планшете,
+   1/4 на компьютере — как в прежней сетке. */
+.ip-section__actions{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ip-slider-nav{
+  display: flex;
+  gap: 8px;
+}
+
+.ip-slider-nav[hidden]{
+  display: none;
+}
+
+.ip-slider-nav__btn{
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.ip-slider-nav__btn:hover:not(:disabled){
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-dark);
+}
+
+.ip-slider-nav__btn:disabled{
+  opacity: .35;
+  cursor: default;
+}
+
+[data-ip-cat-slider] .ip-categories-grid{
+  --ip-cat-cols: 2.1;
+  grid-template-columns: none;
+  grid-template-rows: repeat(2, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - (var(--ip-cat-cols) - 1) * 12px) / var(--ip-cat-cols));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  /* место под тень карточки при наведении — иначе её срезает overflow */
+  padding: 2px 2px 8px;
+  margin: -2px -2px -8px;
+}
+
+[data-ip-cat-slider] .ip-categories-grid::-webkit-scrollbar{
+  display: none;
+}
+
+[data-ip-cat-slider] .ip-category-card{
+  scroll-snap-align: start;
+}
+
+@media (min-width: 576px){
+  [data-ip-cat-slider] .ip-categories-grid{
+    --ip-cat-cols: 3;
+  }
+}
+
+@media (min-width: 992px){
+  [data-ip-cat-slider] .ip-categories-grid{
+    --ip-cat-cols: 4;
+    grid-auto-columns: calc((100% - 3 * 16px) / 4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  [data-ip-cat-slider] .ip-categories-grid{
+    scroll-behavior: auto;
   }
 }
 
